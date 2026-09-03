@@ -1,0 +1,49 @@
+# webshell_lite.rules
+# قواعد RAQIB "YARA-lite" — نسق خفيف (اسم|وزن|regex) يحاكي فكرة قواعد YARA:
+# نطابق أنماط بالمحتوى نفسه (مب بس hash)، مما يمسك نسخ معدّلة/مموّهة من نفس
+# العائلة. كل قاعدة عندها وزن؛ المجموع يقارَن بحد أدنى (threshold) بدل الاعتماد
+# على قاعدة وحيدة قوية — نفس فلسفة raqib_score_tmpexec_file بالضبط، مطبّقة هنا
+# على محتوى السكربتات. عدّل/زد قواعد بهذا الملف وقت ما تحتاج — بدون تعديل كود.
+#
+# Lightweight "YARA-lite" ruleset (name|weight|regex) — same idea as YARA:
+# match patterns in file *content*, not just hash, to catch modified/obfuscated
+# variants of the same family. Each rule has a weight; the sum is compared to
+# a threshold instead of relying on one strong single rule — the same
+# philosophy as raqib_score_tmpexec_file, applied here to script content.
+# Add/tune rules in this file as threats evolve — no code changes needed.
+#
+# الصيغة / Format: RULE_NAME|WEIGHT|EXTENDED_REGEX
+# أسطر تبدأ بـ # أو فارغة تُتجاهل / Lines starting with # or blank are ignored.
+
+# --- تنفيذ مباشر لمدخلات المستخدم (توقيعات كلاسيكية) ---
+DIRECT_EXEC_USER_INPUT|3|(system|exec|shell_exec|passthru|proc_open|popen|pcntl_exec)[[:space:]]*\([[:space:]]*\$_(GET|POST|REQUEST|COOKIE|SERVER)
+DIRECT_EVAL_USER_INPUT|3|(eval|assert)[[:space:]]*\([[:space:]]*\$_(GET|POST|REQUEST|COOKIE)
+
+# --- تمويه عبر بناء اسم الدالة من مقاطع (يفوت regex الكلاسيكي eval() الحرفي) ---
+CONCAT_BUILT_FUNC_CALL|2|\$[A-Za-z_][A-Za-z0-9_]{0,30}[[:space:]]*=[[:space:]]*['\"][A-Za-z]{2,6}['\"][[:space:]]*\.[[:space:]]*['\"][A-Za-z]{2,6}['\"][[:space:]]*;
+VARVAR_CALL_ON_INPUT|3|\$\{?\$[A-Za-z_][A-Za-z0-9_]{0,30}\}?[[:space:]]*\([[:space:]]*\$_(GET|POST|REQUEST)
+DYNAMIC_FUNC_VAR_CONCAT_ON_INPUT|3|\$[A-Za-z_][A-Za-z0-9_]{0,30}[[:space:]]*=[[:space:]]*\$[A-Za-z_][A-Za-z0-9_]{0,30}[[:space:]]*\.[[:space:]]*\$[A-Za-z_][A-Za-z0-9_]{0,30}[[:space:]]*;[\s\S]{0,150}\$[A-Za-z_][A-Za-z0-9_]{0,30}[[:space:]]*\([[:space:]]*\$_(GET|POST|REQUEST|COOKIE)
+
+# --- تمويه عبر chr()/hex/oct escapes لبناء كلمات مثل eval/system حرف-حرف ---
+CHR_BUILT_STRING|3|(chr[[:space:]]*\([[:space:]]*[0-9]+[[:space:]]*\)[[:space:]]*\.[[:space:]]*){3,}
+HEX_ESCAPED_PAYLOAD|2|(\\\\x[0-9a-fA-F]{2}){6,}
+
+# --- تقنيات معروفة قديمة لكن ما زالت تُستخدم بأدوات آلية ---
+CREATE_FUNCTION_RCE|2|create_function[[:space:]]*\(
+CREATE_FUNCTION_WITH_EXEC_BODY|4|create_function[[:space:]]*\([[:space:]]*['\"]\$[A-Za-z_][A-Za-z0-9_]*['\"][[:space:]]*,[[:space:]]*['\"][^'\"]*(system|exec|shell_exec|passthru)[[:space:]]*\(
+PREG_REPLACE_E_MODIFIER|3|preg_replace[[:space:]]*\([[:space:]]*['\"][^'\"]*/[a-zA-Z]*e[a-zA-Z]*['\"]
+CALL_USER_FUNC_ON_INPUT|3|call_user_func(_array)?[[:space:]]*\([[:space:]]*\$_(GET|POST|REQUEST)
+BACKTICK_EXEC_ON_INPUT|3|`[^`]*\$_(GET|POST|REQUEST)[^`]*`
+
+# --- طبقات تمويه/ضغط شائعة بالشيلات الجاهزة (تُحسب وزن أخف لأنها تُستخدم أحياناً بشكل شرعي) ---
+GZ_ROT_OBFUSCATION_LAYER|2|(gzinflate|gzuncompress|str_rot13|convert_uudecode)[[:space:]]*\([[:space:]]*(base64_decode[[:space:]]*\()?
+BASE64_DECODE_INTO_EXEC_CONTEXT|3|(eval|assert|system|exec|create_function|call_user_func)[[:space:]]*\([[:space:]]*base64_decode
+
+# --- توقيعات أدوات شيل معروفة بالاسم (متغيرة الأحجام/النسخ) ---
+KNOWN_WEBSHELL_FAMILY_NAME|4|FilesMan|c99shell|r57shell|WSO [0-9]|b374k|Alfa (Shell|Team)|Cyber ?Shell|Web ?Shell by|Mini ?Shell
+
+# --- تمويه امتداد الملف: ترويسة صورة حقيقية مع كود PHP قابل للتنفيذ بداخلها ---
+POLYGLOT_IMAGE_WITH_PHP|4|^(GIF8[79]a|\xff\xd8\xff|\x89PNG).{0,4096}<\?php
+
+# --- تخزين نصوص بصيغة معكوسة ثم فكها وقت التشغيل (strrev) لمقاومة grep الكلاسيكي ---
+STRREV_DEOBFUSCATION|3|strrev[[:space:]]*\([[:space:]]*['\"][A-Za-z0-9+/=_]{6,}['\"][\s\S]{0,150}\$_(GET|POST|REQUEST|COOKIE)

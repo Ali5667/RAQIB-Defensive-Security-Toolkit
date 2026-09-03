@@ -1,0 +1,32 @@
+# update_source.txt
+# مصدر التحقق من تحديثات الأداة نفسها — يقرأه check_for_updates() بـ raqib.sh
+# الصيغة: url|enabled
+#   url     : رابط خام (raw) مباشر لملف نصي بسيط، السطر الأول فيه رقم
+#             الإصدار الأحدث (مثال: 2.1)، والسطر الثاني (اختياري) رابط
+#             صفحة التحديث/التنزيل يعرضه للمستخدم.
+#   enabled : 1 لتفعيل الفحص، 0 لتعطيله
+#
+# سطور تبدأ بـ # أو فارغة تُتجاهل. لازم يكون سطر واحد بس غير معلّق (فعّال).
+#
+# =============================================================================
+# ملاحظة مهمة / IMPORTANT NOTE:
+# ما فيه سيرفر رسمي لـ RAQIB يوزّع إشعارات تحديث — هذا مثال افتراضي معطّل
+# (enabled=0). لازم تحطه على رابط تتحكم فيه انت (مستودعك الخاص بـ GitHub
+# مثلاً) وتحدّث محتواه كل ما تصدر نسخة جديدة، قبل ما تفعّله.
+#
+# There is no official RAQIB update-notification server — this is a
+# disabled (enabled=0) example placeholder. Point it at a URL you control
+# (your own GitHub repo, for example) and update its content every time
+# you cut a new release, before enabling it.
+# =============================================================================
+#
+# Update-check source for the tool itself, read by check_for_updates() in raqib.sh.
+# Format: url|enabled
+#   url     : direct raw URL to a small text file — first line is the
+#             latest version number (e.g. 2.1), optional second line is
+#             a changelog/download URL shown to the user.
+#   enabled : 1 to enable the check, 0 to keep it disabled.
+
+# مثال: تحقق من الإصدار من مستودعك الخاص
+# Example: check the version from your own repo
+https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/VERSION|1
