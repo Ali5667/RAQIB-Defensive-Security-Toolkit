@@ -1,0 +1,15 @@
+0 2 * * * root /usr/bin/certbot renew --quiet
+*/5 * * * * www-data /usr/local/bin/backup.sh
+0 0 * * 0 root apt-get update && apt-get -y upgrade
+30 3 * * * root /usr/bin/rsync -a /data /backup
+@reboot root /usr/local/bin/start_service.sh
+0 4 * * * root find /tmp -type f -mtime +7 -delete
+*/10 * * * * root /usr/bin/curl -s https://api.example.com/health -o /var/log/health.log
+0 1 * * * root wget -q https://example.com/report.csv -O /data/report.csv
+15 5 * * * root /usr/bin/php /var/www/cron/send_digest.php
+0 3 * * * postgres /usr/bin/pg_dump mydb > /backups/mydb.sql
+0 5 * * * root /usr/bin/docker system prune -f
+*/15 * * * * app /usr/bin/python3 /opt/app/manage.py flush_expired_sessions
+0 6 * * 1 root /usr/local/bin/letsencrypt-renew.sh && systemctl reload nginx
+* * * * * root /usr/lib/nagios/plugins/check_disk -w 20% -c 10% -p /
+0 0 1 * * root /usr/bin/curl -s -o /dev/null -w '%{http_code}' https://status.example.com/ping

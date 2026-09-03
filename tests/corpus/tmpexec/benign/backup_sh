@@ -1,0 +1,3 @@
+#!/bin/bash
+mkdir -p /tmp/backup_stage
+tar czf /tmp/backup_stage/data.tar.gz /home/user/data
