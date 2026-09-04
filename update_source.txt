@@ -29,4 +29,4 @@
 
 # مثال: تحقق من الإصدار من مستودعك الخاص
 # Example: check the version from your own repo
-https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/VERSION|1
+https://raw.githubusercontent.com/Ali5667/RAQIB-Defensive-Security-Toolkit/main/VERSION|1
