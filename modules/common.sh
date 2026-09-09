@@ -206,11 +206,21 @@ save_report() {
     if [ "$ans" = "y" ]; then
         read -rp "$(tf c_filename_prompt "$default_name")" fname
         fname=${fname:-$default_name}
+
+        # يسأل المستخدم عن المجلد اللي يريد يحفظ فيه التقرير (اختياري)
+        local save_dir
         read -rp "أدخل المسار (المجلد) اللي تريد تحفظ فيه التقرير، أو اترك فارغاً للحفظ بالمجلد الحالي: " save_dir
         if [ -n "$save_dir" ]; then
-            mkdir -p -- "$save_dir"
+            # إنشاء المجلد لو مو موجود
+            if ! mkdir -p -- "$save_dir" 2>/dev/null; then
+                echo -e "${RED}تعذّر إنشاء/الوصول للمسار المحدد، سيتم الحفظ بالمجلد الحالي.${NC}"
+                save_dir=""
+            fi
+        fi
+        if [ -n "$save_dir" ]; then
             fname="${save_dir%/}/$fname"
         fi
+
         printf '%s\n' "$content" > "$fname"
         echo -e "${GREEN}$(tf c_report_saved "$fname")${NC}"
 
