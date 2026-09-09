@@ -20,8 +20,19 @@ if [ -z "${BASH_VERSINFO:-}" ] || [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
     exit 1
 fi
 
-VERSION="2.0"
+VERSION="2.1"
 LAST_UPDATED="2026-09-02"
+
+# فرض ترميز UTF-8 بغض النظر عن إعدادات النظام — يمنع تقطيع الأحرف العربية
+# (كل حرف عربي = عدة بايتات) إلى بايتات منفردة تظهر كرموز مكسّرة/مخربطة،
+# خصوصاً بدالة type_line اللي تطبع النص حرف حرف.
+if locale -a 2>/dev/null | grep -qi "^C\.utf8$\|^C\.UTF-8$"; then
+    export LC_ALL=C.UTF-8
+elif locale -a 2>/dev/null | grep -qi "^en_US\.utf8$\|^en_US\.UTF-8$"; then
+    export LC_ALL=en_US.UTF-8
+fi
+export LANG="${LC_ALL:-$LANG}"
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MODULES_DIR="$SCRIPT_DIR/modules"
 TOOLS_DIR="$SCRIPT_DIR/tools"
@@ -94,6 +105,20 @@ export -f radar_scan
 
 show_eagle_intro() {
     clear
+    # تشغيل صوت النسر بالخلفية (لو الأداة اللازمة موجودة) بدون ما يوقف الأنيميشن
+    local sound_file="$SCRIPT_DIR/assets/eagle_cry.wav"
+    if [ -f "$sound_file" ]; then
+        if command -v paplay >/dev/null 2>&1; then
+            paplay "$sound_file" >/dev/null 2>&1 &
+            disown
+        elif command -v aplay >/dev/null 2>&1; then
+            aplay -q "$sound_file" >/dev/null 2>&1 &
+            disown
+        elif command -v ffplay >/dev/null 2>&1; then
+            ffplay -nodisp -autoexit -loglevel quiet "$sound_file" >/dev/null 2>&1 &
+            disown
+        fi
+    fi
     if (( RANDOM % 2 == 0 )); then
         radar_scan "$SCRIPT_DIR/assets/eagle_logo.txt"
     else
@@ -105,7 +130,45 @@ show_eagle_intro() {
 }
 export -f show_eagle_intro
 
-# print_banner_info: يطبع اسم RAQIB وسطر الوصف/الإصدار وتاريخ الإنشاء ومعلومات المؤلف.
+# raqib_hijri_date -> يطبع التاريخ الهجري الحالي (يوم/شهر بالاسم العربي/سنة)
+# باستخدام خوارزمية تحويل جدول-يوليوسي قياسية (لا يحتاج إنترنت أو مكتبات خارجية).
+raqib_hijri_date() {
+    if ! command -v python3 >/dev/null 2>&1; then
+        echo "—"
+        return
+    fi
+    python3 - << 'PYEOF'
+import datetime
+
+months = ["محرم","صفر","ربيع الأول","ربيع الآخر","جمادى الأولى","جمادى الآخرة",
+          "رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"]
+
+def greg_to_jdn(y, m, d):
+    a = (14 - m)//12
+    y2 = y + 4800 - a
+    m2 = m + 12*a - 3
+    return d + (153*m2+2)//5 + 365*y2 + y2//4 - y2//100 + y2//400 - 32045
+
+def jdn_to_hijri(jdn):
+    l = jdn - 1948440 + 10632
+    n = (l-1)//10631
+    l = l - 10631*n + 354
+    j = ((10985-l)//5316)*((50*l)//17719) + (l//5670)*((43*l)//15238)
+    l = l - ((30-j)//15)*((17719*j)//50) - (j//16)*((15238*j)//43) + 29
+    hm = (24*l)//709
+    hd = l - (709*hm)//24
+    hy = 30*n + j - 30
+    return hy, hm, hd
+
+now = datetime.date.today()
+jdn = greg_to_jdn(now.year, now.month, now.day)
+hy, hm, hd = jdn_to_hijri(jdn)
+print(f"{hd} {months[hm-1]} {hy}هـ")
+PYEOF
+}
+export -f raqib_hijri_date
+
+
 # مستخدمة من show_eagle_intro (مرة وحدة بالبداية) ومن show_banner (كل رجعة للقائمة الرئيسية).
 print_banner_info() {
     echo -e "${GREEN}"
@@ -121,6 +184,7 @@ EOF
     type_line "  RAQIB (رقيب) — $(t subtitle) v${VERSION}" 0.006
     type_line "  Rapid Audit & Quick Incident-response Bash-toolkit" 0.004
     type_line "  $(tf banner_created "$(get_created_date)")" 0.001
+    type_line "  $(tf banner_datetime "$(date '+%Y-%m-%d %H:%M:%S')" "$(raqib_hijri_date)")" 0.001
     type_line "  ------------------------------------------------------------" 0.001
     type_line "  [+] Author  : Ali Alnuaimi" 0.012
     type_line "  [+] GitHub  : https://github.com/Ali5667" 0.012
@@ -143,6 +207,8 @@ pause() {
 export -f pause
 
 source "$MODULES_DIR/lang.sh"
+source "$MODULES_DIR/auto_translate.sh"
+raqib_load_translation_caches
 load_lang
 
 source "$MODULES_DIR/monitoring.sh"
