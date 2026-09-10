@@ -1,5 +1,94 @@
 #!/bin/bash
 # =====================================================
+#  محرك استخبارات التهديدات المحلي (raqib_intelligence.py)
+#  Local Threat Intelligence engine bridge
+#  قاعدة IOCs محلية (IP/دومين/URL/هاش) تُبنى من مصادر دفاعية عامة
+#  (Feodo Tracker, URLhaus, CISA KEV) عبر: tools/malware/threat_intel/
+#  الأداة المستقلة (rules_updater بالفكرة، لكن للمؤشرات مو القواعد) تُحدَّث
+#  يدوياً من قائمة "استخبارات التهديدات"، وهذي الدوال تتيح لأي أداة ثانية
+#  بالمشروع تستشير نفس القاعدة محلياً بدون إنترنت وقت الفحص.
+# =====================================================
+RAQIB_INTEL_SCRIPT="$TOOLS_DIR/malware/threat_intel/raqib_intelligence.py"
+
+# raqib_intel_available -> صفر لو محرك الاستخبارات موجود وpython3 متوفر
+raqib_intel_available() {
+    command -v python3 >/dev/null 2>&1 && [ -f "$RAQIB_INTEL_SCRIPT" ]
+}
+export -f raqib_intel_available
+
+# raqib_intel_analyze <indicator> -> يطبع سطر واحد بصيغة verdict|score|action|reasons
+# لو ما فيه تطابق بالقاعدة المحلية يرجع كود خروج != 0 وما يطبع شي
+raqib_intel_analyze() {
+    local indicator="$1" json
+    raqib_intel_available || return 1
+    [ -z "$indicator" ] && return 1
+    json=$(python3 "$RAQIB_INTEL_SCRIPT" analyze "$indicator" 2>/dev/null) || return 1
+    python3 - "$json" << 'PYEOF' 2>/dev/null
+import sys, json as _json
+try:
+    d = _json.loads(sys.argv[1])
+except Exception:
+    sys.exit(1)
+if not d.get("verdict") or d.get("verdict") == "UNKNOWN":
+    sys.exit(1)
+parts = [
+    str(d.get("verdict", "")),
+    str(d.get("risk_score", 0)),
+    str(d.get("recommended_action", "")).replace("|", "/"),
+    "; ".join(d.get("reasons", [])).replace("|", "/"),
+]
+print("|".join(parts))
+PYEOF
+}
+export -f raqib_intel_analyze
+
+# raqib_intel_severity <verdict> -> يترجم verdict محرك الاستخبارات لمستوى خطورة RAQIB القياسي
+raqib_intel_severity() {
+    case "${1^^}" in
+        CRITICAL)  echo critical ;;
+        MALICIOUS) echo high ;;
+        SUSPICIOUS) echo medium ;;
+        *) echo low ;;
+    esac
+}
+export -f raqib_intel_severity
+
+# raqib_intel_check_and_report <indicator> -> يطبع تنبيه ملوّن على الشاشة مباشرة
+# + يسجّل finding_add، لو فيه تطابق بالقاعدة المحلية. يرجع 1 بصمت لو ما فيه تطابق.
+# ملاحظة: يطبع على الشاشة (stdout) مباشرة عمداً — لا تستخدمه داخل $(...) لأنك
+# وقتها بتلتقط الألوان بدل ما تطبع حيّة. للنص الخام للتقرير استخدم
+# raqib_intel_report_lines بدلاً منه.
+raqib_intel_check_and_report() {
+    local indicator="$1" out verdict score action reasons sev badge
+    out=$(raqib_intel_analyze "$indicator") || return 1
+    IFS='|' read -r verdict score action reasons <<< "$out"
+    sev=$(raqib_intel_severity "$verdict")
+    badge=$(_raqib_sev_badge "$sev")
+    echo -e "  ${CRIMSON}$(tf intel_match "$indicator" "$verdict" "$score")${NC} ${badge}"
+    echo -e "    $(t intel_reasons_label): ${reasons}"
+    echo -e "    $(t intel_action_label): ${action}"
+    finding_add "$sev"
+    return 0
+}
+export -f raqib_intel_check_and_report
+
+# raqib_intel_report_lines <indicator> -> نص خام (بدون ألوان) بنفس معلومات
+# raqib_intel_check_and_report، جاهز للإلحاق بمتغير تقرير عبر save_report.
+# ما يسجّل finding_add (خلي هذا لـ raqib_intel_check_and_report وقت العرض
+# على الشاشة، تفادياً لعدّ نفس الملاحظة مرتين).
+raqib_intel_report_lines() {
+    local indicator="$1" out verdict score action reasons
+    out=$(raqib_intel_analyze "$indicator") || return 1
+    IFS='|' read -r verdict score action reasons <<< "$out"
+    printf '%s\n' \
+        "$(tf intel_match "$indicator" "$verdict" "$score")" \
+        "  $(t intel_reasons_label): ${reasons}" \
+        "  $(t intel_action_label): ${action}"
+    return 0
+}
+export -f raqib_intel_report_lines
+
+# =====================================================
 #  دوال توافق الأنظمة (Cross-system portability helpers)
 #  تعالج فروقات GNU coreutils مقابل BSD/macOS، ومدراء
 #  الحزم المختلفة (apt/dnf/yum/pacman/zypper/apk)، ودعم
