@@ -67,6 +67,9 @@ case "$opt" in
         if ! is_valid_ip "$ip"; then
             echo -e "${RED}$(t mon5_invalid_ip)${NC}"; exit 1
         fi
+        if raqib_intel_available; then
+            raqib_intel_check_and_report "$ip" || echo -e "  ${GREY}$(t intel_no_match)${NC}"
+        fi
         read -rp "$(tf ipb_confirm_block "$ip")" confirm
         [ "$confirm" != "y" ] && { echo -e "${YELLOW}$(t qe_cancelled)${NC}"; exit 0; }
         if block_ip "$ip"; then
