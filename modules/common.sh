@@ -300,6 +300,13 @@ save_report() {
         local save_dir
         read -rp "أدخل المسار (المجلد) اللي تريد تحفظ فيه التقرير، أو اترك فارغاً للحفظ بالمجلد الحالي: " save_dir
         if [ -n "$save_dir" ]; then
+            # توسعة ~ يدوياً — أمر read ما يوسّعها تلقائياً زي الشل العادي،
+            # فلو تكتب ~/Desktop كانت تُفهم حرفياً كمجلد اسمه "~" بمكان
+            # عشوائي بدل مجلدك الرئيسي الفعلي على النظام
+            case "$save_dir" in
+                "~") save_dir="$HOME" ;;
+                "~/"*) save_dir="$HOME/${save_dir#\~/}" ;;
+            esac
             # إنشاء المجلد لو مو موجود
             if ! mkdir -p -- "$save_dir" 2>/dev/null; then
                 echo -e "${RED}تعذّر إنشاء/الوصول للمسار المحدد، سيتم الحفظ بالمجلد الحالي.${NC}"
@@ -311,6 +318,12 @@ save_report() {
         fi
 
         printf '%s\n' "$content" > "$fname"
+        # نحوّل المسار لمسار مطلق كامل بعد الحفظ، عشان يطابق بالضبط اللي
+        # يطلعلك بمدير الملفات (Nautilus/Files) على كالي — بدون هذا، مسار
+        # نسبي زي "reports/x.txt" يصير مربك ومايتطابق مع أي شي بمدير الملفات
+        local abs_fname
+        abs_fname=$(raqib_realpath "$fname" 2>/dev/null)
+        [ -n "$abs_fname" ] && fname="$abs_fname"
         echo -e "${GREEN}$(tf c_report_saved "$fname")${NC}"
 
         local report_id
@@ -340,8 +353,8 @@ export -f save_report
 #  always remain decryptable.
 # =====================================================
 
-# يطبع تحذيراً إذا كانت كلمة المرور قصيرة/ضعيفة ويسأل عن المتابعة
-# يرجع 0 للمتابعة، 1 للإلغاء
+# يطبع تحذيراً إعلامياً فقط إذا كانت كلمة المرور قصيرة/ضعيفة — ما يوقف ولا
+# يسأل تأكيد؛ القرار النهائي بكلمة المرور يرجع للمستخدم دائماً، يرجع 0 دوماً
 _raqib_check_pass_strength() {
     local pass="$1" len classes=0
     len=${#pass}
@@ -351,9 +364,6 @@ _raqib_check_pass_strength() {
     [[ "$pass" =~ [^a-zA-Z0-9] ]] && ((classes++))
     if [ "$len" -lt 12 ] || [ "$classes" -lt 3 ]; then
         echo -e "${YELLOW}$(t c_encrypt_weak_pass_warn)${NC}"
-        local cont
-        read -rp "$(t c_encrypt_weak_pass_continue)" cont
-        [ "$cont" = "y" ] || return 1
     fi
     return 0
 }
