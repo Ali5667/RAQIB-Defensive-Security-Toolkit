@@ -2,6 +2,25 @@
 # ip_blocker.sh — يحظر/يفك حظر عنوان IP عبر جدار الحماية المتوفر
 # (ufw > firewalld > iptables)، ويحتفظ بسجل بالعناوين التي حظرها عبر التاق
 # RAQIB-BLOCK حتى يقدر يعرضها/يفكها لاحقاً.
+#
+# وضع تنفيذ صامت داخلي — يستدعيه pending_actions_review.sh بعد الموافقة،
+# مو المستخدم مباشرة. يشغّل الحظر الفعلي بدون أي قائمة/سؤال تفاعلي.
+if [ "${1:-}" = "--execute-block" ]; then
+    ip="$2"
+    if command -v ufw >/dev/null 2>&1 && ufw status 2>/dev/null | grep -qi active; then
+        ufw insert 1 deny from "$ip" to any comment "RAQIB-BLOCK-$ip" >/dev/null 2>&1
+    elif command -v firewall-cmd >/dev/null 2>&1 && firewall-cmd --state 2>/dev/null | grep -qi running; then
+        firewall-cmd --add-rich-rule="rule family='ipv4' source address='$ip' reject" --permanent >/dev/null 2>&1 && firewall-cmd --reload >/dev/null 2>&1
+    elif command -v iptables >/dev/null 2>&1; then
+        iptables -I INPUT 1 -s "$ip" -m comment --comment "RAQIB-BLOCK-$ip" -j DROP >/dev/null 2>&1
+    else
+        exit 1
+    fi
+    rc=$?
+    [ "$rc" -eq 0 ] && echo "$ip|$(date '+%Y-%m-%d %H:%M')" >> "$HOME/.raqib_blocked_ips"
+    exit $rc
+fi
+
 echo -e "${CYAN}$(t ipb_title)${NC}"
 
 if [ "$EUID" -ne 0 ]; then
@@ -72,15 +91,10 @@ case "$opt" in
         fi
         read -rp "$(tf ipb_confirm_block "$ip")" confirm
         [ "$confirm" != "y" ] && { echo -e "${YELLOW}$(t qe_cancelled)${NC}"; exit 0; }
-        if block_ip "$ip"; then
-            echo -e "${GREEN}$(tf ipb_blocked "$ip")${NC}"
-            echo "$ip|$(date '+%Y-%m-%d %H:%M')" >> "$STATE_FILE"
-            save_report "$(tf ipb_report_title "$(date)")
-$(t ipb_prompt_ip)$ip
-$(t ipb_using_fw) $fw" "ip_block_${ip//./_}.txt" "$(t ipb_title)"
-        else
-            echo -e "${RED}$(tf ipb_block_failed "$ip")${NC}"
-        fi
+        exec_cmd="bash \"$TOOLS_DIR/ids_ips/ip_blocker.sh\" --execute-block \"$ip\""
+        req_id=$(raqib_request_approval "block_ip" "$ip" "$(tf ipb_approval_details "$ip" "$fw")" "$exec_cmd")
+        echo -e "${GREEN}$(tf ipb_approval_submitted "$req_id")${NC}"
+        echo -e "${GREY}$(t ipb_approval_hint)${NC}"
         ;;
     2)
         read -rp "$(t ipb_prompt_ip)" ip
