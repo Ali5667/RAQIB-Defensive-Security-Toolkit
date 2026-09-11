@@ -543,19 +543,250 @@ export -f raqib_decrypt_file
 # =====================================================
 declare -A RAQIB_SEV_COUNTS
 
+# =====================================================
+#  سجل أحداث منظّم (Structured Event Log) — أصغر جزء حقيقي من عمل أي SIEM:
+#  الجمع + التخزين المنظّم. كل حدث سطر JSON واحد (JSON Lines / NDJSON) —
+#  نفس الصيغة اللي تقرأها Filebeat أو Wazuh agent أو Logstash مباشرة لو
+#  أشّرتها على هذا الملف، بدون أي تحويل أو parser إضافي تكتبه.
+# =====================================================
+RAQIB_EVENTS_FILE="$SCRIPT_DIR/.raqib_events.jsonl"
+
+# raqib_emit_event <critical|high|medium|low> <tool_name> [رسالة]
+raqib_emit_event() {
+    local sev="${1,,}" tool="${2:-unknown}" msg="${3:-}"
+    local ts host json_line
+    ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    host=$(hostname 2>/dev/null || echo unknown)
+    json_line=$(python3 - "$ts" "$host" "$sev" "$tool" "$msg" "${RAQIB_OPERATOR:-unknown}" 2>/dev/null << 'PYEOF'
+import sys, json
+ts, host, sev, tool, msg, operator = (sys.argv + ["", "", "", "", "", ""])[1:7]
+print(json.dumps({
+    "timestamp": ts,
+    "host": host,
+    "severity": sev,
+    "tool": tool,
+    "message": msg,
+    "operator": operator,
+    "product": "RAQIB",
+}, ensure_ascii=False))
+PYEOF
+)
+    [ -n "$json_line" ] || return 0
+    printf '%s\n' "$json_line" >> "$RAQIB_EVENTS_FILE" 2>/dev/null
+    raqib_forward_event "$json_line" 2>/dev/null
+}
+export -f raqib_emit_event
+
+# =====================================================
+#  إرسال الأحداث لسيرفر تجميع مركزي (اختياري) — لو مضبوط، كل حدث محلي
+#  ينرسل بالتوازي لسيرفر raqib_collector_server.sh بجهاز ثاني، بدون ما يوقف
+#  أو يبطّئ الأداة المحلية لو السيرفر مو متاح (fire-and-forget بالخلفية).
+#  ملف الإعداد: $SCRIPT_DIR/.raqib_collector.conf → COLLECTOR_URL=http://IP:PORT
+# =====================================================
+RAQIB_COLLECTOR_CONF="$SCRIPT_DIR/.raqib_collector.conf"
+
+raqib_collector_configured() {
+    [ -f "$RAQIB_COLLECTOR_CONF" ] || return 1
+    grep -q "^COLLECTOR_URL=" "$RAQIB_COLLECTOR_CONF" 2>/dev/null || return 1
+    return 0
+}
+export -f raqib_collector_configured
+
+# raqib_forward_event <json_line> -> يرسلها بالخلفية (لا ينتظر الرد)
+raqib_forward_event() {
+    local json_line="$1" url api_key
+    command -v curl >/dev/null 2>&1 || return 0
+    raqib_collector_configured || return 0
+    url=$(sed -n 's/^COLLECTOR_URL=//p' "$RAQIB_COLLECTOR_CONF" | head -1)
+    api_key=$(sed -n 's/^API_KEY=//p' "$RAQIB_COLLECTOR_CONF" | head -1)
+    [ -z "$url" ] && return 0
+    (curl -s -m 5 -X POST "${url%/}/event" \
+        -H "Content-Type: application/json" \
+        -H "X-API-Key: ${api_key}" \
+        -d "$json_line" >/dev/null 2>&1 &)
+}
+export -f raqib_forward_event
+
+# =====================================================
+#  تنبيهات تيليجرام فورية (Telegram push alerts)
+#  ملف الإعداد: $SCRIPT_DIR/.raqib_telegram.conf
+#    BOT_TOKEN=123456:ABC-your-bot-token
+#    CHAT_ID=your_chat_or_user_id
+#  المستخدم يسوي بوت تيليجرام بنفسه عبر @BotFather (خطوة خارجية، ما نقدر
+#  نسويها بدلاً عنه)، ويحط التوكن والـchat id هنا مرة وحدة بس.
+# =====================================================
+RAQIB_TELEGRAM_CONF="$SCRIPT_DIR/.raqib_telegram.conf"
+
+# raqib_telegram_configured -> صفر لو ملف الإعداد موجود وفيه القيمتين
+raqib_telegram_configured() {
+    [ -f "$RAQIB_TELEGRAM_CONF" ] || return 1
+    grep -q "^BOT_TOKEN=" "$RAQIB_TELEGRAM_CONF" 2>/dev/null || return 1
+    grep -q "^CHAT_ID=" "$RAQIB_TELEGRAM_CONF" 2>/dev/null || return 1
+    return 0
+}
+export -f raqib_telegram_configured
+
+# raqib_telegram_notify <رسالة نصية> -> يرسلها فوراً عبر Telegram Bot API
+# يرجع 1 لو ما فيه إعداد/curl أو فشل الإرسال فعلياً (يتحقق من رد الـAPI
+# نفسه "ok":true، مو بس إن curl اشتغل بدون خطأ شبكة)
+raqib_telegram_notify() {
+    local msg="$1" token chat_id resp
+    command -v curl >/dev/null 2>&1 || return 1
+    raqib_telegram_configured || return 1
+    token=$(sed -n 's/^BOT_TOKEN=//p' "$RAQIB_TELEGRAM_CONF" | head -1)
+    chat_id=$(sed -n 's/^CHAT_ID=//p' "$RAQIB_TELEGRAM_CONF" | head -1)
+    [ -z "$token" ] || [ -z "$chat_id" ] && return 1
+    resp=$(curl -s -m 10 -X POST "https://api.telegram.org/bot${token}/sendMessage" \
+        --data-urlencode "chat_id=${chat_id}" \
+        --data-urlencode "text=${msg}" 2>/dev/null)
+    printf '%s' "$resp" | grep -q '"ok":true' && return 0
+    return 1
+}
+export -f raqib_telegram_notify
+
+# =====================================================
+#  هوية المشغّل + محاسبة (Operator Identity & Accountability)
+#  كل حدث يتسجّل مرتبط باسم المشغّل الحالي — أساس أي نظام يشتغل بأكثر من
+#  شخص، حتى لو محلياً بدون كلمة سر حقيقية (الهدف محاسبة/تتبّع، مو تشفير
+#  هوية Enterprise كامل).
+# =====================================================
+RAQIB_OPERATOR_FILE="$SCRIPT_DIR/.raqib_last_operator"
+RAQIB_OPERATORS_FILE="$SCRIPT_DIR/.raqib_operators.json"
+
+# _raqib_pbkdf2_hash <password> <salt_hex> -> يطبع الهاش (PBKDF2-HMAC-SHA256،
+# 100000 دورة) — نفس مستوى الحماية المستخدم أصلاً بتشفير التقارير بالمشروع
+_raqib_pbkdf2_hash() {
+    python3 -c "
+import hashlib, sys
+pw, salt = sys.argv[1], bytes.fromhex(sys.argv[2])
+print(hashlib.pbkdf2_hmac('sha256', pw.encode(), salt, 100000).hex())
+" "$1" "$2" 2>/dev/null
+}
+
+# raqib_operator_login -> مصادقة حقيقية (اسم + كلمة سر)، أول مرة تسوي حساب
+# وتختار صلاحية (محلل/سينيور)، والمرات الجاية يتحقق من كلمة السر فعلياً.
+# يصدّر RAQIB_OPERATOR و RAQIB_OPERATOR_ROLE للجلسة كاملة.
+raqib_operator_login() {
+    local name pass pass2 salt stored_hash role computed exists role_choice
+    read -rp "$(t op_login_prompt)" name
+    name=$(printf '%s' "$name" | tr -c 'A-Za-z0-9_ -' '_' | sed 's/^_*//;s/_*$//')
+    [ -z "$name" ] && name="unknown"
+
+    exists=$(python3 -c "
+import json, sys
+try:
+    d = json.load(open(sys.argv[1]))
+    print('1' if sys.argv[2] in d else '0')
+except Exception:
+    print('0')
+" "$RAQIB_OPERATORS_FILE" "$name" 2>/dev/null)
+
+    if [ "$exists" = "1" ]; then
+        read -rsp "$(t op_password_prompt)" pass; echo ""
+        IFS='|' read -r salt stored_hash role < <(python3 -c "
+import json, sys
+d = json.load(open(sys.argv[1]))
+o = d[sys.argv[2]]
+print(o['salt'] + '|' + o['hash'] + '|' + o.get('role', 'analyst'))
+" "$RAQIB_OPERATORS_FILE" "$name" 2>/dev/null)
+        computed=$(_raqib_pbkdf2_hash "$pass" "$salt")
+        if [ -z "$stored_hash" ] || [ "$computed" != "$stored_hash" ]; then
+            echo -e "${RED}$(t op_wrong_password)${NC}"
+            export RAQIB_OPERATOR="unauthenticated"
+            export RAQIB_OPERATOR_ROLE="none"
+            return 1
+        fi
+        echo -e "${GREEN}$(tf op_welcome_back "$name")${NC}"
+    else
+        echo -e "${YELLOW}$(tf op_new_operator "$name")${NC}"
+        read -rsp "$(t op_password_create_prompt)" pass; echo ""
+        read -rsp "$(t op_password_confirm_prompt)" pass2; echo ""
+        if [ -z "$pass" ] || [ "$pass" != "$pass2" ]; then
+            echo -e "${RED}$(t op_password_mismatch)${NC}"
+            export RAQIB_OPERATOR="unauthenticated"
+            export RAQIB_OPERATOR_ROLE="none"
+            return 1
+        fi
+        echo ""
+        echo -e "${YELLOW}$(t op_role_prompt_header)${NC}"
+        echo "1) $(t op_role_analyst)"
+        echo "2) $(t op_role_senior)"
+        read -rp "  $(t choice_label)" role_choice
+        [ "$role_choice" = "2" ] && role="senior" || role="analyst"
+        salt=$(python3 -c "import os; print(os.urandom(16).hex())")
+        stored_hash=$(_raqib_pbkdf2_hash "$pass" "$salt")
+        python3 -c "
+import json, os, sys
+path, name, salt, h, role = sys.argv[1:6]
+try:
+    d = json.load(open(path))
+except Exception:
+    d = {}
+d[name] = {'salt': salt, 'hash': h, 'role': role}
+json.dump(d, open(path, 'w'))
+os.chmod(path, 0o600)
+" "$RAQIB_OPERATORS_FILE" "$name" "$salt" "$stored_hash" "$role"
+        echo -e "${GREEN}$(tf op_created "$name" "$role")${NC}"
+    fi
+
+    export RAQIB_OPERATOR="$name"
+    export RAQIB_OPERATOR_ROLE="${role:-analyst}"
+    echo "$name" > "$RAQIB_OPERATOR_FILE" 2>/dev/null
+}
+export -f raqib_operator_login
+
+# =====================================================
+#  موافقة قبل التنفيذ (Approval Workflow)
+#  لأي إجراء حاسم (حذف/حظر...): يُقترح أول شي بدل ما ينفّذ مباشرة، ويحتاج
+#  مراجعة/موافقة صريحة (عبر pending_actions_review.sh) قبل التنفيذ الفعلي.
+# =====================================================
+RAQIB_PENDING_FILE="$SCRIPT_DIR/.raqib_pending_actions.jsonl"
+
+# raqib_request_approval <action> <target> <details> <exec_cmd>
+# يسجّل طلب معلّق ويطبع رقم الطلب على stdout (بدون أي طباعة ثانية)
+raqib_request_approval() {
+    local action="$1" target="$2" details="$3" exec_cmd="$4"
+    local id ts
+    id="REQ-$(date +%s)-$RANDOM"
+    ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    python3 - "$id" "$ts" "${RAQIB_OPERATOR:-unknown}" "$action" "$target" "$details" "$exec_cmd" >> "$RAQIB_PENDING_FILE" << 'PYEOF'
+import sys, json
+id_, ts, req_by, action, target, details, exec_cmd = sys.argv[1:8]
+print(json.dumps({
+    "id": id_, "timestamp": ts, "requested_by": req_by,
+    "action": action, "target": target, "details": details,
+    "exec_cmd": exec_cmd, "status": "pending",
+}, ensure_ascii=False))
+PYEOF
+    echo "$id"
+}
+export -f raqib_request_approval
+
 finding_reset() {
     RAQIB_SEV_COUNTS=( [critical]=0 [high]=0 [medium]=0 [low]=0 )
 }
 export -f finding_reset
 
-# finding_add <critical|high|medium|low>
+# finding_add <critical|high|medium|low> [رسالة مختصرة اختيارية]
 finding_add() {
-    local sev="${1,,}"
+    local sev="${1,,}" msg="${2:-}"
     case "$sev" in
         critical|high|medium|low) ;;
         *) sev="low" ;;
     esac
     RAQIB_SEV_COUNTS[$sev]=$(( ${RAQIB_SEV_COUNTS[$sev]:-0} + 1 ))
+    # يسجّل الحدث تلقائياً بسجل منظّم (JSON Lines) — يتعرّف على اسم الأداة
+    # المستدعية من BASH_SOURCE، فكل أداة موجودة أصلاً (~15 نقطة استدعاء
+    # finding_add بمختلف أنحاء المشروع) تبدأ تصدّر أحداث منظّمة تلقائياً
+    # بدون أي تعديل عليها هي نفسها.
+    local caller_tool
+    caller_tool=$(basename -- "${BASH_SOURCE[1]:-unknown}" .sh)
+    raqib_emit_event "$sev" "$caller_tool" "$msg" 2>/dev/null
+    # تنبيه فوري بتيليجرام — بس للملاحظات الحرجة (critical)، عشان ما يصير
+    # سبام؛ يشتغل بصمت لو المستخدم ما ضبط تيليجرام أصلاً (fail silently)
+    if [ "$sev" = "critical" ] && raqib_telegram_configured 2>/dev/null; then
+        raqib_telegram_notify "$(tf tg_alert_critical "$caller_tool" "$msg")" 2>/dev/null &
+    fi
 }
 export -f finding_add
 
