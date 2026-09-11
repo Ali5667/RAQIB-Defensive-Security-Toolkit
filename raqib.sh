@@ -219,6 +219,15 @@ source "$MODULES_DIR/forensics.sh"
 source "$MODULES_DIR/hardening.sh"
 source "$MODULES_DIR/vuln_scan.sh"
 
+raqib_login_attempts=0
+until raqib_operator_login; do
+    raqib_login_attempts=$((raqib_login_attempts + 1))
+    if [ "$raqib_login_attempts" -ge 3 ]; then
+        echo -e "${RED}$(t op_too_many_attempts)${NC}"
+        exit 1
+    fi
+done
+
 show_known_limitations() {
     show_banner
     echo -e "${BOLD}${ORANGE}$(t limitations_title)${NC}"
