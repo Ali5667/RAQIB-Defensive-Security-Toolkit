@@ -406,7 +406,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). The most impactful contributions: new de
 
 ## 📄 License
 
-[MIT License](LICENSE) — see the file for details.
+[GNU License](LICENSE) — see the file for details.
 
 ---
 
