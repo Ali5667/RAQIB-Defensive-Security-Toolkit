@@ -1,0 +1,24 @@
+# السجلات وملفات الفحص
+*.log
+*.jsonl
+*.csv
+reports/
+
+# ملفات إعدادات المستخدم والبيانات الحساسة
+.raqib_lang
+.raqib_telegram.conf
+.env
+secret*.txt
+
+# ملفات البناء والنظام
+__pycache__/
+*.pyc
+.DS_Store
+*.swp
+*.bak
+*~
+
+# أي ملفات مؤقتة (Scratch) يتم توليدها أثناء استخدام الأداة
+temp/
+tmp/
+*.tmp

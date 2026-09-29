@@ -211,6 +211,11 @@ source "$MODULES_DIR/auto_translate.sh"
 raqib_load_translation_caches
 load_lang
 
+# لو أول مرة يشغل الأداة (ملف اللغة مو موجود)، طلع له قائمة اللغات
+if [ ! -f "$RAQIB_LANG_FILE" ]; then
+    menu_language
+fi
+
 source "$MODULES_DIR/monitoring.sh"
 source "$MODULES_DIR/logs.sh"
 source "$MODULES_DIR/ids_ips.sh"
@@ -218,6 +223,7 @@ source "$MODULES_DIR/malware.sh"
 source "$MODULES_DIR/forensics.sh"
 source "$MODULES_DIR/hardening.sh"
 source "$MODULES_DIR/vuln_scan.sh"
+source "$TOOLS_DIR/ctf/ctf_menu.sh" 2>/dev/null || true
 
 raqib_login_attempts=0
 until raqib_operator_login; do
@@ -337,10 +343,11 @@ main_menu() {
         echo -e "  ${CYAN}5)${NC} $(t cat5)"
         echo -e "  ${CYAN}6)${NC} $(t cat6)"
         echo -e "  ${CYAN}7)${NC} $(t cat7)"
-        echo -e "  ${CYAN}8)${NC} $(t history_menu_option)"
-        echo -e "  ${CYAN}9)${NC} $(t lang_menu_option)"
-        echo -e "  ${CYAN}10)${NC} $(t limitations_menu_option)"
-        echo -e "  ${CYAN}11)${NC} $(t update_menu_option)"
+        echo -e "  ${CYAN}8)${NC} 🏴 CTF / Wargames Mode"
+        echo -e "  ${CYAN}9)${NC} $(t history_menu_option)"
+        echo -e "  ${CYAN}10)${NC} $(t lang_menu_option)"
+        echo -e "  ${CYAN}11)${NC} $(t limitations_menu_option)"
+        echo -e "  ${CYAN}12)${NC} $(t update_menu_option)"
         echo -e "  ${RED}0)${NC} $(t exit_label)"
         echo ""
         read -rp "  $(t choice_label)" choice
@@ -352,15 +359,39 @@ main_menu() {
             5) menu_forensics ;;
             6) menu_hardening ;;
             7) menu_vuln_scan ;;
-            8) view_scan_history ;;
-            9) menu_language ;;
-            10) show_known_limitations ;;
-            11) check_for_updates ;;
+            8) menu_ctf_main ;;
+            9) view_scan_history ;;
+            10) menu_language ;;
+            11) show_known_limitations ;;
+            12) check_for_updates ;;
             0) echo -e "${GREEN}$(t goodbye)${NC}"; exit 0 ;;
             *) echo -e "${RED}$(t invalid_choice)${NC}"; sleep 1 ;;
         esac
     done
 }
 
+# ─── Live Clock Daemon ───
+_live_clock_daemon() {
+    while true; do
+        # Save cursor
+        tput sc 2>/dev/null
+        # Move to top right corner (Row 1, Col: width - 22)
+        local cols
+        cols=$(tput cols 2>/dev/null || echo 80)
+        tput cup 1 $(( cols - 22 )) 2>/dev/null
+        # Print time
+        printf "\033[1;36m%s\033[0m" "$(date '+%Y-%m-%d %H:%M:%S')"
+        # Restore cursor
+        tput rc 2>/dev/null
+        sleep 1
+    done
+}
+
+# Start the clock in the background and kill it on exit
+_live_clock_daemon &
+CLOCK_PID=$!
+trap 'kill $CLOCK_PID 2>/dev/null' EXIT
+
 show_eagle_intro
 main_menu
+

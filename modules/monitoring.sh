@@ -25,12 +25,12 @@ menu_monitoring() {
             4) run_tool "$TOOLS_DIR/monitoring/arp_watch.sh" ;;
             5) run_tool "$TOOLS_DIR/monitoring/dns_lookup_tool.sh" ;;
             6) run_tool "$TOOLS_DIR/monitoring/ping_sweep.sh" ;;
-            7) run_tool "$TOOLS_DIR/monitoring/siem_correlator.sh" ;;
-            8) run_tool "$TOOLS_DIR/monitoring/telegram_setup.sh" ;;
-            9) run_tool "$TOOLS_DIR/monitoring/dashboard_generator.sh" ;;
-            10) run_tool "$TOOLS_DIR/monitoring/watchdog_setup.sh" ;;
-            11) run_tool "$TOOLS_DIR/monitoring/raqib_collector_server.sh" ;;
-            12) run_tool "$TOOLS_DIR/monitoring/collector_client_setup.sh" ;;
+            7) run_tool "$TOOLS_DIR/monitoring/13_siem_correlator.sh" ;;
+            8) run_tool "$TOOLS_DIR/monitoring/15_telegram_setup.sh" ;;
+            9) run_tool "$TOOLS_DIR/monitoring/16_dashboard_generator.sh" ;;
+            10) run_tool "$TOOLS_DIR/monitoring/18_watchdog_setup.sh" ;;
+            11) run_tool "$TOOLS_DIR/monitoring/22_raqib_collector_server.sh" ;;
+            12) run_tool "$TOOLS_DIR/monitoring/23_collector_client_setup.sh" ;;
             0) return ;;
             *) echo -e "${RED}$(t invalid_choice)${NC}"; sleep 1; continue ;;
         esac
