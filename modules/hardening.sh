@@ -11,7 +11,8 @@ menu_hardening() {
             "$(t h4)" \
             "$(t h5)" \
             "$(t h6)" \
-            "$(t h7)"
+            "$(t h7)" \
+            "$(t h8)"
         read -rp "  $(t choice_label)" c
         case $c in
             1) run_tool "$TOOLS_DIR/hardening/permission_auditor.sh" ;;
@@ -21,6 +22,7 @@ menu_hardening() {
             5) run_tool "$TOOLS_DIR/hardening/firewall_status_checker.sh" ;;
             6) run_tool "$TOOLS_DIR/hardening/report_decryptor.sh" ;;
             7) run_tool "$TOOLS_DIR/hardening/20_audit_log_viewer.sh" ;;
+            8) run_tool "$TOOLS_DIR/hardening/21_pending_actions_review.sh" ;;
             0) return ;;
             *) echo -e "${RED}$(t invalid_choice)${NC}"; sleep 1; continue ;;
         esac
