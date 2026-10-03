@@ -8,7 +8,7 @@
 #  يدوياً من قائمة "استخبارات التهديدات"، وهذي الدوال تتيح لأي أداة ثانية
 #  بالمشروع تستشير نفس القاعدة محلياً بدون إنترنت وقت الفحص.
 # =====================================================
-RAQIB_INTEL_SCRIPT="$TOOLS_DIR/malware/threat_intel/raqib_intelligence.py"
+RAQIB_INTEL_SCRIPT="$TOOLS_DIR/malware/10_raqib_intelligence.py"
 
 # raqib_intel_available -> صفر لو محرك الاستخبارات موجود وpython3 متوفر
 raqib_intel_available() {

@@ -106,7 +106,7 @@ export -f radar_scan
 show_eagle_intro() {
     clear
     # تشغيل صوت النسر بالخلفية (لو الأداة اللازمة موجودة) بدون ما يوقف الأنيميشن
-    local sound_file="$SCRIPT_DIR/assets/eagle_cry.wav"
+    local sound_file="$SCRIPT_DIR/assets/eagle_cry_real.wav"
     if [ -f "$sound_file" ]; then
         if command -v paplay >/dev/null 2>&1; then
             paplay "$sound_file" >/dev/null 2>&1 &
@@ -184,7 +184,8 @@ EOF
     type_line "  RAQIB (رقيب) — $(t subtitle) v${VERSION}" 0.006
     type_line "  Rapid Audit & Quick Incident-response Bash-toolkit" 0.004
     type_line "  $(tf banner_created "$(get_created_date)")" 0.001
-    type_line "  $(tf banner_datetime "$(date '+%Y-%m-%d %H:%M:%S')" "$(raqib_hijri_date)")" 0.001
+    type_line "  📅 $(date '+%Y-%m-%d  %H:%M:%S')" 0.001
+    type_line "  🕌 $(raqib_hijri_date)" 0.001
     type_line "  ------------------------------------------------------------" 0.001
     type_line "  [+] Author  : Ali Alnuaimi" 0.012
     type_line "  [+] GitHub  : https://github.com/Ali5667" 0.012
@@ -370,27 +371,7 @@ main_menu() {
     done
 }
 
-# ─── Live Clock Daemon ───
-_live_clock_daemon() {
-    while true; do
-        # Save cursor
-        tput sc 2>/dev/null
-        # Move to top right corner (Row 1, Col: width - 22)
-        local cols
-        cols=$(tput cols 2>/dev/null || echo 80)
-        tput cup 1 $(( cols - 22 )) 2>/dev/null
-        # Print time
-        printf "\033[1;36m%s\033[0m" "$(date '+%Y-%m-%d %H:%M:%S')"
-        # Restore cursor
-        tput rc 2>/dev/null
-        sleep 1
-    done
-}
 
-# Start the clock in the background and kill it on exit
-_live_clock_daemon &
-CLOCK_PID=$!
-trap 'kill $CLOCK_PID 2>/dev/null' EXIT
 
 show_eagle_intro
 main_menu
