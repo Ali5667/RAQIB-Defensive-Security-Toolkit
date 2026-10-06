@@ -8,7 +8,7 @@
 **The only zero-dependency incident-response platform built entirely from scratch —  
 58 standalone tools · 20 languages · real-time monitoring · CTF mode · threat intelligence**
 
-[![License: GNU](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: GNU GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-2.1-blue.svg)](VERSION)
 [![Bash 4+](https://img.shields.io/badge/Bash-4%2B-4EAA25?logo=gnu-bash&logoColor=white)](https://www.gnu.org/software/bash/)
 [![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white)](https://python.org)
@@ -377,6 +377,26 @@ Overall (weighted)    99.2%    97.2%   98.2%    98.2%
 ```
 
 > Measured against a manually-labeled, deliberately adversarial corpus including obfuscated webshells, clean-but-suspicious files, and static droppers. No marketing numbers.
+
+---
+
+## 🛠️ Troubleshooting & Common Issues
+
+| Issue | Cause & Solution |
+|---|---|
+| **`Permission denied` when executing** | The script lacks execute permissions. Run `chmod +x raqib.sh`. |
+| **Syntax errors on macOS** | macOS ships with Bash 3 by default, but RAQIB requires Bash 4+. Solution: Install newer bash via `brew install bash` and run it with `/opt/homebrew/bin/bash raqib.sh`. |
+| **Language characters (Arabic, etc.) display as `?` or boxes** | Terminal does not support UTF-8 encoding. Solution: Use a modern terminal like Windows Terminal, iTerm2, or GNOME Terminal, and ensure your system locale supports UTF-8 (e.g., `export LANG=en_US.UTF-8`). |
+| **Encryption/Decryption fails** | The Python `cryptography` library might be missing. Solution: Install it using `pip3 install cryptography` or your OS package manager (`sudo apt install python3-cryptography`). |
+
+### 🛠️ حل المشاكل الشائعة (Troubleshooting - Arabic)
+
+| المشكلة | السبب والحل |
+|---|---|
+| **ظهور رسالة `Permission denied` عند التشغيل** | السكربت لا يمتلك صلاحيات التشغيل. قم بتشغيل الأمر: `chmod +x raqib.sh`. |
+| **أخطاء في بناء الجملة (Syntax errors) على نظام macOS** | يأتي نظام macOS افتراضيًا بإصدار قديم (Bash 3)، ولكن الأداة تتطلب Bash 4 فما فوق. **الحل**: قم بتثبيت إصدار أحدث باستخدام الأمر `brew install bash` ثم شغل الأداة عبر `/opt/homebrew/bin/bash raqib.sh`. |
+| **الأحرف العربية تظهر كعلامات استفهام `?` أو مربعات** | الطرفية (Terminal) لا تدعم تشفير UTF-8. **الحل**: استخدم طرفية حديثة تدعم اللغة العربية مثل Windows Terminal أو iTerm2 أو GNOME Terminal، وتأكد من أن لغة النظام تدعم UTF-8 (مثال: `export LANG=ar_AE.UTF-8`). |
+| **فشل عملية التشفير أو فك التشفير** | مكتبة `cryptography` في بايثون غير مثبتة. **الحل**: قم بتثبيتها باستخدام `pip3 install cryptography` أو عبر مدير الحزم الخاص بنظامك (`sudo apt install python3-cryptography`). |
 
 ---
 
