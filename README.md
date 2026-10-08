@@ -1,9 +1,9 @@
 <div align="center">
 
-<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=30&pause=1000&color=22D3EE&center=true&vCenter=true&width=700&lines=%F0%9F%A6%85+RAQIB+%28%D8%B1%D9%82%D9%8A%D8%A8%29;Defensive+Security+Toolkit;Blue+Team+%E2%80%94+Enterprise+Grade" alt="RAQIB"/>
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=30&pause=1000&color=22D3EE&center=true&vCenter=true&width=700&lines=%F0%9F%A6%85+RAQIB+%28%D8%B1%D9%82%D9%8A%D8%A8%29;Defensive+Security+Toolkit;Blue+Team" alt="RAQIB"/>
 
 # RAQIB (رقيب)
-### Enterprise Defensive Security Toolkit
+### Defensive Security Toolkit
 
 **The only zero-dependency incident-response platform built entirely from scratch —  
 58 standalone tools · 20 languages · real-time monitoring · CTF mode · threat intelligence**
@@ -25,9 +25,9 @@
 
 ## 📖 Overview
 
-**RAQIB** is a **production-grade** defensive security toolkit built for blue teams, SOC analysts, incident responders, and security engineers who need *immediate, trustworthy results* — on hardened servers with nothing extra installed.
+**RAQIB** is a defensive security toolkit built for blue teams, incident responders, and security engineers who need *immediate, trustworthy results* — on hardened servers with nothing extra installed.
 
-Every single tool is written from scratch against core POSIX utilities (`ss`, `find`, `awk`, `grep`, `openssl`, `/dev/tcp`, `python3` stdlib). No Nmap. No Wireshark. No third-party security binaries. Just clean, auditable code that runs on a minimal Alpine container or a fully-locked-down production box.
+Every single tool is written from scratch against core POSIX utilities (`ss`, `find`, `awk`, `grep`, `openssl`, `/dev/tcp`, `python3` stdlib). No Nmap. No Wireshark. No third-party security binaries. Just clean, auditable code that runs on a minimal Alpine container or a fully-locked-down box.
 
 58 tools across 8 operational domains, **wired together as one integrated incident-response workflow** — not a pile of disconnected scripts.
 
@@ -47,7 +47,7 @@ Every single tool is written from scratch against core POSIX utilities (`ss`, `f
 <tr><td>🏴</td><td><b>Complete CTF / Wargames mode</b><br>22 purpose-built tools across Crypto, Stego, Forensics, Web, and Binary — from Vigenère cracking to ELF analysis to PCAP parsing. Flag Hunter + Writeup Logger included.</td></tr>
 <tr><td>👤</td><td><b>Operator identity + approval workflow</b><br>PBKDF2 hashed operator accounts. Two roles (analyst/senior). Every destructive action goes through a pending-approval queue reviewable by senior operators only.</td></tr>
 <tr><td>🌍</td><td><b>20 languages, 505 strings each</b><br>Every message, prompt, error, and report — fully translated. Missing string? The optional LibreTranslate bridge fills it live and caches locally.</td></tr>
-<tr><td>📈</td><td><b>Honest accuracy benchmark</b><br><code>tests/run_accuracy_eval.sh</code> imports the actual production detection code and reports Precision/Recall/F1 against a manually-labeled adversarial corpus. No marketing numbers.</td></tr>
+<tr><td>📈</td><td><b>Honest accuracy benchmark</b><br><code>tests/run_accuracy_eval.sh</code> imports the actual detection code and reports Precision/Recall/F1 against a manually-labeled adversarial corpus.</td></tr>
 </table>
 
 ---
@@ -376,7 +376,7 @@ Malicious Cron        100%     96.3%   98.1%    97.8%
 Overall (weighted)    99.2%    97.2%   98.2%    98.2%
 ```
 
-> Measured against a manually-labeled, deliberately adversarial corpus including obfuscated webshells, clean-but-suspicious files, and static droppers. No marketing numbers.
+> Measured against a manually-labeled, deliberately adversarial corpus including obfuscated webshells, clean-but-suspicious files, and static droppers.
 
 ---
 
@@ -389,16 +389,7 @@ Overall (weighted)    99.2%    97.2%   98.2%    98.2%
 | **Language characters (Arabic, etc.) display as `?` or boxes** | Terminal does not support UTF-8 encoding. Solution: Use a modern terminal like Windows Terminal, iTerm2, or GNOME Terminal, and ensure your system locale supports UTF-8 (e.g., `export LANG=en_US.UTF-8`). |
 | **Encryption/Decryption fails** | The Python `cryptography` library might be missing. Solution: Install it using `pip3 install cryptography` or your OS package manager (`sudo apt install python3-cryptography`). |
 
-### 🛠️ حل المشاكل الشائعة (Troubleshooting - Arabic)
 
-| المشكلة | السبب والحل |
-|---|---|
-| **ظهور رسالة `Permission denied` عند التشغيل** | السكربت لا يمتلك صلاحيات التشغيل. قم بتشغيل الأمر: `chmod +x raqib.sh`. |
-| **أخطاء في بناء الجملة (Syntax errors) على نظام macOS** | يأتي نظام macOS افتراضيًا بإصدار قديم (Bash 3)، ولكن الأداة تتطلب Bash 4 فما فوق. **الحل**: قم بتثبيت إصدار أحدث باستخدام الأمر `brew install bash` ثم شغل الأداة عبر `/opt/homebrew/bin/bash raqib.sh`. |
-| **الأحرف العربية تظهر كعلامات استفهام `?` أو مربعات** | الطرفية (Terminal) لا تدعم تشفير UTF-8. **الحل**: استخدم طرفية حديثة تدعم اللغة العربية مثل Windows Terminal أو iTerm2 أو GNOME Terminal، وتأكد من أن لغة النظام تدعم UTF-8 (مثال: `export LANG=ar_AE.UTF-8`). |
-| **فشل عملية التشفير أو فك التشفير** | مكتبة `cryptography` في بايثون غير مثبتة. **الحل**: قم بتثبيتها باستخدام `pip3 install cryptography` أو عبر مدير الحزم الخاص بنظامك (`sudo apt install python3-cryptography`). |
-
----
 
 ## ⚠️ Known Limitations
 

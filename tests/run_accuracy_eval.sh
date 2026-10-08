@@ -1,12 +1,12 @@
 #!/bin/bash
 # run_accuracy_eval.sh
 # يقيس دقة الكاشفات الاستدلالية الثلاثة (webshell / cron / tmpexec) فعلياً،
-# عبر تشغيل نفس دوال/أنماط الإنتاج الموجودة بـ tools/malware/malware_heuristics.sh
+# عبر تشغيل نفس دوال/أنماط الموجودة بـ tools/malware/malware_heuristics.sh
 # على مجموعة اختبار مُصنَّفة يدوياً (benign/malicious) داخل tests/corpus/.
 # يطبع Precision / Recall / F1 / Accuracy لكل كاشف ولمجموعهم.
 #
 # Measures the real accuracy of the three heuristic detectors by running the
-# exact same production functions/patterns from
+# exact same functions/patterns from
 # tools/malware/malware_heuristics.sh against a manually labeled benign/
 # malicious corpus in tests/corpus/. Prints Precision/Recall/F1/Accuracy per
 # detector and overall. This is a static/local test — it does not touch the

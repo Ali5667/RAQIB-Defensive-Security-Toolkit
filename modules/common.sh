@@ -648,7 +648,7 @@ export -f raqib_telegram_notify
 #  هوية المشغّل + محاسبة (Operator Identity & Accountability)
 #  كل حدث يتسجّل مرتبط باسم المشغّل الحالي — أساس أي نظام يشتغل بأكثر من
 #  شخص، حتى لو محلياً بدون كلمة سر حقيقية (الهدف محاسبة/تتبّع، مو تشفير
-#  هوية Enterprise كامل).
+#  هوية كامل).
 # =====================================================
 RAQIB_OPERATOR_FILE="$SCRIPT_DIR/.raqib_last_operator"
 RAQIB_OPERATORS_FILE="$SCRIPT_DIR/.raqib_operators.json"

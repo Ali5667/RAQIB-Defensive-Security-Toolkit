@@ -47,7 +47,7 @@ DANGEROUS_SERVICES["time"]="low|Time service — استبدل بـ NTP"
 declare -A DEV_SERVICES
 DEV_SERVICES["apache2-dev"]="high|Apache dev mode"
 DEV_SERVICES["jupyter"]="critical|Jupyter Notebook — تنفيذ كود مكشوف!"
-DEV_SERVICES["jupyter-notebook"]="critical|Jupyter Notebook في بيئة production"
+DEV_SERVICES["jupyter-notebook"]="critical|Jupyter Notebook مكشوف"
 DEV_SERVICES["rstudio-server"]="high|RStudio Server — dev tool"
 DEV_SERVICES["netdata"]="medium|NetData — بيانات النظام مكشوفة"
 DEV_SERVICES["grafana-server"]="medium|Grafana — تحقق من المصادقة"
@@ -81,7 +81,7 @@ if command -v systemctl >/dev/null 2>&1; then
             dsev=$(echo "$dev_risk" | cut -d'|' -f1)
             ddesc=$(echo "$dev_risk" | cut -d'|' -f2)
             echo -e "  ${ORANGE}[${dsev^^}] $svc — $ddesc${NC}"
-            finding_add "$dsev" "Dev service in production: $svc — $ddesc"
+            finding_add "$dsev" "Dev service exposed: $svc — $ddesc"
         else
             echo -e "  ${GREEN}  ✓${NC} $svc"
         fi
