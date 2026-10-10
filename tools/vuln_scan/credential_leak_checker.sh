@@ -1,5 +1,10 @@
 #!/bin/bash
-echo -e "${CYAN}$(t cred_leak_title)${NC}"
+finding_reset
+
+TOOL_TITLE="$(t cred_leak_title)"
+echo -e "${CYAN}${TOOL_TITLE}${NC}"
+echo -e "${GREY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo ""
 
 if ! command -v python3 >/dev/null 2>&1; then
     echo -e "${RED}$(t cred_leak_no_python)${NC}"
@@ -15,7 +20,10 @@ fi
 python3 "$SCRIPT_PATH"
 
 echo ""
-read -rp "$(t c_save_report_prompt)" ans
-if [ "$ans" = "y" ]; then
-    echo -e "${GREEN}$(t cred_leak_tip)${NC}"
-fi
+echo -e "${GREEN}$(t cred_leak_tip)${NC}"
+
+echo ""
+echo -e "${GREY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+print_executive_summary "$TOOL_TITLE"
+
+save_report "$(t cred_leak_title) — $(date)\n\n$(t cred_leak_tip)" "credential_leak_report.txt" "$TOOL_TITLE"
