@@ -8,7 +8,7 @@
 #  يدوياً من قائمة "استخبارات التهديدات"، وهذي الدوال تتيح لأي أداة ثانية
 #  بالمشروع تستشير نفس القاعدة محلياً بدون إنترنت وقت الفحص.
 # =====================================================
-RAQIB_INTEL_SCRIPT="$TOOLS_DIR/malware/threat_intel/raqib_intelligence.py"
+RAQIB_INTEL_SCRIPT="$TOOLS_DIR/malware/10_raqib_intelligence.py"
 
 # raqib_intel_available -> صفر لو محرك الاستخبارات موجود وpython3 متوفر
 raqib_intel_available() {
@@ -296,9 +296,12 @@ save_report() {
         read -rp "$(tf c_filename_prompt "$default_name")" fname
         fname=${fname:-$default_name}
 
-        # يسأل المستخدم عن المجلد اللي يريد يحفظ فيه التقرير (اختياري)
+        # المجلد الافتراضي لحفظ التقارير — ينشأ تلقائياً لو مو موجود
+        local default_dir="$SCRIPT_DIR/reports"
+        mkdir -p "$default_dir" 2>/dev/null
         local save_dir
-        read -rp "أدخل المسار (المجلد) اللي تريد تحفظ فيه التقرير، أو اترك فارغاً للحفظ بالمجلد الحالي: " save_dir
+        read -rp "$(tf c_save_dir_prompt "$default_dir")" save_dir
+        save_dir="${save_dir:-$default_dir}"
         if [ -n "$save_dir" ]; then
             # توسعة ~ يدوياً — أمر read ما يوسّعها تلقائياً زي الشل العادي،
             # فلو تكتب ~/Desktop كانت تُفهم حرفياً كمجلد اسمه "~" بمكان
@@ -309,13 +312,12 @@ save_report() {
             esac
             # إنشاء المجلد لو مو موجود
             if ! mkdir -p -- "$save_dir" 2>/dev/null; then
-                echo -e "${RED}تعذّر إنشاء/الوصول للمسار المحدد، سيتم الحفظ بالمجلد الحالي.${NC}"
-                save_dir=""
+                echo -e "${RED}$(t c_save_dir_fail)${NC}"
+                save_dir="$default_dir"
+                mkdir -p "$save_dir" 2>/dev/null
             fi
         fi
-        if [ -n "$save_dir" ]; then
-            fname="${save_dir%/}/$fname"
-        fi
+        fname="${save_dir%/}/$fname"
 
         printf '%s\n' "$content" > "$fname"
         # نحوّل المسار لمسار مطلق كامل بعد الحفظ، عشان يطابق بالضبط اللي

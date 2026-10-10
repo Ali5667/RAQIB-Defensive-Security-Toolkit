@@ -1,0 +1,6 @@
+# يفرض LF لكل ملفات الشل، بغض النظر عن نظام التشغيل
+*.sh text eol=lf
+*.py text eol=lf
+*.rules text eol=lf
+*.txt text eol=lf
+*.md text eol=lf
