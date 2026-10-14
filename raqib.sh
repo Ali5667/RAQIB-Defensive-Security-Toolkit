@@ -105,18 +105,14 @@ export -f radar_scan
 
 show_eagle_intro() {
     clear
-    # تشغيل صوت النسر بالخلفية (لو الأداة اللازمة موجودة) بدون ما يوقف الأنيميشن
+    # تشغيل صوت النسر بالخلفية بدون تعطيل الرسوم التفاعلية (يدعم macOS وLinux وWindows/WSL)
     local sound_file="$SCRIPT_DIR/assets/eagle_cry_real.wav"
     if [ -f "$sound_file" ]; then
-        if command -v paplay >/dev/null 2>&1; then
-            paplay "$sound_file" >/dev/null 2>&1 &
-            disown
-        elif command -v aplay >/dev/null 2>&1; then
-            aplay -q "$sound_file" >/dev/null 2>&1 &
-            disown
-        elif command -v ffplay >/dev/null 2>&1; then
-            ffplay -nodisp -autoexit -loglevel quiet "$sound_file" >/dev/null 2>&1 &
-            disown
+        if declare -F raqib_play_sound >/dev/null 2>&1; then
+            raqib_play_sound "$sound_file"
+        elif [ -f "$MODULES_DIR/common.sh" ]; then
+            source "$MODULES_DIR/common.sh" 2>/dev/null || true
+            declare -F raqib_play_sound >/dev/null 2>&1 && raqib_play_sound "$sound_file"
         fi
     fi
     if (( RANDOM % 2 == 0 )); then
@@ -207,6 +203,7 @@ pause() {
 }
 export -f pause
 
+source "$MODULES_DIR/common.sh"
 source "$MODULES_DIR/lang.sh"
 source "$MODULES_DIR/auto_translate.sh"
 raqib_load_translation_caches

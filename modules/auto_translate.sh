@@ -37,28 +37,28 @@ raqib_translate_one() {
     local text="$1"
     local target="$2"
 
-    if command -v python3 >/dev/null 2>&1; then
-        python3 - "$LT_API_URL" "$target" "$text" << 'PYEOF'
-import sys, json, urllib.request, urllib.error
+    local pycmd=""
+    command -v python3 >/dev/null 2>&1 && pycmd="python3"
+    [ -z "$pycmd" ] && command -v python >/dev/null 2>&1 && pycmd="python"
 
-url, target, text = sys.argv[1], sys.argv[2], sys.argv[3]
-payload = json.dumps({"q": text, "source": "en", "target": target, "format": "text"}).encode()
-req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
+    if [ -n "$pycmd" ] && [ -f "$MODULES_DIR/update_translations.py" ]; then
+        "$pycmd" "$MODULES_DIR/update_translations.py" --single-key "$text" "$target" 2>/dev/null
+    elif [ -n "$pycmd" ]; then
+        "$pycmd" - "$target" "$text" << 'PYEOF' 2>/dev/null
+import sys, json, urllib.request, urllib.parse
+target, text = sys.argv[1], sys.argv[2]
+url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl={target}&dt=t&q={urllib.parse.quote(text)}"
+req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
 try:
-    with urllib.request.urlopen(req, timeout=10) as resp:
-        data = json.loads(resp.read().decode())
-        print(data.get("translatedText", ""))
+    with urllib.request.urlopen(req, timeout=5) as resp:
+        data = json.loads(resp.read().decode("utf-8"))
+        print("".join(chunk[0] for chunk in data[0] if chunk[0]))
 except Exception:
     print("")
 PYEOF
     else
-        # بديل بسيط بدون python3 (أقل دقة بمعالجة JSON، يكفي لحالات بسيطة)
-        local escaped
-        escaped=$(printf '%s' "$text" | sed 's/\\/\\\\/g; s/"/\\"/g')
-        curl -s -m 10 -X POST "$LT_API_URL" \
-            -H "Content-Type: application/json" \
-            -d "{\"q\":\"$escaped\",\"source\":\"en\",\"target\":\"$target\",\"format\":\"text\"}" \
-            2>/dev/null | grep -oP '(?<="translatedText":")[^"]*'
+        # بديل بسيط بدون بايثون عبر curl
+        curl -s -m 5 -A "Mozilla/5.0" "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${target}&dt=t&q=$(printf '%s' "$text" | jq -sRr @uri 2>/dev/null || printf '%s' "$text")" 2>/dev/null | grep -oP '(?<=\[\[\[")[^"]*' || true
     fi
 }
 
@@ -83,14 +83,20 @@ raqib_auto_translate_missing() {
         return 0
     fi
 
-    if ! command -v curl >/dev/null 2>&1; then
-        echo -e "${RED}$(t at_needs_curl)${NC}"
-        return 1
-    fi
-
     echo -e "$(tf at_missing_count "$missing_count")"
     read -rp "$(t at_confirm_prompt)" ans
     [ "$ans" != "y" ] && [ "$ans" != "Y" ] && { echo -e "$(t at_cancelled)"; return 0; }
+
+    local pycmd=""
+    command -v python3 >/dev/null 2>&1 && pycmd="python3"
+    [ -z "$pycmd" ] && command -v python >/dev/null 2>&1 && pycmd="python"
+
+    if [ -n "$pycmd" ] && [ -f "$MODULES_DIR/update_translations.py" ]; then
+        echo -e "${CYAN}▶ $(t at_translating)${NC}"
+        "$pycmd" "$MODULES_DIR/update_translations.py" --lang "$code"
+        source "$MODULES_DIR/lang.sh" 2>/dev/null || true
+        return 0
+    fi
 
     mkdir -p "$LT_CACHE_DIR"
     local cache_file="$LT_CACHE_DIR/${code}.sh"

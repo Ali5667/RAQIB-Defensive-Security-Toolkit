@@ -8,7 +8,19 @@
 #  يدوياً من قائمة "استخبارات التهديدات"، وهذي الدوال تتيح لأي أداة ثانية
 #  بالمشروع تستشير نفس القاعدة محلياً بدون إنترنت وقت الفحص.
 # =====================================================
-RAQIB_INTEL_SCRIPT="$TOOLS_DIR/malware/10_raqib_intelligence.py"
+GREEN="${GREEN:-$'\033[0;32m'}"
+CYAN="${CYAN:-$'\033[0;36m'}"
+YELLOW="${YELLOW:-$'\033[1;33m'}"
+RED="${RED:-$'\033[0;31m'}"
+ORANGE="${ORANGE:-$'\033[38;5;208m'}"
+CRIMSON="${CRIMSON:-$'\033[1;31m'}"
+WHITE="${WHITE:-$'\033[1;37m'}"
+GREY="${GREY:-$'\033[1;30m'}"
+BOLD="${BOLD:-$'\033[1m'}"
+NC="${NC:-$'\033[0m'}"
+export GREEN CYAN YELLOW RED ORANGE CRIMSON WHITE GREY BOLD NC
+
+RAQIB_INTEL_SCRIPT="${TOOLS_DIR:-}/malware/10_raqib_intelligence.py"
 
 # raqib_intel_available -> صفر لو محرك الاستخبارات موجود وpython3 متوفر
 raqib_intel_available() {
@@ -551,7 +563,7 @@ declare -A RAQIB_SEV_COUNTS
 #  نفس الصيغة اللي تقرأها Filebeat أو Wazuh agent أو Logstash مباشرة لو
 #  أشّرتها على هذا الملف، بدون أي تحويل أو parser إضافي تكتبه.
 # =====================================================
-RAQIB_EVENTS_FILE="$SCRIPT_DIR/.raqib_events.jsonl"
+RAQIB_EVENTS_FILE="${SCRIPT_DIR:-.}/.raqib_events.jsonl"
 
 # raqib_emit_event <critical|high|medium|low> <tool_name> [رسالة]
 raqib_emit_event() {
@@ -585,7 +597,7 @@ export -f raqib_emit_event
 #  أو يبطّئ الأداة المحلية لو السيرفر مو متاح (fire-and-forget بالخلفية).
 #  ملف الإعداد: $SCRIPT_DIR/.raqib_collector.conf → COLLECTOR_URL=http://IP:PORT
 # =====================================================
-RAQIB_COLLECTOR_CONF="$SCRIPT_DIR/.raqib_collector.conf"
+RAQIB_COLLECTOR_CONF="${SCRIPT_DIR:-.}/.raqib_collector.conf"
 
 raqib_collector_configured() {
     [ -f "$RAQIB_COLLECTOR_CONF" ] || return 1
@@ -617,7 +629,7 @@ export -f raqib_forward_event
 #  المستخدم يسوي بوت تيليجرام بنفسه عبر @BotFather (خطوة خارجية، ما نقدر
 #  نسويها بدلاً عنه)، ويحط التوكن والـchat id هنا مرة وحدة بس.
 # =====================================================
-RAQIB_TELEGRAM_CONF="$SCRIPT_DIR/.raqib_telegram.conf"
+RAQIB_TELEGRAM_CONF="${SCRIPT_DIR:-.}/.raqib_telegram.conf"
 
 # raqib_telegram_configured -> صفر لو ملف الإعداد موجود وفيه القيمتين
 raqib_telegram_configured() {
@@ -652,8 +664,8 @@ export -f raqib_telegram_notify
 #  شخص، حتى لو محلياً بدون كلمة سر حقيقية (الهدف محاسبة/تتبّع، مو تشفير
 #  هوية كامل).
 # =====================================================
-RAQIB_OPERATOR_FILE="$SCRIPT_DIR/.raqib_last_operator"
-RAQIB_OPERATORS_FILE="$SCRIPT_DIR/.raqib_operators.json"
+RAQIB_OPERATOR_FILE="${SCRIPT_DIR:-.}/.raqib_last_operator"
+RAQIB_OPERATORS_FILE="${SCRIPT_DIR:-.}/.raqib_operators.json"
 
 # _raqib_pbkdf2_hash <password> <salt_hex> -> يطبع الهاش (PBKDF2-HMAC-SHA256،
 # 100000 دورة) — نفس مستوى الحماية المستخدم أصلاً بتشفير التقارير بالمشروع
@@ -742,7 +754,7 @@ export -f raqib_operator_login
 #  لأي إجراء حاسم (حذف/حظر...): يُقترح أول شي بدل ما ينفّذ مباشرة، ويحتاج
 #  مراجعة/موافقة صريحة (عبر pending_actions_review.sh) قبل التنفيذ الفعلي.
 # =====================================================
-RAQIB_PENDING_FILE="$SCRIPT_DIR/.raqib_pending_actions.jsonl"
+RAQIB_PENDING_FILE="${SCRIPT_DIR:-.}/.raqib_pending_actions.jsonl"
 
 # raqib_request_approval <action> <target> <details> <exec_cmd>
 # يسجّل طلب معلّق ويطبع رقم الطلب على stdout (بدون أي طباعة ثانية)
@@ -942,50 +954,265 @@ view_scan_history() {
 export -f view_scan_history
 
 # =====================================================
-#  شريط تقدّم + مؤشر تحميل متحرك (Progress bar + Spinner)
+#  مشغّل الصوت الشامل متعدد المنصات (Cross-platform Audio Player)
+#  يدعم تشغيل المؤثرات الصوتية وصوت النسر بالخلفية بدون تعطيل
+#  الواجهة على: macOS (afplay), Linux (PipeWire / PulseAudio / ALSA),
+#  وأنظمة ويندوز عبر Git Bash أو WSL عبر powershell/winsound
+# =====================================================
+raqib_play_sound() {
+    local file="${1:-}"
+    [ -z "$file" ] || [ ! -f "$file" ] && return 1
+
+    # 1. macOS: afplay (أسرع وأدق مشغل أصلي على نظام ماك)
+    if command -v afplay >/dev/null 2>&1; then
+        afplay "$file" >/dev/null 2>&1 &
+        disown 2>/dev/null || true
+        return 0
+    fi
+
+    # 2. Linux الحديث: PipeWire (الافتراضي في أوبونتو وفيدورا وآرتش الحديثة)
+    if command -v pw-play >/dev/null 2>&1; then
+        pw-play "$file" >/dev/null 2>&1 &
+        disown 2>/dev/null || true
+        return 0
+    fi
+
+    # 3. Linux: PulseAudio
+    if command -v paplay >/dev/null 2>&1; then
+        paplay "$file" >/dev/null 2>&1 &
+        disown 2>/dev/null || true
+        return 0
+    fi
+
+    # 4. Linux: ALSA
+    if command -v aplay >/dev/null 2>&1; then
+        aplay -q "$file" >/dev/null 2>&1 &
+        disown 2>/dev/null || true
+        return 0
+    fi
+
+    # 5. بيئة ويندوز (Git Bash / MSYS2 / WSL): عبر powershell.exe المضمن
+    if command -v powershell.exe >/dev/null 2>&1; then
+        local pspath="$file"
+        if command -v cygpath >/dev/null 2>&1; then
+            pspath=$(cygpath -w "$file" 2>/dev/null || echo "$file")
+        elif command -v wslpath >/dev/null 2>&1; then
+            pspath=$(wslpath -w "$file" 2>/dev/null || echo "$file")
+        fi
+        local b64
+        b64=$(printf "%s" "$pspath" | base64 2>/dev/null | tr -d '\r\n')
+        if [ -n "$b64" ]; then
+            powershell.exe -NoProfile -NonInteractive -Command "
+                try {
+                    \$b = [System.Convert]::FromBase64String('$b64');
+                    \$p = [System.Text.Encoding]::UTF8.GetString(\$b);
+                    (New-Object Media.SoundPlayer \$p).Play();
+                } catch {}
+            " >/dev/null 2>&1 &
+            disown 2>/dev/null || true
+            return 0
+        fi
+    fi
+
+    # 6. بيئة بايثون (winsound على ويندوز كحل بديل مباشر)
+    if command -v python3 >/dev/null 2>&1 || command -v python >/dev/null 2>&1; then
+        local pycmd="python3"
+        command -v python3 >/dev/null 2>&1 || pycmd="python"
+        "$pycmd" -c '
+import sys
+try:
+    import winsound
+    winsound.PlaySound(sys.argv[1], winsound.SND_FILENAME | winsound.SND_ASYNC)
+except Exception:
+    pass
+' "$file" >/dev/null 2>&1 &
+        disown 2>/dev/null || true
+        return 0
+    fi
+
+    # 7. مشغلات سطر الأوامر البديلة
+    if command -v play >/dev/null 2>&1; then
+        play -q "$file" >/dev/null 2>&1 &
+        disown 2>/dev/null || true
+        return 0
+    elif command -v mpv >/dev/null 2>&1; then
+        mpv --no-video --really-quiet "$file" >/dev/null 2>&1 &
+        disown 2>/dev/null || true
+        return 0
+    elif command -v ffplay >/dev/null 2>&1; then
+        ffplay -nodisp -autoexit -loglevel quiet "$file" >/dev/null 2>&1 &
+        disown 2>/dev/null || true
+        return 0
+    fi
+
+    return 1
+}
+export -f raqib_play_sound
+
+# =====================================================
+#  شريط تقدّم ناعم + مؤشرات تحميل متحركة (Visual Progress Suite)
 # =====================================================
 
-# يرسم شريط تقدّم على نفس السطر (يُستدعى داخل حلقة for)
+# يرسم شريط تقدّم ناعم بحركة أجزاء البلوك الثُمانية (Sub-block Progress)
 # الاستخدام: draw_progress_bar <الحالي> <الإجمالي> "<تسمية>"
 draw_progress_bar() {
-    local current="$1" total="$2" label="$3"
+    local current="${1:-0}" total="${2:-0}" label="${3:-}"
     [ "$total" -le 0 ] && return
-    local width=30
-    local filled=$(( current * width / total ))
-    [ "$filled" -gt "$width" ] && filled=$width
-    local empty=$(( width - filled ))
+    local width=28
+
     local pct=$(( current * 100 / total ))
-    printf "\r\033[K${CYAN}%s${NC} [" "$label"
-    [ "$filled" -gt 0 ] && printf "%0.s█" $(seq 1 "$filled")
-    [ "$empty" -gt 0 ] && printf "%0.s░" $(seq 1 "$empty")
-    printf "] ${BOLD}%3d%%${NC} (%d/%d)" "$pct" "$current" "$total"
+    [ "$pct" -gt 100 ] && pct=100
+
+    local -a sub_blocks=(" " "▏" "▎" "▍" "▌" "▋" "▊" "▉")
+    local total_eighths=$(( width * 8 ))
+    local filled_eighths=$(( current * total_eighths / total ))
+    [ "$filled_eighths" -gt "$total_eighths" ] && filled_eighths=$total_eighths
+
+    local full_blocks=$(( filled_eighths / 8 ))
+    local remainder=$(( filled_eighths % 8 ))
+    local empty_blocks=$(( width - full_blocks - (remainder > 0 ? 1 : 0) ))
+    [ "$empty_blocks" -lt 0 ] && empty_blocks=0
+
+    local bar_str=""
+    local b
+    for (( b=0; b<full_blocks; b++ )); do bar_str+="█"; done
+    if [ "$remainder" -gt 0 ]; then
+        bar_str+="${sub_blocks[$remainder]}"
+    fi
+    for (( b=0; b<empty_blocks; b++ )); do bar_str+="░"; done
+
+    local bar_color="$CYAN"
+    [ "$pct" -ge 100 ] && bar_color="$GREEN"
+
+    printf "\r\033[K${bar_color}%s${NC} [${bar_color}%s${NC}] ${BOLD}%3d%%${NC} (${GREY}%d/%d${NC})" \
+        "$label" "$bar_str" "$pct" "$current" "$total"
 }
 export -f draw_progress_bar
 
-# ينهي سطر شريط التقدّم وينتقل لسطر جديد
+# ينهي سطر شريط التقدّم وينتقل لسطر جديد مع شارة نجاح اختيارية
 finish_progress_bar() {
-    printf "\n"
+    local label="${1:-}"
+    if [ -n "$label" ]; then
+        printf "\r\033[K${GREEN}  ✔ %s [اكتمل 100%%]${NC}\n" "$label"
+    else
+        printf "\n"
+    fi
 }
 export -f finish_progress_bar
 
-# يشغّل أمراً بالخلفية ويعرض نقاطاً متحركة "..." أثناء انتظاره
+# يشغّل أمراً بالخلفية ويعرض مؤشراً دواراً متحركاً متعدّد الأنماط (Cyber Spinner)
+# يدعم الأنماط: braille (افتراضي)، radar، pulse، dots، arrows
 # مخرجات الأمر (stdout) تبقى قابلة للالتقاط عبر $(...) كالمعتاد
 # الاستخدام: result=$(run_with_spinner "الرسالة" -- command args...)
+# أو مع تحديد نمط: run_with_spinner --style=pulse "الرسالة" -- command...
 run_with_spinner() {
+    local style="${RAQIB_SPINNER_STYLE:-braille}"
+    local transient=0
+    while [[ "${1:-}" == --* ]]; do
+        if [[ "$1" == "--style="* ]]; then
+            style="${1#--style=}"
+            shift
+        elif [ "$1" = "--transient" ]; then
+            transient=1
+            shift
+        elif [ "$1" = "--" ]; then
+            shift
+            break
+        else
+            break
+        fi
+    done
+
     local msg="$1"; shift
     [ "$1" = "--" ] && shift
+
+    local -a frames
+    local frame_delay=0.08
+    case "$style" in
+        radar|orbit)
+            frames=("◐" "◓" "◑" "◒")
+            frame_delay=0.10
+            ;;
+        pulse)
+            frames=("▰▱▱▱▱" "▱▰▱▱▱" "▱▱▰▱▱" "▱▱▱▰▱" "▱▱▱▱▰" "▱▱▱▰▱" "▱▱▰▱▱" "▱▰▱▱▱")
+            frame_delay=0.09
+            ;;
+        dots)
+            frames=("." ".." "..." "....")
+            frame_delay=0.22
+            ;;
+        arrows)
+            frames=("←" "↖" "↑" "↗" "→" "↘" "↓" "↙")
+            frame_delay=0.10
+            ;;
+        braille|*)
+            frames=("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏")
+            frame_delay=0.08
+            ;;
+    esac
+
     "$@" &
     local cmd_pid=$!
-    local -a frames=("." ".." "...")
+    local num_frames=${#frames[@]}
     local i=0
+
+    # تنظيف المسافات الزائدة من نهاية الرسالة
+    local clean_msg="${msg%"${msg##*[![:space:]]}"}"
+
     while kill -0 "$cmd_pid" 2>/dev/null; do
-        printf "\r\033[K${YELLOW}%s%s${NC}" "$msg" "${frames[$((i % 3))]}" >&2
-        sleep 0.3
+        local frame="${frames[$((i % num_frames))]}"
+        local elapsed_tenths=$(( (i * 8) / 10 ))
+        local sec=$(( elapsed_tenths / 10 ))
+        local tenth=$(( elapsed_tenths % 10 ))
+        printf "\r\033[K${CYAN}[%s]${NC} ${YELLOW}%s${NC} ${GREY}(%d.%ds)${NC}" "$frame" "$clean_msg" "$sec" "$tenth" >&2
+        sleep "$frame_delay"
         ((i++))
     done
+
     wait "$cmd_pid"
     local rc=$?
-    printf "\r\033[K" >&2
+
+    local total_tenths=$(( (i * 8) / 10 ))
+    local final_sec=$(( total_tenths / 10 ))
+    local final_tenth=$(( total_tenths % 10 ))
+    local elapsed_str="${final_sec}.${final_tenth}s"
+
+    if [ "$transient" -eq 1 ] || [ "${RAQIB_SPINNER_KEEP:-1}" = "0" ]; then
+        printf "\r\033[K" >&2
+    else
+        if [ "$rc" -eq 0 ]; then
+            printf "\r\033[K${GREEN}  ✔ %s ${GREY}(%s)${NC}\n" "$clean_msg" "$elapsed_str" >&2
+        else
+            printf "\r\033[K${RED}  ✘ %s ${GREY}(failed - code %d)${NC}\n" "$clean_msg" "$rc" >&2
+        fi
+    fi
+
     return $rc
 }
 export -f run_with_spinner
+
+# يرسم سطر فحص حي لعنصر مفرد في مكانه بدون إغراق الشاشة (Single-line live scanner)
+# الاستخدام: draw_scan_line "<اسم الفئة>" "<المسار أو الهدف>" "[STATUS]"
+draw_scan_line() {
+    local label="${1:-SCAN}" item="$2" status="${3:-}"
+    local max_len=40
+    local disp_item="$item"
+    if [ "${#disp_item}" -gt "$max_len" ]; then
+        disp_item="...${disp_item: -((max_len - 3))}"
+    fi
+    printf "\r\033[K${CYAN}⚡${NC} ${YELLOW}[%-8s]${NC} %-${max_len}s %b" "$label" "$disp_item" "$status" >&2
+}
+export -f draw_scan_line
+
+# وميض فك تشفير رقمي سريع (Cyber Matrix Flicker)
+cyber_flicker() {
+    local text="${1:-INITIALIZING}"
+    local -a glitches=("0x7F2A" "0x00FF" "0x9C14" "0xA8B2" "0x1337")
+    local g
+    for g in "${glitches[@]}"; do
+        printf "\r\033[K${GREY}[%s]${NC} ${CYAN}%s...${NC}" "$g" "$text" >&2
+        sleep 0.04
+    done
+    printf "\r\033[K" >&2
+}
+export -f cyber_flicker
