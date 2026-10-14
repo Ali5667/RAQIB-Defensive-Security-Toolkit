@@ -4,6 +4,7 @@
 # جوا الملف نفسه (JSON inline + JS خام بدون مكتبات خارجية)، فتفتحها بأي
 # متصفح حتى بدون إنترنت. تعرض: إحصائيات عامة، توزيع حسب الأداة والخطورة،
 # الخط الزمني، والحوادث المركّبة (نفس محرك raqib_correlate.py المشترك).
+# ممتد: تجميع حسب الفئة، فلترة، وتسليط ضوء على وحدات جديدة.
 
 echo -e "${CYAN}$(t dash_title)${NC}"
 echo -e "${GREY}$(t dash_disclaimer)${NC}"
@@ -15,7 +16,8 @@ if [ ! -s "$RAQIB_EVENTS_FILE" ]; then
 fi
 
 PAYLOAD=$(python3 - "$RAQIB_EVENTS_FILE" "$TOOLS_DIR/monitoring/raqib_correlate.py" << 'PYEOF'
-import sys, json, subprocess, collections
+import sys, json, subprocess, collections, re
+from datetime import datetime
 
 events_path, correlate_script = sys.argv[1], sys.argv[2]
 
@@ -34,6 +36,89 @@ by_severity = collections.Counter(e.get("severity", "low") for e in events)
 by_tool = collections.Counter(e.get("tool", "unknown") for e in events)
 by_hour = collections.Counter(e.get("timestamp", "")[:13] for e in events if e.get("timestamp"))
 
+# Category mapping: tool -> category
+TOOL_TO_CATEGORY = {
+    "port_scanner": "monitoring",
+    "active_connections": "monitoring",
+    "bandwidth_monitor": "monitoring",
+    "arp_watch": "monitoring",
+    "dns_lookup_tool": "monitoring",
+    "ping_sweep": "monitoring",
+    "si13_correlator": "monitoring",
+    "telegram_setup": "monitoring",
+    "dashboard_generator": "monitoring",
+    "raqib_watchdog": "monitoring",
+    "raqib_collector_server": "monitoring",
+    "collector_client_setup": "monitoring",
+    "failed_ssh_report": "logs",
+    "log_keyword_search": "logs",
+    "top_repeated_lines": "logs",
+    "log_timeline": "logs",
+    "web_access_analyzer": "logs",
+    "brute_force_detector": "ids_ips",
+    "listening_ports_auditor": "ids_ips",
+    "file_integrity_monitor": "ids_ips",
+    "cron_auditor": "ids_ips",
+    "connection_rate_watcher": "ids_ips",
+    "ip_blocker": "ids_ips",
+    "hash_calculator": "malware",
+    "file_type_identifier": "malware",
+    "suspicious_strings_extractor": "malware",
+    "entropy_calculator": "malware",
+    "persistence_scanner": "malware",
+    "quarantine_and_eradicate": "malware",
+    "auto_malware_cleaner": "malware",
+    "hash_reputation_check": "malware",
+    "yara_lite_scanner": "malware",
+    "rules_updater": "malware",
+    "threat_intel_lookup": "malware",
+    "unknown_file_triage": "malware",
+    "raqib_intelligence": "malware",
+    "login_history": "forensics",
+    "bash_history_reviewer": "forensics",
+    "filesystem_timeline": "forensics",
+    "disk_usage_snapshot": "forensics",
+    "sudo_log_review": "forensics",
+    "permission_auditor": "hardening",
+    "ssh_config_auditor": "hardening",
+    "service_lister": "hardening",
+    "password_policy_checker": "hardening",
+    "firewall_status_checker": "hardening",
+    "report_decryptor": "hardening",
+    "audit_log_viewer": "hardening",
+    "pending_actions_review": "hardening",
+    "open_ports_vs_services": "vuln_scan",
+    "outdated_packages": "vuln_scan",
+    "weak_permissions_scanner": "vuln_scan",
+    "ssl_certificate_checker": "vuln_scan",
+    "default_credentials_scanner": "vuln_scan",
+}
+
+CATEGORY_LABELS = {
+    "monitoring": "🛰️ Network Monitoring",
+    "logs": "📋 Log Analysis",
+    "ids_ips": "🚨 Intrusion Detection",
+    "malware": "🦠 Malware Analysis",
+    "forensics": "🔍 Digital Forensics",
+    "hardening": "🛡️ System Hardening",
+    "vuln_scan": "🎯 Vulnerability Scan",
+    "unknown": "❓ Unknown",
+}
+
+by_category = collections.Counter()
+for e in events:
+    tool = e.get("tool", "unknown")
+    cat = TOOL_TO_CATEGORY.get(tool, "unknown")
+    by_category[cat] += 1
+
+# Identify "new modules" - tools that appear in events but aren't in the standard set
+STANDARD_TOOLS = set(TOOL_TO_CATEGORY.keys())
+all_tools_in_events = {e.get("tool", "unknown") for e in events}
+new_module_tools = all_tools_in_events - STANDARD_TOOLS
+
+# Collect events from new modules
+new_module_events = [e for e in events if e.get("tool", "unknown") in new_module_tools]
+
 corr_raw = subprocess.run(
     ["python3", correlate_script, events_path, "60"],
     capture_output=True, text=True
@@ -43,14 +128,26 @@ try:
 except Exception:
     corr = {"incidents": [], "total_events": len(events), "relevant_events": 0}
 
+# By severity within category
+sev_by_cat = {}
+for e in events:
+    cat = TOOL_TO_CATEGORY.get(e.get("tool", "unknown"), "unknown")
+    sev = e.get("severity", "low")
+    sev_by_cat.setdefault(cat, collections.Counter())[sev] += 1
+
 payload = {
     "generated_at": events[-1].get("timestamp", "") if events else "",
     "total_events": len(events),
     "by_severity": dict(by_severity),
-    "by_tool": dict(by_tool.most_common(15)),
+    "by_tool": dict(by_tool.most_common(20)),
+    "by_category": dict(by_category),
     "by_hour": dict(sorted(by_hour.items())),
     "incidents": corr.get("incidents", []),
     "events_tail": events[-100:],
+    "new_module_tools": sorted(list(new_module_tools)),
+    "new_module_events": new_module_events[-50:],
+    "sev_by_cat": {cat: dict(cnt) for cat, cnt in sev_by_cat.items()},
+    "category_labels": CATEGORY_LABELS,
 }
 print(json.dumps(payload, ensure_ascii=False))
 PYEOF

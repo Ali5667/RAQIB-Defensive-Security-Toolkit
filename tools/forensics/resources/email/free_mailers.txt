@@ -1,0 +1,9 @@
+# RAQIB Email Header Analyzer — free-mailer domains
+# One domain per line. '#' starts a comment. ANY file extension works:
+# free_mailers.txt, free_mailers.list, free_mailers.dat — the NAME selects
+# the list. Entries MERGE with the built-in defaults and deduplicate.
+# Built-in defaults (reference): gmail.com outlook.com hotmail.com yahoo.com
+# aol.com protonmail.com icloud.com live.com mail.com yandex.com
+#
+# Add your own below:
+

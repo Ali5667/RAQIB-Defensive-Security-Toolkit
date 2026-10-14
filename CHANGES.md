@@ -131,3 +131,84 @@ octet بعد فحص الصيغة.
 - ما يقترح "تراجع" (downgrade) لو الرقم البعيد أقدم من المثبّت.
 - اختُبرت الحالات الأربع (معطّل، إصدار أحدث متوفر، نفس الإصدار، إصدار أقدم)
   + حالة فشل الاتصال، كلها تعمل صح.
+
+## 6) New tools — Rootkit Detector + Email Header Analyzer (roadmap items 1 & 2)
+
+### tools/malware/rootkit_detector.sh (+ rootkit_detector.md)
+Read-only rootkit check (Bash, zero external dependencies):
+- Hidden processes: every PID in /proc vs `ps -e` (plus ghost PIDs from ps itself,
+  and /proc/<pid>/status unreadable as root = kernel-level hiding).
+- Suspicious kernel modules: known LKM-rootkit name blocklist (diamorphine/reptile/
+  suterusu...) + loaded modules with no .ko file on disk.
+- ld.so.preload / LD_PRELOAD: the file, live variable, and persistent settings in
+  /etc/environment and /etc/profile*.
+- Package checksum verification (dpkg --verify / rpm -Va) — optional, clear message
+  when the package manager is missing.
+- NEW: eBPF checks (kprobe/tracepoint hooks via optional bpftool, pinned objects in
+  /sys/fs/bpf, kernel.unprivileged_bpf_disabled) — a modern blind spot.
+- CLI: --help, --json (NDJSON), exit codes 0/1/2; all findings go through finding_add
+  (structured JSON event log + critical Telegram alert).
+
+### tools/forensics/email_header_analyzer.py (+ email_header_analyzer.md)
+Defensive phishing/spoofing email-header triage (Python stdlib only, no network, no DNS):
+- SPF/DKIM/DMARC verdicts from Authentication-Results/Received-SPF as already
+  evaluated by the receiving MTA.
+- Received chain: missing/long chains, missing, unparseable or out-of-order
+  timestamps, private-IP first hop.
+- Identity mismatches: From vs Return-Path vs Reply-To (reply_to_mismatch is critical
+  with free mailers), display-name spoofing, free-mailer sender.
+- CLI: --help, --json, stdin (-), exit codes 0/1/2; events written to
+  .raqib_events.jsonl using the exact raqib_emit_event schema.
+- Tested against a fake phishing email (6 findings incl. critical dmarc_fail +
+  reply_to_mismatch, exit 1), a clean email (exit 0), --help, missing file (exit 2).
+
+README.md updated: Malware table (13), Forensics table (6), tool count 60.
+
+## 7) Logic enhancement round — Rootkit Detector + Email Header Analyzer
+
+### tools/malware/rootkit_detector.sh — new checks
+- /proc/<pid>/exe anomaly scan (root): running_deleted_binary ("(deleted)" exe),
+  memfd_execution (fileless, no disk artifact), executable_from_temp (/tmp, /dev/shm,
+  /var/tmp binaries), empty_cmdline (wiped argv on a userland process).
+- hidden_kernel_module: /sys/module/*/sections present but the module is filtered
+  out of /proc/modules — module-hiding detection that lsmod cannot lie around
+  (lsmod reads /proc/modules).
+- unowned_preload_lib: dpkg -S / rpm -qf ownership check on every library listed in
+  /etc/ld.so.preload — an unowned library is the rootkit's hook itself.
+- hidden_temp_executable: executable dotfiles in /tmp, /dev/shm, /var/tmp.
+
+### tools/forensics/email_header_analyzer.py — new checks
+- Proper per-mechanism verdict parsing: spf fail(high)/softfail/permerror/temperror(medium),
+  spf_missing/dkim_none/dmarc_none (low), pass verdicts now print as [+] lines.
+- message_id_mismatch (medium): Message-ID domain vs From domain.
+- date_received_skew (low): Date header vs last Received time, > 24h.
+- forged_localhost_hop (medium): fake topmost Received claiming localhost origin.
+- null_return_path (low): envelope <> with normal content.
+- social_engineering_subject (low): >= 2 lure keywords in Subject.
+
+Tests: fake phishing email now yields 9 findings (incl. critical dmarc_fail +
+reply_to_mismatch) exit 1; clean email prints SPF/DKIM/DMARC pass, exit 0;
+bash -n syntax OK for the rootkit script.
+
+## 8) User-extensible resource lists (any file extension) — both new tools
+
+No more editing code to add detection entries. Both tools now load detection
+lists from plain-text resource files; ANY file extension works because the
+file's NAME selects the list (lkm_modules.txt / lkm_modules.dat / lkm_modules
+all extend the same list). Format: one entry per line, '#' = comment.
+Entries MERGE with the built-in defaults (never replace) and deduplicate
+case-insensitively. Built-ins remain as fallback so the tools still run with
+no resource files at all.
+
+- tools/malware/rootkit_detector.sh: resources/rootkit/lkm_modules.*
+  (module blocklist), resources/rootkit/temp_scan_dirs.* (scan dirs);
+  new --rules <file|dir> CLI option; rk_merge_list loader (Bash 4+ namerefs).
+- tools/forensics/email_header_analyzer.py: resources/email/free_mailers.*,
+  resources/email/lure_keywords.*; new --rules <file|dir> option;
+  .py files in resource dirs are never touched (data only, nothing imported).
+- Shipped starter files (with format comments): lkm_modules.txt,
+  temp_scan_dirs.txt, free_mailers.txt, lure_keywords.txt.
+- Bug fixed by the new tests: _ip_is_private passed bytes to socket.ntohl
+  (crash on private-IP Received hops) — now int.from_bytes.
+- Verified: --rules with .dat/.conf files loads entries (merge+dedup),
+  regressions green (fake phish exit 1, clean email exit 0).

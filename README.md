@@ -2,11 +2,17 @@
 
 <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=30&pause=1000&color=22D3EE&center=true&vCenter=true&width=700&lines=%F0%9F%A6%85+RAQIB+%28%D8%B1%D9%82%D9%8A%D8%A8%29;Defensive+Security+Toolkit;Blue+Team" alt="RAQIB"/>
 
+<br/>
+
+<img src="assets/raqib_demo.gif" alt="RAQIB Terminal Demo" width="780"/>
+
+<br/>
+
 # RAQIB (رقيب)
 ### Defensive Security Toolkit
 
 **The only zero-dependency incident-response platform built entirely from scratch —  
-58 standalone tools · 20 languages · real-time monitoring · CTF mode · threat intelligence**
+60 standalone tools · 20 languages · real-time monitoring · CTF mode · threat intelligence**
 
 [![License: GNU GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-2.1-blue.svg)](VERSION)
@@ -14,10 +20,10 @@
 [![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white)](https://python.org)
 [![Platform: Linux](https://img.shields.io/badge/platform-Linux%20%7C%20macOS-informational)](#-requirements)
 [![Languages: 20](https://img.shields.io/badge/languages-20-brightgreen)](modules/lang.sh)
-[![Tools: 58](https://img.shields.io/badge/tools-58-red)](tools/)
+[![Tools: 60](https://img.shields.io/badge/tools-60-red)](tools/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-[Overview](#-overview) • [Architecture](#-architecture) • [Quick Start](#-quick-start) • [Tools](#-tools-58) • [CTF Mode](#-ctf--wargames-mode-22-tools) • [Intelligence](#-threat-intelligence) • [Languages](#-languages-20) • [Accuracy](#-accuracy-benchmark) • [العربية](README.ar.md)
+[Overview](#-overview) • [Demo](#-interactive-demo) • [Architecture](#-architecture) • [Quick Start](#-quick-start) • [Tools](#-tools-60) • [Rootkit Detector](#-rootkit-detector-guide) • [Email Header Analyzer](#-email-header-analyzer-guide) • [Samples & Testing](#-samples--testing-dataset-guide) • [Threat Intelligence](#-threat-intelligence) • [Accuracy](#-accuracy-benchmark) • [العربية](README.ar.md)
 
 </div>
 
@@ -29,9 +35,29 @@
 
 Every single tool is written from scratch against core POSIX utilities (`ss`, `find`, `awk`, `grep`, `openssl`, `/dev/tcp`, `python3` stdlib). No Nmap. No Wireshark. No third-party security binaries. Just clean, auditable code that runs on a minimal Alpine container or a fully-locked-down box.
 
-58 tools across 8 operational domains, **wired together as one integrated incident-response workflow** — not a pile of disconnected scripts.
+60 tools across 8 operational domains, **wired together as one integrated incident-response workflow** — not a pile of disconnected scripts.
 
 > ⚠️ **Authorized use only.** Scanning tools are for *your own infrastructure* or systems you have explicit written authorization to assess.
+
+---
+
+## 🎥 Interactive Demo
+
+The toolkit runs directly inside your terminal with an ASCII radar animation, audible eagle prompt (optional), operator authentication, and live security telemetry:
+
+<div align="center">
+  <img src="assets/raqib_demo.gif" alt="RAQIB Live Terminal Demonstration" width="780"/>
+  <br/>
+  <sub><i>Figure: RAQIB terminal initialization, subsystem loading, and active defense monitoring.</i></sub>
+</div>
+
+### 🖥️ Main Menu Interface
+
+<div align="center">
+  <img src="assets/raqib_menu.png" alt="RAQIB Interactive Main Menu" width="800"/>
+  <br/>
+  <sub><i>Figure: RAQIB interactive terminal main menu showcasing 8 operational domains, CTF mode, and operator session.</i></sub>
+</div>
 
 ---
 
@@ -56,52 +82,60 @@ Every single tool is written from scratch against core POSIX utilities (`ss`, `f
 
 ```
 raqib/
-├── raqib.sh                    ← Main entry: auth, menu routing, live clock daemon
-├── VERSION · update_source.txt ← Self-update checker (disabled until you enable it)
-├── README.md / README.ar.md    ← Full documentation (EN + AR)
+├── raqib.sh                             ← Main entry: auth, menu routing, live clock daemon
+├── VERSION · update_source.txt          ← Self-update checker (disabled until you enable it)
+├── README.md / README.ar.md             ← Full documentation (EN + AR)
 ├── LICENSE · SECURITY.md · CONTRIBUTING.md · CHANGES.md
 │
-├── modules/                    ← Shared kernel (sourced by every tool)
-│   ├── common.sh               ← 990-line shared library:
-│   │                              • AES-256-GCM encryption/decryption (Argon2id + Scrypt)
-│   │                              • Structured JSON event log (SIEM-compatible)
-│   │                              • Telegram alerts (push on critical findings)
-│   │                              • Central collector forwarding (multi-host)
-│   │                              • Severity scoring + executive summary
-│   │                              • Operator identity + approval workflow
-│   │                              • Report ID + scan history (last 10)
-│   │                              • Cross-platform portability helpers
-│   │                              • Shared quarantine + secure-delete
-│   │                              • Progress bar + spinner UI components
-│   ├── lang.sh                 ← 20×505 = 10,100 translation strings
-│   ├── auto_translate.sh       ← LibreTranslate bridge (optional, cached)
-│   └── lang_cache/             ← Auto-translated strings (local, persistent)
+├── modules/                             ← Shared kernel (sourced by every tool)
+│   ├── common.sh                        ← 990-line shared library:
+│   │                                       • AES-256-GCM encryption/decryption (Argon2id + Scrypt)
+│   │                                       • Structured JSON event log (SIEM-compatible)
+│   │                                       • Telegram alerts (push on critical findings)
+│   │                                       • Central collector forwarding (multi-host)
+│   │                                       • Severity scoring + executive summary
+│   │                                       • Operator identity + approval workflow
+│   │                                       • Report ID + scan history (last 10)
+│   │                                       • Cross-platform portability helpers
+│   │                                       • Shared quarantine + secure-delete
+│   │                                       • Progress bar + spinner UI components
+│   ├── lang.sh                          ← 20×505 = 10,100 translation strings
+│   ├── auto_translate.sh                ← LibreTranslate bridge (optional, cached)
+│   └── lang_cache/                      ← Auto-translated strings (local, persistent)
 │
 ├── assets/
-│   ├── eagle_logo.txt / eagle_logo_2.txt  ← ASCII art (radar-scan animation)
-│   └── eagle_cry.wav           ← Startup sound (paplay / aplay / ffplay)
+│   ├── eagle_logo.txt / eagle_logo_2.txt  ← ASCII art (radar-scan terminal banner)
+│   ├── eagle_cry_real.wav               ← Startup sound (paplay / aplay / ffplay)
+│   └── raqib_demo.gif                   ← Animated terminal demo for documentation
 │
-├── samples/                    ← Immediately testable sample data
+├── samples/                             ← Synthetic test logs and binaries
+│   ├── README_samples.md                ← [MD File] Samples usage guide & test scenarios
+│   ├── sample_auth.log                  ← Synthetic authentication logs (SSH / brute-force)
+│   ├── sample_access.log                ← Synthetic HTTP server access log (web attacks)
+│   └── sample_suspicious_binary.bin     ← Synthetic high-entropy test binary
+│
 ├── tests/
-│   ├── run_accuracy_eval.sh    ← Precision/Recall/F1 benchmark (F1=98.5%)
-│   └── corpus/                 ← Manually-labeled adversarial test samples
+│   ├── run_accuracy_eval.sh             ← Precision/Recall/F1 benchmark (F1=98.5%)
+│   └── corpus/                          ← Adversarial test corpus
 │
 └── tools/
-    ├── monitoring/ (12)        ← Network + SIEM + alerting + fleet collection
-    ├── logs/       (5)         ← Log analysis and parsing
-    ├── ids_ips/    (6)         ← Intrusion detection and IP blocking
-    ├── malware/    (12+)       ← Static analysis + threat intelligence engine
-    ├── forensics/  (5)         ← Digital forensics + timeline
-    ├── hardening/  (8)         ← System hardening + audit trail
-    ├── vuln_scan/  (5)         ← Vulnerability and permission scanning
-    └── ctf/        (22)        ← CTF / Wargames mode (Crypto/Stego/Forensics/Web/Binary)
-        ├── crypto/   (5)       ← Base64/Hex/ROT/XOR/RSA/Vigenère
-        ├── stego/    (4)       ← LSB/Metadata/Magic Bytes/Audio
-        ├── forensics/(4)       ← PCAP/File Carving/Strings/Timeline
-        ├── web/      (3)       ← Headers/JWT/Cookies/Robots
-        ├── binary/   (3)       ← ELF/Packing/BOF Helper
-        ├── flag_hunter.sh      ← Automated multi-pattern flag search
-        └── writeup_logger.sh   ← Markdown writeup generator
+    ├── monitoring/ (12)                 ← Network + SIEM + alerting + fleet collection
+    ├── logs/       (5)                  ← Log analysis and parsing
+    ├── ids_ips/    (6)                  ← Intrusion detection and IP blocking
+    ├── malware/    (13)                 ← Static analysis + threat intelligence engine
+    │   ├── rootkit_detector.md          ← [MD File] Complete Rootkit Detector documentation
+    │   ├── rootkit_detector.sh          ← Rootkit Scanner (kernel/proc/memfd/eBPF/preload)
+    │   ├── resources/rootkit/           ← Detection resource lists
+    │   └── rules/                       ← Rules and feeds
+    │
+    ├── forensics/  (6)                  ← Digital forensics + timeline
+    │   ├── email_header_analyzer.md     ← [MD File] Complete Email Header Analyzer documentation
+    │   ├── email_header_analyzer.py     ← Email spoofing/phishing header triage engine
+    │   └── resources/email/             ← Detection resource lists
+    │
+    ├── hardening/  (8)                  ← System hardening + audit trail
+    ├── vuln_scan/  (5)                  ← Vulnerability and permission scanning
+    └── ctf/        (22)                 ← CTF / Wargames mode (Crypto/Stego/Forensics/Web/Binary)
 ```
 
 ---
@@ -134,7 +168,7 @@ chmod +x raqib.sh
 
 ---
 
-## 📋 Tools (58)
+## 📋 Tools (60)
 
 ### 🛰️ Network Monitoring (12)
 
@@ -174,7 +208,7 @@ chmod +x raqib.sh
 | 5 | **Connection Rate Watcher** | Two-snapshot delta to catch sudden connection spikes |
 | 6 | **IP Blocker** | UFW/iptables/nftables rule insertion with audit logging |
 
-### 🦠 Malware Analysis — Static (12)
+### 🦠 Malware Analysis — Static (13)
 
 | # | Tool | Description |
 |---|---|---|
@@ -190,8 +224,9 @@ chmod +x raqib.sh
 | 10 | **Live Rules Updater** | Safe pull from your chosen source: format-validated, backed-up, local rules preserved |
 | 11 | **Threat Intel Lookup** | Query and update local IOC database (Feodo/URLhaus/CISA KEV) — offline queries |
 | 12 | **Unknown File Triage** | Weighted explainable heuristic scoring (6 signal types) — no ML, every point justified |
+| 13 | **Rootkit Detector** | Hidden processes (`/proc` vs `ps`), memfd/temp execution, module hiding, LKM blocklists, `ld.so.preload`, altered binaries, eBPF kprobes |
 
-### 🔍 Digital Forensics (5)
+### 🔍 Digital Forensics (6)
 
 | # | Tool | Description |
 |---|---|---|
@@ -200,6 +235,7 @@ chmod +x raqib.sh
 | 3 | **Filesystem Timeline** | Chronological ordering by mtime/ctime |
 | 4 | **Disk Usage Snapshot** | Folder-size comparison between two points in time |
 | 5 | **Sudo Log Review** | Every executed sudo command + failed sudo attempts |
+| 6 | **Email Header Analyzer** | SPF/DKIM/DMARC verdicts, Received-chain anomaly analysis, From/Reply-To mismatches, Date skew, lure keywords |
 
 ### 🛡️ System Hardening (8)
 
@@ -296,17 +332,223 @@ Launched from the main menu — a complete, self-contained toolkit for security 
 
 ---
 
+## 🛡️ Rootkit Detector Guide
+
+*(Included from [`tools/malware/rootkit_detector.md`](tools/malware/rootkit_detector.md))*
+
+Read-only heuristic rootkit checks (item 1 of the RAQIB roadmap). Zero external dependencies: core POSIX utilities + `python3` stdlib only. `dpkg`/`rpm` checksum verification is optional — a clear message is shown if neither exists.
+
+### What it checks (and why it matters)
+
+| Check | What was checked | Why it matters |
+|---|---|---|
+| `hidden_processes` | Every PID in `/proc` compared against `ps -e` | A PID alive in `/proc` but absent from `ps` is hidden by a userland rootkit hook. |
+| `tampered_ps_output` | `ps` listing PIDs that do not exist in `/proc` | The `ps` binary itself may be replaced/hooked. |
+| `unreadable_procs` | As root: `/proc/<pid>/status` unreadable | Kernel-level hiding (LKM rootkit) blocks root's read. |
+| `running_deleted_binary` | `/proc/<pid>/exe` → `"(deleted)"` | Process keeps running after its binary is deleted — classic post-exploitation. |
+| `memfd_execution` | `/proc/<pid>/exe` → `memfd:` | Fileless execution — no disk artifact at all. |
+| `executable_from_temp` | `/proc/<pid>/exe` under `/tmp` `/dev/shm` `/var/tmp` | Droppers stage payloads in world-writable dirs. |
+| `empty_cmdline` | Userland process with empty `cmdline` | Wiped argv to blend in with kernel threads. |
+| `hidden_kernel_module` | `/sys/module/*/sections` present but module missing from `/proc/modules` | Module-hiding filter — exactly what LKM rootkits implement (lsmod reads /proc/modules, so it lies too). |
+| `unowned_preload_lib` | `dpkg -S` / `rpm -qf` ownership of preload libraries | An unowned library injected into every process is the rootkit's hook itself. |
+| `hidden_temp_executable` | Dotfile executables in `/tmp` `/dev/shm` `/var/tmp` | Invisible to a casual `ls`; `/var/tmp` survives reboots. |
+| `suspicious_kernel_module` | `lsmod` names against a known LKM-rootkit blocklist (diamorphine, reptile, suterusu, …) | LKM rootkits run with kernel privileges and defeat userland checks. |
+| `module_file_missing` | Loaded modules with no `.ko` under `/lib/modules/$(uname -r)` | Module loaded "from nowhere" = dropper deleted itself. |
+| `ld_so_preload` | Existence/content of `/etc/ld.so.preload` | Forces a library into every dynamic binary — the classic userland hook. |
+| `env_ld_preload` / `persistent_ld_preload` | `LD_PRELOAD` in the session and in `/etc/environment`, `/etc/profile*` | Session or boot-persistent hooking. |
+| `altered_system_binary` | `dpkg --verify` / `rpm -Va` on `/bin /sbin /usr/bin /usr/sbin /usr/lib` | Checksum mismatch = trojaned (ps/netstat/ls) or corrupted. |
+| `unprivileged_bpf_enabled` | `sysctl kernel.unprivileged_bpf_disabled` | Any local user can load BPF — the entry path for eBPF rootkits. |
+| `bpf_kprobe_attached` | `bpftool link/prog show`: kprobe/tracepoint hooks + owner PIDs | eBPF rootkits hide processes/files with **no `.ko` and no lsmod entry** — but legit tools (Falco, Tetragon, systemd) hook too, so severity is *medium* (verify, don't panic). `bpftool` is an **optional** dependency; the check is skipped with a clear message if missing. |
+| `pinned_bpf_objects` | Pinned objects under `/sys/fs/bpf` | Pinned BPF survives reboot — a dropper that pins its hook reloads at boot. |
+
+Every finding explains: what was checked, what was found, why it matters, and a suggested fix. **Nothing is modified** — remediation text only; changes require your explicit approval workflow.
+
+### Run it
+
+```bash
+# From repo root (normal, human report + executive summary)
+sudo bash tools/malware/rootkit_detector.sh
+
+# Machine-readable: NDJSON on stdout (text diagnostics suppressed)
+sudo bash tools/malware/rootkit_detector.sh --json
+
+# Help
+bash tools/malware/rootkit_detector.sh --help
+```
+
+Example JSON output line (also auto-forwarded to `.raqib_events.jsonl` via `finding_add`, with a Telegram push if the finding is critical):
+
+```json
+{"tool": "rootkit_detector", "severity": "critical", "check": "hidden_processes", "finding": "1 process(es) exist in /proc but are hidden from 'ps' (PIDs: 31337 )", "impact": "Userland rootkits hook libc/ps to hide attacker processes; the process is running but invisible to operators.", "fix": "From a trusted live-CD/live-USB (not the suspect OS), inspect /proc/<pid>/{exe,cmdline,maps}, capture memory, and rebuild the host if compromise is confirmed."}
+```
+
+### Exit codes
+
+| Code | Meaning |
+|---|---|
+| `0` | No suspicious findings |
+| `1` | Findings detected (severity summary also printed/logged) |
+| `2` | Usage error or `modules/common.sh` unavailable |
+
+### Extending with resource files (any extension)
+
+Detection lists are **user-extensible without touching the code**. Drop a file into `resources/rootkit/` — **any extension works** (`lkm_modules.txt`, `lkm_modules.list`, `lkm_modules.dat`, no extension at all…) — the file's **name** selects which list it extends:
+
+| List | Extends | Default file shipped |
+|---|---|---|
+| `lkm_modules.*` | `suspicious_kernel_module` blocklist (substring match) | `resources/rootkit/lkm_modules.txt` |
+| `temp_scan_dirs.*` | `hidden_temp_executable` scan dirs (absolute paths) | `resources/rootkit/temp_scan_dirs.txt` |
+
+Format: one entry per line, `#` starts a comment, blank lines ignored. Entries are **merged** with the built-in defaults (never replace them) and deduplicated case-insensitively. Extra sources at runtime:
+
+```bash
+sudo bash rootkit_detector.sh --rules /path/to/extra_lists      # a directory of lists
+sudo bash rootkit_detector.sh --rules /path/to/lkm_modules.dat   # or a single file (base name must match)
+```
+
+### Notes
+
+- Best run as **root**; without root some checks are degraded with a clear warning.
+- For a suspect host, authoritative triage is from a **live-CD/live-USB** with the disk mounted read-only — a running rootkit can hide from local checks.
+- Integration: findings flow through the existing `finding_add` → `raqib_emit_event` JSON-lines event log and critical Telegram alerting automatically; the dashboard picks them up from `.raqib_events.jsonl` with no new format invented.
+
+---
+
+## 📧 Email Header Analyzer Guide
+
+*(Included from [`tools/forensics/email_header_analyzer.md`](tools/forensics/email_header_analyzer.md))*
+
+Defensive phishing/spoofing triage for emails received on **your own domains** (item 2 of the RAQIB roadmap). Pure Python stdlib (`email` module) — zero third-party dependencies, **no network calls**, nothing leaves the machine.
+
+### What it checks
+
+| Check | What was checked | Why it matters |
+|---|---|---|
+| `no_auth_headers` | Presence of `Authentication-Results` / `Received-SPF` | Without SPF/DKIM/DMARC verdicts the message cannot be authenticated from headers |
+| `spf_fail` / `spf_softfail`/`permerror`/`temperror` | Per-mechanism SPF verdict parsing | fail = not authorized (spoofing); softfail/broken-SPF = spammer infrastructure or forwarder artifact |
+| `spf_missing` | No SPF verdict at all | Your MTA always evaluates SPF — a missing verdict means headers were stripped |
+| `dkim_fail` | DKIM verdict: fail | Signature did not validate — altered in transit or wrong signer |
+| `dkim_none` | DKIM verdict: none | No cryptographic proof of integrity; strengthens other findings |
+| `dmarc_missing` / `dmarc_none` | No usable DMARC verdict | No alignment decision to lean on |
+| `dmarc_fail` | DMARC verdict | Strongest header-based spoofing verdict (alignment failed) |
+| `no_received_chain` | `Received` headers exist | Stripped relay history = forged headers |
+| `long_received_chain` | Hop count > 8 | Anonymizing relay chains make origin tracing hard |
+| `received_missing_timestamp` / `received_unparseable_timestamp` | Timestamp in each hop | Hand-forged hops often lack valid timestamps |
+| `received_time_anomaly` | Chronological order of hops | Decreasing times indicate injected/forged hops |
+| `private_ip_origin` | Source IP of the earliest hop | Direct-to-MX spam often comes from compromised home machines (RFC1918) |
+| `envelope_mismatch` | `From` domain vs `Return-Path` domain | Claims one sender, sent from another — classic BEC pattern (mailing lists do it legitimately, so lower severity on consumer mailers) |
+| `reply_to_mismatch` | `From` vs `Reply-To` domain | Replies silently redirected elsewhere — the signature move of CEO-fraud (critical when From is a free mailer) |
+| `display_name_spoof` | Domain inside the friendly name | Impersonates a brand in the visible name; only the hidden address is real |
+| `free_mailer_sender` | From domain is gmail/hotmail/etc. | "Invoices" from free mailers are a strong phish marker |
+| `message_id_mismatch` | Message-ID domain vs From domain | Message-ID is stamped by the *real* origin's software — a mismatch fingerprints spoofed/bulk mail |
+| `date_received_skew` | `Date` header vs last `Received` time (> 24 h) | Hand-crafted Date or a resent spam run |
+| `forged_localhost_hop` | Topmost Received claims localhost/127.0.0.1 origin | Fake chain injected above your MTA's hop to look internal |
+| `null_return_path` | Return-Path is `<>` with normal content | Sender dodging bounce processing |
+| `social_engineering_subject` | Lure keywords in Subject (needs ≥ 2) | Urgency + threat + action demand is the standard phishing pre-text (low severity — not proof alone) |
+
+Every finding explains: what was checked, what was found, why it matters, and a suggested fix. Read-only: the `.eml` file is never modified.
+
+### Run it
+
+```bash
+# Human report
+python3 tools/forensics/email_header_analyzer.py suspicious.eml
+
+# Machine-readable: NDJSON findings on stdout
+python3 tools/forensics/email_header_analyzer.py --json suspicious.eml
+
+# From stdin (e.g. straight from a mail spool)
+cat suspicious.eml | python3 tools/forensics/email_header_analyzer.py -
+
+# Help
+python3 tools/forensics/email_header_analyzer.py --help
+```
+
+Example JSON output line:
+
+```json
+{"tool": "email_header_analyzer", "severity": "critical", "check": "reply_to_mismatch", "finding": "From domain (gmail.com) differs from Reply-To domain (secure-billing.net)", "impact": "Replies would be redirected to an unrelated domain — the signature move of CEO-fraud/BEC and account-takeover phishing.", "fix": "Contact the alleged sender through a known-good channel; block the Reply-To domain at the gateway."}
+```
+
+### Exit codes
+
+| Code | Meaning |
+|---|---|
+| `0` | No suspicious findings |
+| `1` | Findings detected |
+| `2` | Usage / file error |
+
+### Integration
+
+Findings are appended to the existing RAQIB event log `.raqib_events.jsonl` using the exact `raqib_emit_event` schema (`timestamp, host, severity, tool, message, operator, product`) — no new format invented, so the dashboard, SIEM correlation, and Telegram alerting pick them up automatically. The event log write is best-effort: if the file is not writable the analysis still completes with correct stdout output and exit code.
+
+### Extending with resource files (any extension)
+
+Detection lists are **user-extensible without touching the code**. Drop a file into `resources/email/` — **any extension works** (`free_mailers.txt`, `free_mailers.list`, `free_mailers.dat`, no extension at all…) — the file's **name** selects which list it extends:
+
+| List | Extends | Default file shipped |
+|---|---|---|
+| `free_mailers.*` | `free_mailer_sender`, `envelope_mismatch`, `reply_to_mismatch`, `display_name_spoof` heuristics | `resources/email/free_mailers.txt` |
+| `lure_keywords.*` | `social_engineering_subject` (needs ≥ 2 hits) | `resources/email/lure_keywords.txt` |
+
+Format: one entry per line, `#` starts a comment, blank lines ignored. Entries are **merged** with the built-in defaults (never replace them) and deduplicated case-insensitively. Extra sources at runtime:
+
+```bash
+python3 email_header_analyzer.py --rules extra_free_mailers.dat suspicious.eml  # one file (base name must match a list)
+python3 email_header_analyzer.py --rules my_lists_dir suspicious.eml   # or a whole directory
+```
+
+Safety: only plain data is read — `.py` files in a resource dir are ignored, nothing is ever imported or executed.
+
+---
+
+## 📂 Samples & Testing Dataset Guide
+
+*(Included from [`samples/README_samples.md`](samples/README_samples.md))*
+
+هذا المجلد يحتوي بيانات **اصطناعية مولّدة عشوائياً** (مو بيانات حقيقية من أي نظام) لتجربة أدوات RAQIB مباشرة بدون الحاجة لملفات لوج حقيقية من جهازك.
+
+This directory contains **synthetic, randomly-generated test data** (not real production data) for immediately evaluating RAQIB tools without needing real host logs.
+
+| File | Size | Intended Tool Pairings |
+|---|---|---|
+| `sample_auth.log` | ~1.4MB | Failed SSH Report, Brute Force Detector, Sudo Log Review, Keyword Search |
+| `sample_access.log` | ~1.4MB | Web Access Analyzer |
+| `sample_suspicious_binary.bin` | ~2MB | Hash Calculator, File Type Identifier, Suspicious Strings Extractor, Entropy Calculator |
+
+### Quick Test Walkthrough / مثال تجربة سريعة
+
+1. Run RAQIB:
+   ```bash
+   ./raqib.sh
+   ```
+2. Choose **Log Analysis → Failed SSH Logins Report** (تحليل السجلات → تقرير محاولات SSH الفاشلة)
+3. Enter input path:
+   ```
+   samples/sample_auth.log
+   ```
+4. Or for Malware analysis tools:
+   - Select **Malware Analysis → Suspicious Strings Extractor** (تحليل الملفات المشبوهة → مستخرج النصوص المشبوهة)
+   - Enter input path:
+     ```
+     samples/sample_suspicious_binary.bin
+     ```
+
+> ⚠️ All data in `samples/` is synthetic for testing purposes only and contains no real sensitive or executable malicious code.
+
+---
+
 ## 🧠 Threat Intelligence
 
 The local intelligence engine (`tools/malware/10_raqib_intelligence.py`) is automatically consulted by **6 other tools** at scan time:
 
 ```
-hash_calculator.sh ──┐
-hash_reputation_check.sh ──┤
-suspicious_strings_extractor.sh ──┤──► raqib_intelligence.py ──► Local IOC DB
-ip_blocker.sh ──┤                      (Feodo C2 IPs + URLhaus +
-active_connections.sh ──┤               CISA KEV — offline at query time)
-connection_rate_watcher.sh ──┘
+hash_calculator.sh ─────────────┐
+hash_reputation_check.sh ───────┤
+suspicious_strings_extractor.sh ┼──► raqib_intelligence.py ──► Local IOC DB
+ip_blocker.sh ──────────────────┤                      (Feodo C2 IPs + URLhaus +
+active_connections.sh ──────────┤                       CISA KEV — offline at query time)
+connection_rate_watcher.sh ─────┘
 ```
 
 **Update once, protect everywhere** — run the Threat Intel Lookup tool to pull fresh IOCs, and every other tool immediately benefits without any configuration change.
@@ -322,12 +564,12 @@ Tool findings ──► finding_add() ──► .raqib_events.jsonl ──► SI
                                    (NDJSON, Wazuh/ELK-ready)    (4 correlation rules)
                         │                                             │
                         ▼                                             ▼
-               Telegram alert                               CEF export (Splunk/ArcSight)
-               (critical only)                              HTML Dashboard (offline)
+                Telegram alert                               CEF export (Splunk/ArcSight)
+                (critical only)                              HTML Dashboard (offline)
                         │
                         ▼
-               Collector Server
-               (multi-host fleet)
+                Collector Server
+                (multi-host fleet)
 ```
 
 ---
@@ -355,8 +597,7 @@ Tool findings ──► finding_add() ──► .raqib_events.jsonl ──► SI
 
 </div>
 
-All 20 languages cover all 505 strings: menus, prompts, report text, error messages, and severity labels.  
-Switch from the in-app language menu at any time — no restart needed.
+All 20 languages cover all 505 strings: menus, prompts, report text, error messages, and severity labels. Switch from the in-app language menu at any time — no restart needed.
 
 ---
 
@@ -389,7 +630,7 @@ Overall (weighted)    99.2%    97.2%   98.2%    98.2%
 | **Language characters (Arabic, etc.) display as `?` or boxes** | Terminal does not support UTF-8 encoding. Solution: Use a modern terminal like Windows Terminal, iTerm2, or GNOME Terminal, and ensure your system locale supports UTF-8 (e.g., `export LANG=en_US.UTF-8`). |
 | **Encryption/Decryption fails** | The Python `cryptography` library might be missing. Solution: Install it using `pip3 install cryptography` or your OS package manager (`sudo apt install python3-cryptography`). |
 
-
+---
 
 ## ⚠️ Known Limitations
 
@@ -417,7 +658,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). The most impactful contributions: new de
 
 ## 📄 License
 
-[GNU License](LICENSE) — see the file for details.
+[GNU General Public License v3.0](LICENSE) — see the file for details.
 
 ---
 

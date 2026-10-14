@@ -1,0 +1,10 @@
+# RAQIB Email Header Analyzer — subject lure keywords (social engineering)
+# One keyword/phrase per line, lowercase. '#' starts a comment. ANY extension
+# works: lure_keywords.txt, lure_keywords.csv — the NAME selects the list.
+# The check needs >= 2 matched keywords to fire (low severity).
+# Built-in defaults (reference): urgent, immediately, suspend, verify your
+# account, unusual activity, password expires, click here, confirm your
+# identity, final warning, wire transfer
+#
+# Add your own below:
+
