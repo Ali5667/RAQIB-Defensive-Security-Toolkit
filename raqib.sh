@@ -20,8 +20,8 @@ if [ -z "${BASH_VERSINFO:-}" ] || [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
     exit 1
 fi
 
-VERSION="2.1"
-LAST_UPDATED="2026-09-02"
+VERSION="2.2"
+LAST_UPDATED="2026-10-14"
 
 # فرض ترميز UTF-8 بغض النظر عن إعدادات النظام — يمنع تقطيع الأحرف العربية
 # (كل حرف عربي = عدة بايتات) إلى بايتات منفردة تظهر كرموز مكسّرة/مخربطة،
@@ -262,6 +262,12 @@ _raqib_version_gt() {
 
 check_for_updates() {
     show_banner
+    if command -v python3 >/dev/null 2>&1 && [ -f "$MODULES_DIR/raqib_updater.py" ]; then
+        python3 "$MODULES_DIR/raqib_updater.py"
+        pause
+        return
+    fi
+
     echo -e "${CYAN}$(t upd_title)${NC}"
     echo -e "${GREY}$(tf upd_current_version "$VERSION")${NC}"
     echo ""

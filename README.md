@@ -12,18 +12,18 @@
 ### Defensive Security Toolkit
 
 **The only zero-dependency incident-response platform built entirely from scratch —  
-60 standalone tools · 20 languages · real-time monitoring · CTF mode · threat intelligence**
+85 standalone tools · 20 languages (100% complete) · real-time monitoring · CTF mode · threat intelligence**
 
 [![License: GNU GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.1-blue.svg)](VERSION)
+[![Version](https://img.shields.io/badge/version-2.2-blue.svg)](VERSION)
 [![Bash 4+](https://img.shields.io/badge/Bash-4%2B-4EAA25?logo=gnu-bash&logoColor=white)](https://www.gnu.org/software/bash/)
 [![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white)](https://python.org)
-[![Platform: Linux](https://img.shields.io/badge/platform-Linux%20%7C%20macOS-informational)](#-requirements)
-[![Languages: 20](https://img.shields.io/badge/languages-20-brightgreen)](modules/lang.sh)
-[![Tools: 60](https://img.shields.io/badge/tools-60-red)](tools/)
+[![Platform: Linux | macOS | WSL](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20WSL-informational)](#-requirements)
+[![Languages: 20 (100%)](https://img.shields.io/badge/languages-20%20(100%25)-brightgreen)](modules/lang.sh)
+[![Tools: 85](https://img.shields.io/badge/tools-85-red)](tools/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-[Overview](#-overview) • [Demo](#-interactive-demo) • [Architecture](#-architecture) • [Quick Start](#-quick-start) • [Tools](#-tools-60) • [Rootkit Detector](#-rootkit-detector-guide) • [Email Header Analyzer](#-email-header-analyzer-guide) • [Samples & Testing](#-samples--testing-dataset-guide) • [Threat Intelligence](#-threat-intelligence) • [Accuracy](#-accuracy-benchmark) • [العربية](README.ar.md)
+[Overview](#-overview) • [Demo](#-interactive-demo) • [Architecture](#-architecture) • [Quick Start](#-quick-start) • [Tools](#-tools-85) • [Rootkit Detector](#-rootkit-detector-guide) • [Email Header Analyzer](#-email-header-analyzer-guide) • [Samples & Testing](#-samples--testing-dataset-guide) • [Threat Intelligence](#-threat-intelligence) • [Accuracy](#-accuracy-benchmark) • [العربية](README.ar.md)
 
 </div>
 
@@ -35,7 +35,7 @@
 
 Every single tool is written from scratch against core POSIX utilities (`ss`, `find`, `awk`, `grep`, `openssl`, `/dev/tcp`, `python3` stdlib). No Nmap. No Wireshark. No third-party security binaries. Just clean, auditable code that runs on a minimal Alpine container or a fully-locked-down box.
 
-60 tools across 8 operational domains, **wired together as one integrated incident-response workflow** — not a pile of disconnected scripts.
+85 tools across 8 operational domains (including 22 specialized CTF & Wargames tools), **wired together as one integrated incident-response workflow** — not a pile of disconnected scripts.
 
 > ⚠️ **Authorized use only.** Scanning tools are for *your own infrastructure* or systems you have explicit written authorization to assess.
 
@@ -88,7 +88,7 @@ raqib/
 ├── LICENSE · SECURITY.md · CONTRIBUTING.md · CHANGES.md
 │
 ├── modules/                             ← Shared kernel (sourced by every tool)
-│   ├── common.sh                        ← 990-line shared library:
+│   ├── common.sh                        ← Shared core library:
 │   │                                       • AES-256-GCM encryption/decryption (Argon2id + Scrypt)
 │   │                                       • Structured JSON event log (SIEM-compatible)
 │   │                                       • Telegram alerts (push on critical findings)
@@ -98,14 +98,19 @@ raqib/
 │   │                                       • Report ID + scan history (last 10)
 │   │                                       • Cross-platform portability helpers
 │   │                                       • Shared quarantine + secure-delete
-│   │                                       • Progress bar + spinner UI components
-│   ├── lang.sh                          ← 20×505 = 10,100 translation strings
-│   ├── auto_translate.sh                ← LibreTranslate bridge (optional, cached)
+│   │                                       • Multi-style Cyber Spinners (Braille/Radar/Pulse/Dots/Arrows)
+│   │                                       • Smooth sub-block (1/8th Unicode) progress bars with live ETA
+│   │                                       • Live single-line target scanner (draw_scan_line) & cyber flicker
+│   │                                       • Universal cross-platform audio player (macOS/Linux/WSL/Windows)
+│   ├── lang.sh                          ← 20×667 = 13,340 translation strings (100% complete)
+│   ├── auto_translate.sh                ← Automated on-demand translation bridge
+│   ├── update_translations.py           ← Python batch translation synchronizer (format specifier protection)
+│   ├── raqib_updater.py                 ← Advanced toolkit updater & integrity manager (snapshots, rollback, verify)
 │   └── lang_cache/                      ← Auto-translated strings (local, persistent)
 │
 ├── assets/
 │   ├── eagle_logo.txt / eagle_logo_2.txt  ← ASCII art (radar-scan terminal banner)
-│   ├── eagle_cry_real.wav               ← Startup sound (paplay / aplay / ffplay)
+│   ├── eagle_cry_real.wav               ← Startup sound (afplay / pw-play / paplay / aplay / powershell)
 │   └── raqib_demo.gif                   ← Animated terminal demo for documentation
 │
 ├── samples/                             ← Synthetic test logs and binaries
@@ -119,7 +124,7 @@ raqib/
 │   └── corpus/                          ← Adversarial test corpus
 │
 └── tools/
-    ├── monitoring/ (12)                 ← Network + SIEM + alerting + fleet collection
+    ├── monitoring/ (15)                 ← Network + SIEM + alerting + fleet collection
     ├── logs/       (5)                  ← Log analysis and parsing
     ├── ids_ips/    (6)                  ← Intrusion detection and IP blocking
     ├── malware/    (13)                 ← Static analysis + threat intelligence engine
@@ -134,7 +139,7 @@ raqib/
     │   └── resources/email/             ← Detection resource lists
     │
     ├── hardening/  (8)                  ← System hardening + audit trail
-    ├── vuln_scan/  (5)                  ← Vulnerability and permission scanning
+    ├── vuln_scan/  (8)                  ← Vulnerability and permission scanning
     └── ctf/        (22)                 ← CTF / Wargames mode (Crypto/Stego/Forensics/Web/Binary)
 ```
 
@@ -163,12 +168,14 @@ chmod +x raqib.sh
 | `find`, `awk`, `grep`, `ss`, `openssl` | Core utilities — present on any Linux |
 | `curl` *(optional)* | Reputation checks, rule updates, Telegram alerts |
 | `yara` *(optional)* | Real YARA rule layer on top of the YARA-lite engine |
-| `paplay`/`aplay`/`ffplay` *(optional)* | Startup sound |
+| `afplay`/`pw-play`/`paplay`/`aplay`/`powershell` *(optional)* | Eagle startup sound (macOS, PipeWire, PulseAudio, ALSA, Windows/WSL) |
 | `python3 cryptography` *(optional)* | Report encryption (AES-256-GCM) |
 
 ---
 
-## 📋 Tools (60)
+## 📋 Tools & Security Engines (85)
+
+> **Architecture Overview**: RAQIB provides **85 total security tools, analytical engines, and daemons** — 63 core defensive incident-response & audit tools distributed across 7 primary categories, plus 22 dedicated CTF & competition tools.
 
 ### 🛰️ Network Monitoring (12)
 

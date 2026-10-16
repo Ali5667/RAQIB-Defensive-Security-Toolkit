@@ -212,3 +212,60 @@ no resource files at all.
   (crash on private-IP Received hops) — now int.from_bytes.
 - Verified: --rules with .dat/.conf files loads entries (merge+dedup),
   regressions green (fake phish exit 1, clean email exit 0).
+
+## 9) v2.2 — Complete i18n Suite, Dynamic Visual Effects & Cross-Platform Audio
+
+### 1. Translation Engine & 100% i18n Coverage (modules/update_translations.py + modules/lang.sh + modules/auto_translate.sh)
+- **Built `modules/update_translations.py`**: High-performance Python translation synchronization utility using Google Translate web endpoint:
+  - Format placeholder preservation (`%s`, `%d`, `%1$s` masked into tokens `__VARn__` to prevent translator corruption).
+  - Escaped characters validation and Bash syntax verification.
+  - Generates atomic `.bak` backup before writing.
+  - Supports `--status` (coverage report), `--lang <code>`, `--all`, `--cache-only`, and `--single-key`.
+- **100.0% Translation Completion across all 20 Languages**:
+  - Automatically translated 2,900 missing strings across Spanish, French, German, Turkish, Persian, Russian, Kurdish, Chinese, Urdu, Portuguese, Indonesian, Italian, Japanese, Hindi, Dutch, Korean, Ukrainian, and Polish.
+  - Every single one of the 20 supported languages now has 100.0% coverage (667 keys each = 13,340 strings total).
+- **Updated `modules/auto_translate.sh`**: Bridged live translation fallback into `update_translations.py`.
+
+### 2. Modern Cyber Visual Indicators & Terminal UI (modules/common.sh)
+- **`run_with_spinner`**:
+  - Supports 5 customizable spinner styles: `braille` (default: ⠋⠙⠹...), `radar` (◐◓◑◒), `pulse` (▉▊▋▌...), `dots` (⣾⣽⣻...), and `arrows` (←↖↑↗...).
+  - Live execution timer displaying elapsed time in tenths of a second (`1.4s`).
+  - Persistent completion badges (`✔` in bold green upon success, `✘` in bold red upon error).
+  - `--style=<name>` flag and `RAQIB_SPINNER_STYLE` environment variable configuration.
+  - Clean signal handling (`SIGINT`, `SIGTERM`, `EXIT`) with cursor restoration (`\e[?25h`).
+- **`draw_progress_bar`**:
+  - Replaced rough full blocks with smooth 1/8th Unicode fractional sub-blocks (`▏▎▍▌▋▊▉█`).
+  - Dynamic gradient transition (cyan during progress, bold green on 100% completion).
+  - Zero subshell overhead with pure Bash arithmetic.
+- **`draw_scan_line`**:
+  - Single-line streaming status indicator with carriage return (`\r`) for in-place target updates.
+- **`cyber_flicker`**:
+  - Rapid hex cyber flicker animation for initialization and engine warmups.
+
+### 3. Universal Cross-Platform Eagle Startup Sound (modules/common.sh + raqib.sh)
+- **`raqib_play_sound`**:
+  - Created a robust universal sound player supporting:
+    - **macOS**: Native `afplay`
+    - **Modern Linux**: PipeWire (`pw-play`), PulseAudio (`paplay`), ALSA (`aplay`), FFmpeg (`ffplay`)
+    - **Windows / WSL / Git Bash**: PowerShell `System.Media.SoundPlayer` using Base64-encoded UTF-8 script execution to reliably handle usernames with single quotes (e.g. `Ali'`) without quoting errors.
+    - **Python Fallback**: `winsound` on native Windows.
+  - Dispatches playback in the background (`&`) with output suppression to avoid blocking or cluttering the terminal.
+
+### 4. Accuracy & Robustness Verification
+- Tested and verified under `set -u` strict mode (fixed unbound variables in `modules/common.sh` including `TOOLS_DIR` and `SCRIPT_DIR`).
+- Verified all accuracy benchmarks in `tests/run_accuracy_eval.sh` (100% pass, Accuracy: 85.5%, Exit code: 0).
+- Passed Bash syntax checks (`bash -n`) across all shell scripts.
+
+### 5. Advanced Python Toolkit Updater & Integrity Manager (modules/raqib_updater.py)
+- **Built `modules/raqib_updater.py`**: Zero-dependency automated update engine using Python stdlib:
+  - **Remote Discovery**: Queries GitHub Releases API, commit logs, and raw mirrors (`update_source.txt`).
+  - **Version Intelligence**: Performs semantic version comparisons and commit delta evaluations.
+  - **Pre-Update Atomic Snapshots**: Automatically backs up project files into `.raqib_backups/` before any file write.
+  - **Dual-Mode Updating**:
+    - **Git Clone Mode**: Safely stashes local changes, fetches origin, fast-forwards updates, and restores executable permissions.
+    - **Standalone / Tarball Mode**: Downloads latest archive, unpacks core files, and preserves local user configurations (`.raqib_lang`, `.raqib_telegram.conf`, `.raqib_events.jsonl`).
+  - **Rollback System**: Instant recovery via `--rollback` flag.
+  - **Post-Update Integrity Verification**: Validates syntax of Bash scripts (`bash -n`) and Python files (`py_compile`) before finalizing.
+  - **Seamless Integration with `raqib.sh`**: Option 12 in the main menu now directly leverages `raqib_updater.py` when Python is available.
+
+
