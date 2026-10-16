@@ -47,8 +47,9 @@ CRIMSON=$'\033[1;31m'
 WHITE=$'\033[1;37m'
 GREY=$'\033[1;30m'
 BOLD=$'\033[1m'
+PURPLE=$'\033[38;5;141m'
 NC=$'\033[0m'
-export GREEN CYAN YELLOW RED ORANGE CRIMSON WHITE GREY BOLD NC
+export GREEN CYAN YELLOW RED ORANGE CRIMSON WHITE GREY BOLD PURPLE NC
 
 type_line() {
     local text="$1"; local delay="${2:-0.01}"
@@ -250,16 +251,25 @@ print_banner_info() {
 
 EOF
     echo -e "${NC}"
-    type_line "  RAQIB (رقيب) — $(t subtitle) v${VERSION}" 0.006
-    type_line "  Rapid Audit & Quick Incident-response Bash-toolkit" 0.004
-    type_line "  $(tf banner_created "$(get_created_date)")" 0.001
-    type_line "  📅 $(raqib_current_date)" 0.001
-    type_line "  🕌 $(raqib_hijri_date)" 0.001
-    type_line "  ------------------------------------------------------------" 0.001
-    type_line "  [+] Author  : Ali Alnuaimi" 0.012
-    type_line "  [+] GitHub  : https://github.com/Ali5667" 0.012
-    type_line "  [+] Twitter : @ali_cys45" 0.012
-    type_line "  ------------------------------------------------------------" 0.001
+    echo -e "  ${BOLD}${CYAN}RAQIB (رقيب) — $(t subtitle) v${VERSION}${NC}"
+    echo -e "  Rapid Audit & Quick Incident-response Bash-toolkit"
+
+    local cur_dt hijri_dt
+    cur_dt="$(date '+%Y-%m-%d  %H:%M:%S')"
+    hijri_dt="$(raqib_hijri_date 2>/dev/null || echo '—')"
+    echo -e "  📅 ${cur_dt}   |   🕌 ${hijri_dt}   |   🛡️  Zero External Dependencies"
+    echo -e "  ${GREY}--------------------------------------------------------------------------------${NC}"
+
+    local op_name="${RAQIB_OPERATOR:-Operator Active}"
+    local op_role="${RAQIB_OPERATOR_ROLE:-Senior}"
+    op_role="$(tr '[:lower:]' '[:upper:]' <<< "${op_role:0:1}")${op_role:1}"
+    local siem_state="Active"
+    [ ! -s "${RAQIB_EVENTS_FILE:-.raqib_events.jsonl}" ] && siem_state="Standby"
+
+    printf "  ${YELLOW}[+] Author  :${NC} %-25s ${YELLOW}[+] Session :${NC} ${GREEN}%s (%s)${NC}\n" "Ali Alnuaimi (@Ali5667)" "$op_name" "$op_role"
+    printf "  ${YELLOW}[+] GitHub  :${NC} %-25s ${YELLOW}[+] Suite   :${NC} %s\n" "https://github.com/Ali5667" "85 Standalone Tools Loaded"
+    printf "  ${YELLOW}[+] Twitter :${NC} %-25s ${YELLOW}[+] SIEM    :${NC} .raqib_events.jsonl (${GREEN}%s${NC})\n" "@ali_cys45" "$siem_state"
+    echo -e "  ${GREY}--------------------------------------------------------------------------------${NC}"
     echo ""
 }
 export -f print_banner_info
@@ -411,23 +421,39 @@ export -f check_for_updates
 main_menu() {
     while true; do
         show_banner
-        echo -e "${BOLD}$(t menu_prompt)${NC}"
+        echo -e "${BOLD}Choose a defensive category / اختر الفئة الأمنية للدفاع:${NC}"
         echo ""
-        echo -e "  ${CYAN}1)${NC} $(t cat1)"
-        echo -e "  ${CYAN}2)${NC} $(t cat2)"
-        echo -e "  ${CYAN}3)${NC} $(t cat3)"
-        echo -e "  ${CYAN}4)${NC} $(t cat4)"
-        echo -e "  ${CYAN}5)${NC} $(t cat5)"
-        echo -e "  ${CYAN}6)${NC} $(t cat6)"
-        echo -e "  ${CYAN}7)${NC} $(t cat7)"
-        echo -e "  ${CYAN}8)${NC} 🏴 CTF / Wargames Mode"
-        echo -e "  ${CYAN}9)${NC} $(t history_menu_option)"
-        echo -e "  ${CYAN}10)${NC} $(t lang_menu_option)"
-        echo -e "  ${CYAN}11)${NC} $(t limitations_menu_option)"
-        echo -e "  ${CYAN}12)${NC} $(t update_menu_option)"
-        echo -e "  ${RED}0)${NC} $(t exit_label)"
+        if [ "${LANG_CODE:-ar}" = "ar" ]; then
+            echo -e "  ${CYAN} 1)${NC} 🛰️  مراقبة الشبكة                     ${CYAN}(12 tools - PortScan, ARP, SIEM, Collector)${NC}"
+            echo -e "  ${CYAN} 2)${NC} 📋  تحليل السجلات                     ${CYAN}(5 tools  - SSH Brute, Keyword, Timeline, Web)${NC}"
+            echo -e "  ${CYAN} 3)${NC} 🚨  كشف التسلل والتهديدات             ${CYAN}(6 tools  - FIM, Cron Auditor, IP Blocker)${NC}"
+            echo -e "  ${CYAN} 4)${NC} 🦠  تحليل الملفات المشبوهة            ${CYAN}(13 tools - YARA-Lite, Threat Intel, Rootkit)${NC}"
+            echo -e "  ${CYAN} 5)${NC} 🔍  الطب الشرعي الرقمي                ${CYAN}(6 tools  - Email Header, Sudo, History)${NC}"
+            echo -e "  ${CYAN} 6)${NC} 🛡️  تقوية الأنظمة                     ${CYAN}(8 tools  - Permissions, SSH, Encrypted Reports)${NC}"
+            echo -e "  ${CYAN} 7)${NC} 🎯  فحص الثغرات والصلاحيات            ${CYAN}(5 tools  - Port CVEs, Outdated Pkgs, SSL)${NC}"
+            echo -e "  ${CYAN} 8)${NC} 🏴  وضع التحديات (CTF / Wargames)     ${PURPLE}(22 tools - Crypto, Stego, Forensics, Web, Binary)${NC}"
+            echo -e "  ${CYAN} 9)${NC} 📜  سجل الفحوصات الأخيرة              ${GREY}(Last 10 generated audit reports)${NC}"
+            echo -e "  ${CYAN}10)${NC} 🌐  تغيير اللغة                       ${GREY}(20 fully supported languages)${NC}"
+            echo -e "  ${CYAN}11)${NC} ⚠️  حدود معروفة بالأداة               ${GREY}(Transparency & technical boundaries)${NC}"
+            echo -e "  ${CYAN}12)${NC} 🔄  التحقق من التحديثات               ${GREY}(Passive GitHub release check)${NC}"
+            echo -e "  ${RED} 0)${NC} 🚪  خروج                              ${RED}(Clean session shutdown)${NC}"
+        else
+            echo -e "  ${CYAN} 1)${NC} 🛰️  Network Monitoring               ${CYAN}(12 tools - PortScan, ARP, SIEM, Collector)${NC}"
+            echo -e "  ${CYAN} 2)${NC} 📋  Log Analysis                      ${CYAN}(5 tools  - SSH Brute, Keyword, Timeline, Web)${NC}"
+            echo -e "  ${CYAN} 3)${NC} 🚨  Intrusion & Threat Detection      ${CYAN}(6 tools  - FIM, Cron Auditor, IP Blocker)${NC}"
+            echo -e "  ${CYAN} 4)${NC} 🦠  Suspicious File Analysis          ${CYAN}(13 tools - YARA-Lite, Threat Intel, Rootkit)${NC}"
+            echo -e "  ${CYAN} 5)${NC} 🔍  Digital Forensics                 ${CYAN}(6 tools  - Email Header, Sudo, History)${NC}"
+            echo -e "  ${CYAN} 6)${NC} 🛡️  System Hardening                  ${CYAN}(8 tools  - Permissions, SSH, Encrypted Reports)${NC}"
+            echo -e "  ${CYAN} 7)${NC} 🎯  Vulnerability & Permission Scan   ${CYAN}(5 tools  - Port CVEs, Outdated Pkgs, SSL)${NC}"
+            echo -e "  ${CYAN} 8)${NC} 🏴  CTF / Wargames Mode               ${PURPLE}(22 tools - Crypto, Stego, Forensics, Web, Binary)${NC}"
+            echo -e "  ${CYAN} 9)${NC} 📜  View Scan History                 ${GREY}(Last 10 generated audit reports)${NC}"
+            echo -e "  ${CYAN}10)${NC} 🌐  Change Language                   ${GREY}(20 fully supported languages)${NC}"
+            echo -e "  ${CYAN}11)${NC} ⚠️  Known Limitations                 ${GREY}(Transparency & technical boundaries)${NC}"
+            echo -e "  ${CYAN}12)${NC} 🔄  Check for Updates                 ${GREY}(Passive GitHub release check)${NC}"
+            echo -e "  ${RED} 0)${NC} 🚪  Exit RAQIB                        ${RED}(Clean session shutdown)${NC}"
+        fi
         echo ""
-        read -rp "  $(t choice_label)" choice
+        read -rp "  ${BOLD}${YELLOW}Choice [0-12]:${NC} " choice
         case $choice in
             1) menu_monitoring ;;
             2) menu_logs ;;
