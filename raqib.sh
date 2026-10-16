@@ -253,7 +253,7 @@ EOF
     type_line "  RAQIB (رقيب) — $(t subtitle) v${VERSION}" 0.006
     type_line "  Rapid Audit & Quick Incident-response Bash-toolkit" 0.004
     type_line "  $(tf banner_created "$(get_created_date)")" 0.001
-    type_line "  📅 $(raqib_current_datetime)" 0.001
+    type_line "  📅 $(raqib_current_date)" 0.001
     type_line "  🕌 $(raqib_hijri_date)" 0.001
     type_line "  ------------------------------------------------------------" 0.001
     type_line "  [+] Author  : Ali Alnuaimi" 0.012

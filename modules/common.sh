@@ -338,10 +338,32 @@ save_report() {
         local abs_fname
         abs_fname=$(raqib_realpath "$fname" 2>/dev/null)
         [ -n "$abs_fname" ] && fname="$abs_fname"
-        echo -e "${GREEN}$(tf c_report_saved "$fname")${NC}"
 
         local report_id
         report_id=$(_raqib_new_report_id "$fname")
+
+        # إدراج ترويسة قياسية متضمنة وقت النظام المتزامن والتاريخين الميلادي والهجري
+        local sys_time greg_date hijri_date rep_header
+        sys_time=$(date '+%Y-%m-%d %H:%M:%S %Z')
+        greg_date=$(raqib_current_date 2>/dev/null || date '+%Y-%m-%d')
+        hijri_date=$(raqib_hijri_date 2>/dev/null || echo "—")
+
+        rep_header=$(cat << REP_HDR
+================================================================================
+  RAQIB (رقيب) — Security Report / تقرير أمني
+  ------------------------------------------------------------------------------
+  Report ID                   : ${report_id}
+  Tool                        : ${tool_title}
+  Operator                    : ${RAQIB_OPERATOR:-unknown} (${RAQIB_OPERATOR_ROLE:-analyst})
+  System Time / وقت النظام    : ${sys_time}
+  Gregorian / التاريخ الجورجي : ${greg_date}
+  Hijri / التاريخ الهجري      : ${hijri_date}
+================================================================================
+
+REP_HDR
+)
+        printf '%s\n%s\n' "$rep_header" "$content" > "$fname"
+        echo -e "${GREEN}$(tf c_report_saved "$fname")${NC}"
         echo -e "${CYAN}$(tf c_report_id_line "$report_id")${NC}"
         _raqib_log_history "$report_id" "$tool_title" "$fname"
 
@@ -568,14 +590,21 @@ RAQIB_EVENTS_FILE="${SCRIPT_DIR:-.}/.raqib_events.jsonl"
 # raqib_emit_event <critical|high|medium|low> <tool_name> [رسالة]
 raqib_emit_event() {
     local sev="${1,,}" tool="${2:-unknown}" msg="${3:-}"
-    local ts host json_line
+    local ts host json_line sys_time greg_date hijri_date
     ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    sys_time=$(date '+%Y-%m-%d %H:%M:%S %Z')
+    greg_date=$(raqib_current_date 2>/dev/null || date '+%Y-%m-%d')
+    hijri_date=$(raqib_hijri_date 2>/dev/null || echo "—")
     host=$(hostname 2>/dev/null || echo unknown)
-    json_line=$(python3 - "$ts" "$host" "$sev" "$tool" "$msg" "${RAQIB_OPERATOR:-unknown}" 2>/dev/null << 'PYEOF'
+    json_line=$(python3 - "$ts" "$host" "$sev" "$tool" "$msg" "${RAQIB_OPERATOR:-unknown}" "$sys_time" "$greg_date" "$hijri_date" 2>/dev/null << 'PYEOF'
 import sys, json
-ts, host, sev, tool, msg, operator = (sys.argv + ["", "", "", "", "", ""])[1:7]
+args = (sys.argv + [""] * 10)[1:10]
+ts, host, sev, tool, msg, operator, sys_time, greg_date, hijri_date = args
 print(json.dumps({
     "timestamp": ts,
+    "system_time": sys_time,
+    "gregorian_date": greg_date,
+    "hijri_date": hijri_date,
     "host": host,
     "severity": sev,
     "tool": tool,
@@ -926,7 +955,11 @@ _raqib_log_history() {
     local sev_key
     sev_key=$(_raqib_overall_key)
     local hist_file="$SCRIPT_DIR/.raqib_history"
-    printf '%s|%s|%s|%s|%s\n' "$report_id" "$(date '+%Y-%m-%d %H:%M')" "$tool_title" "$sev_key" "$fname" >> "$hist_file" 2>/dev/null
+    local sys_time greg_date hijri_date
+    sys_time=$(date '+%Y-%m-%d %H:%M:%S')
+    greg_date=$(raqib_current_date 2>/dev/null || date '+%Y-%m-%d')
+    hijri_date=$(raqib_hijri_date 2>/dev/null || echo "—")
+    printf '%s|%s|%s|%s|%s|%s|%s\n' "$report_id" "$sys_time" "$tool_title" "$sev_key" "$fname" "$greg_date" "$hijri_date" >> "$hist_file" 2>/dev/null
     if [ -f "$hist_file" ]; then
         tail -n 10 "$hist_file" > "${hist_file}.tmp" 2>/dev/null && mv "${hist_file}.tmp" "$hist_file"
     fi
@@ -942,11 +975,21 @@ view_scan_history() {
     if [ ! -s "$hist_file" ]; then
         echo -e "${YELLOW}$(t history_empty)${NC}"
     else
-        local id ts title sev fname badge
-        while IFS='|' read -r id ts title sev fname; do
+        local id ts title sev fname greg hijri badge date_str
+        while IFS='|' read -r id ts title sev fname greg hijri; do
             [ -z "$id" ] && continue
             badge="$(_raqib_sev_badge "$sev")"
-            echo -e "  ${CYAN}${id}${NC}  ${ts}  ${BOLD}${title}${NC}  ${badge}  (${fname})"
+            date_str=""
+            if [ -n "$greg" ] && [ -n "$hijri" ] && [ "$hijri" != "—" ]; then
+                date_str="${WHITE}${greg}${NC} ${GREY}(${hijri})${NC}"
+            elif [ -n "$greg" ]; then
+                date_str="${WHITE}${greg}${NC}"
+            fi
+            if [ -n "$date_str" ]; then
+                echo -e "  ${CYAN}${id}${NC}  ${ts}  ${date_str}  ${BOLD}${title}${NC}  ${badge}  (${fname})"
+            else
+                echo -e "  ${CYAN}${id}${NC}  ${ts}  ${BOLD}${title}${NC}  ${badge}  (${fname})"
+            fi
         done < <(tac "$hist_file" 2>/dev/null || tail -r "$hist_file" 2>/dev/null || cat "$hist_file")
     fi
     pause

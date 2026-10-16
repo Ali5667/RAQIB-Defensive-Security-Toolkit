@@ -62,7 +62,10 @@ for line in sys.stdin:
         e = json.loads(line)
     except Exception:
         continue
-    print(f\"[{e.get('timestamp','-')}] {e.get('operator','unknown')} @ {e.get('tool','-')} ({e.get('severity','-')}): {e.get('message','')}\")
+    t_disp = e.get('system_time') or e.get('timestamp', '-')
+    g_disp = f\" [{e['gregorian_date']}]\" if e.get('gregorian_date') and e['gregorian_date'] != '—' else \"\"
+    h_disp = f\" ({e['hijri_date']})\" if e.get('hijri_date') and e['hijri_date'] != '—' else \"\"
+    print(f\"[{t_disp}]{g_disp}{h_disp} {e.get('operator','unknown')} @ {e.get('tool','-')} ({e.get('severity','-')}): {e.get('message','')}\")
 "
         ;;
     3)
