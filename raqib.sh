@@ -126,18 +126,55 @@ show_eagle_intro() {
 }
 export -f show_eagle_intro
 
-# raqib_hijri_date -> يطبع التاريخ الهجري الحالي (يوم/شهر بالاسم العربي/سنة)
-# باستخدام خوارزمية تحويل جدول-يوليوسي قياسية (لا يحتاج إنترنت أو مكتبات خارجية).
+# raqib_hijri_date -> يطبع التاريخ الهجري الحالي (يوم/شهر بالاسم/سنة) حسب اللغة المختارة
+# باستخدام خوارزمية تحويل جدول-يوليوسي قياسية بدون إنترنت أو مكتبات خارجية.
 raqib_hijri_date() {
-    if ! command -v python3 >/dev/null 2>&1; then
+    local lang="${1:-${LANG_CODE:-ar}}"
+    local py_cmd=""
+    if python3 -c "import sys; sys.exit(0)" >/dev/null 2>&1; then
+        py_cmd="python3"
+    elif python -c "import sys; sys.exit(0)" >/dev/null 2>&1; then
+        py_cmd="python"
+    elif py -3 -c "import sys; sys.exit(0)" >/dev/null 2>&1; then
+        py_cmd="py -3"
+    else
         echo "—"
         return
     fi
-    python3 - << 'PYEOF'
-import datetime
 
-months = ["محرم","صفر","ربيع الأول","ربيع الآخر","جمادى الأولى","جمادى الآخرة",
-          "رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"]
+    $py_cmd - "$lang" << 'PYEOF'
+import sys, datetime
+
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
+lang = sys.argv[1].lower() if len(sys.argv) > 1 and sys.argv[1] else "ar"
+
+HIJRI_MONTHS = {
+    'ar': ['محرم','صفر','ربيع الأول','ربيع الآخر','جمادى الأولى','جمادى الآخرة','رجب','شعبان','رمضان','شوال','ذو القعدة','ذو الحجة'],
+    'en': ['Muharram','Safar','Rabi\' al-Awwal','Rabi\' al-Thani','Jumada al-Ula','Jumada al-Akhirah','Rajab','Sha\'ban','Ramadan','Shawwal','Dhu al-Qi\'dah','Dhu al-Hijjah'],
+    'fr': ['Mouharram','Safar','Rabi\' al-awwal','Rabi\' ath-thani','Joumada al-oula','Joumada ath-thaniya','Rajab','Cha\'bane','Ramadan','Chawwal','Dhou al-qi\'da','Dhou al-hijja'],
+    'es': ['Muharram','Safar','Rabi\' al-Awwal','Rabi\' al-Thani','Yumada al-Wla','Yumada al-Ajira','Rayab','Sha\'ban','Ramadán','Shawwal','Du al-Qa\'da','Du al-Hiyya'],
+    'de': ['Muharram','Safar','Rabi\' al-Awwal','Rabi\' ath-Thani','Dschumada l-ula','Dschumada l-achira','Radschab','Scha\'ban','Ramadan','Schawwal','Dhu l-qa\'da','Dhu l-Hiddscha'],
+    'tr': ['Muharrem','Safer','Rebiülevvel','Rebiülahir','Cemaziyelevvel','Cemaziyelahir','Recep','Şaban','Ramazan','Şevval','Zilkade','Zilhicce'],
+    'fa': ['محرم','صفر','ربیع‌الاول','ربیع‌الثانی','جمادی‌الاول','جمادی‌الثانی','رجب','شعبان','رمضان','شوال','ذی‌القعده','ذی‌الحجه'],
+    'ru': ['Мухаррам','Сафар','Раби аль-авваль','Раби ас-сани','Джумада аль-уля','Джумада аль-ахира','Раджаб','Шаабан','Рамадан','Шавваль','Зу-ль-каада','Зу-ль-хиджа'],
+    'ku': ['مۆحەڕەم','سەفەر','ڕەبیعولئەووەڵ','ڕەبیعولئاخیر','جومادەلئوولا','جومادەلئاخیرە','ڕەجەب','شەعبان','ڕەمەزان','شەووال','زولقەعدە','زولحیججە'],
+    'zh': ['穆哈兰姆月','色法尔月','赖比尔·敖外鲁月','赖比尔·阿色尼月','主马达·敖外鲁月','主马达·阿色尼月','热哲卜月','舍尔邦月','赖买丹月','闪瓦鲁月','都尔喀尔德月','都尔黑哲月'],
+    'ur': ['محرم','صفر','ربیع الاول','ربیع الثانی','جمادی الاول','جمادی الثانی','رجب','شعبان','رمضان','شوال','ذوالقعدہ','ذوالحجہ'],
+    'pt': ['Muharram','Safar','Rabi al-Awwal','Rabi al-Thani','Jumada al-Awwal','Jumada al-Thani','Rajab','Sha\'ban','Ramadan','Shawwal','Dhu al-Qi\'dah','Dhu al-Hijjah'],
+    'id': ['Muharram','Safar','Rabi\'ul Awal','Rabi\'ul Akhir','Jumadil Awal','Jumadil Akhir','Rajab','Sya\'ban','Ramadan','Syawal','Zulkaidah','Zulhijah'],
+    'it': ['Muharram','Safar','Rabi\' al-Awwal','Rabi\' al-Thani','Jumada al-Ula','Jumada al-Akhira','Rajab','Sha\'ban','Ramadan','Shawwal','Dhu al-Qi\'da','Dhu al-Hijja'],
+    'ja': ['ムハッラム','サファル','ラビー・ウル＝アウワル','ラビー・ウス＝サーニー','ジュマーダー・ル＝ウーラー','ジュマーダー・ス＝サーニー','ラジャブ','シャアバーン','ラマダーン','シャウワール','ズー・ル＝カイダ','ズー・ル＝ヒッジャ'],
+    'hi': ['मुहर्रम','सफ़र','रबी उल-अव्वल','रबी उस-सानी','जुमादा अल-अव्वल','जुमादा अल-सानी','रजब','शाबान','रमज़ान','शव्वाल','ज़ुल-क़ादा','ज़ुल-हिज्जा'],
+    'nl': ['Moeharram','Safar','Rabi\' al-awwal','Rabi\' al-thani','Djoemada al-awwal','Djoemada al-thani','Radjab','Sja\'ban','Ramadan','Sjawwal','Dhoe al-qi\'da','Dhoe al-hidjdja'],
+    'ko': ['무하람','사파르','라비 알아우왈','라비 알사니','주마다 알아우왈','주마다 알사니','라잡','샤아반','라마단','샤왈','두 알카아다','두 알히자'],
+    'pl': ['Muharram','Safar','Rabi al-Awwal','Rabi al-Thani','Dżumada al-Ula','Dżumada al-Achira','Radżab','Szaban','Ramadan','Szawwal','Zu al-Kada','Zu al-Hidżdża'],
+    'uk': ['Мухаррам','Сафар','Рабі аль-авваль','Рабі ас-сані','Джумада аль-уля','Джумада аль-ахіра','Раджаб','Шаабан','Рамадан','Шавваль','Зуль-каада','Зуль-хіджжа'],
+}
 
 def greg_to_jdn(y, m, d):
     a = (14 - m)//12
@@ -159,7 +196,43 @@ def jdn_to_hijri(jdn):
 now = datetime.date.today()
 jdn = greg_to_jdn(now.year, now.month, now.day)
 hy, hm, hd = jdn_to_hijri(jdn)
-print(f"{hd} {months[hm-1]} {hy}هـ")
+
+months = HIJRI_MONTHS.get(lang, HIJRI_MONTHS['ar'])
+m_name = months[hm - 1]
+if lang == 'ar':
+    out = f"{hd} {m_name} {hy}هـ"
+elif lang == 'ur':
+    out = f"{hd} {m_name} {hy} ھ"
+elif lang == 'fa':
+    out = f"{hd} {m_name} {hy} ق"
+elif lang == 'ku':
+    out = f"{hd}ی {m_name}ی {hy}ک"
+elif lang == 'tr':
+    out = f"{hd} {m_name} {hy} H"
+elif lang in ('zh', 'ja'):
+    out = f"{m_name}{hd}日, {hy}年"
+elif lang == 'ko':
+    out = f"{hy}년 {m_name} {hd}일"
+elif lang in ('es', 'pt'):
+    out = f"{hd} de {m_name} de {hy} AH"
+elif lang == 'de':
+    out = f"{hd}. {m_name} {hy} d.H."
+elif lang == 'ru':
+    out = f"{hd} {m_name} {hy} г.х."
+elif lang == 'uk':
+    out = f"{hd} {m_name} {hy} р.х."
+elif lang == 'hi':
+    out = f"{hd} {m_name} {hy} हिजरी"
+elif lang == 'id':
+    out = f"{hd} {m_name} {hy} H"
+elif lang == 'it':
+    out = f"{hd} {m_name} {hy} d.E."
+elif lang == 'nl':
+    out = f"{hd} {m_name} {hy} n.H."
+else:
+    out = f"{hd} {m_name} {hy} AH"
+
+print(out)
 PYEOF
 }
 export -f raqib_hijri_date
@@ -180,7 +253,7 @@ EOF
     type_line "  RAQIB (رقيب) — $(t subtitle) v${VERSION}" 0.006
     type_line "  Rapid Audit & Quick Incident-response Bash-toolkit" 0.004
     type_line "  $(tf banner_created "$(get_created_date)")" 0.001
-    type_line "  📅 $(date '+%Y-%m-%d  %H:%M:%S')" 0.001
+    type_line "  📅 $(raqib_current_datetime)" 0.001
     type_line "  🕌 $(raqib_hijri_date)" 0.001
     type_line "  ------------------------------------------------------------" 0.001
     type_line "  [+] Author  : Ali Alnuaimi" 0.012

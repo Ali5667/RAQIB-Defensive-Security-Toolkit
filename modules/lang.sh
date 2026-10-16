@@ -3897,24 +3897,228 @@ STR_RU[banner_created]="[i] Дата создания: %s"
 STR_KU[banner_created]="[i] بەرواری دروستکردن: %s"
 STR_ZH[banner_created]="[i] 创建日期：%s"
 
-# get_created_date -> returns the toolkit's creation date (2026-09-01)
-# formatted according to the currently selected LANG_CODE.
-get_created_date() {
-    case "$LANG_CODE" in
-        ar) printf '%s' "1 سبتمبر 2026" ;;
-        en) printf '%s' "September 1, 2026" ;;
-        fr) printf '%s' "1 septembre 2026" ;;
-        es) printf '%s' "1 de septiembre de 2026" ;;
-        de) printf '%s' "1. September 2026" ;;
-        tr) printf '%s' "1 Eylül 2026" ;;
-        fa) printf '%s' "1 سپتامبر 2026" ;;
-        ru) printf '%s' "1 сентября 2026" ;;
-        ku) printf '%s' "1ی ئەیلوول 2026" ;;
-        zh) printf '%s' "2026年9月1日" ;;
-        *)  printf '%s' "2026-09-01" ;;
+# raqib_format_date "<YYYY-MM-DD>" [lang_code]
+# Formats any ISO date into the language-specific date format with month written as a name.
+# Supports all 20 languages recognized by the RAQIB Defensive Toolkit.
+raqib_format_date() {
+    local date_str="$1"
+    local lc="${2:-${LANG_CODE:-ar}}"
+    [ -z "$date_str" ] && date_str="$(date '+%Y-%m-%d')"
+    
+    local y="${date_str%%-*}"
+    local rest="${date_str#*-}"
+    local m="${rest%%-*}"
+    local d="${rest#*-}"
+    
+    # Strip leading zeros for arithmetic
+    m=$(( 10#$m ))
+    d=$(( 10#$d ))
+    
+    local month_name=""
+    case "$lc" in
+        ar)
+            case "$m" in
+                1) month_name="يناير" ;; 2) month_name="فبراير" ;; 3) month_name="مارس" ;;
+                4) month_name="أبريل" ;; 5) month_name="مايو" ;; 6) month_name="يونيو" ;;
+                7) month_name="يوليو" ;; 8) month_name="أغسطس" ;; 9) month_name="سبتمبر" ;;
+                10) month_name="أكتوبر" ;; 11) month_name="نوفمبر" ;; 12) month_name="ديسمبر" ;;
+            esac
+            printf '%s' "${d} ${month_name} ${y}"
+            ;;
+        en)
+            case "$m" in
+                1) month_name="January" ;; 2) month_name="February" ;; 3) month_name="March" ;;
+                4) month_name="April" ;; 5) month_name="May" ;; 6) month_name="June" ;;
+                7) month_name="July" ;; 8) month_name="August" ;; 9) month_name="September" ;;
+                10) month_name="October" ;; 11) month_name="November" ;; 12) month_name="December" ;;
+            esac
+            printf '%s' "${month_name} ${d}, ${y}"
+            ;;
+        fr)
+            case "$m" in
+                1) month_name="janvier" ;; 2) month_name="février" ;; 3) month_name="mars" ;;
+                4) month_name="avril" ;; 5) month_name="mai" ;; 6) month_name="juin" ;;
+                7) month_name="juillet" ;; 8) month_name="août" ;; 9) month_name="septembre" ;;
+                10) month_name="octobre" ;; 11) month_name="novembre" ;; 12) month_name="décembre" ;;
+            esac
+            printf '%s' "${d} ${month_name} ${y}"
+            ;;
+        es)
+            case "$m" in
+                1) month_name="enero" ;; 2) month_name="febrero" ;; 3) month_name="marzo" ;;
+                4) month_name="abril" ;; 5) month_name="mayo" ;; 6) month_name="junio" ;;
+                7) month_name="julio" ;; 8) month_name="agosto" ;; 9) month_name="septiembre" ;;
+                10) month_name="octubre" ;; 11) month_name="noviembre" ;; 12) month_name="diciembre" ;;
+            esac
+            printf '%s' "${d} de ${month_name} de ${y}"
+            ;;
+        de)
+            case "$m" in
+                1) month_name="Januar" ;; 2) month_name="Februar" ;; 3) month_name="März" ;;
+                4) month_name="April" ;; 5) month_name="Mai" ;; 6) month_name="Juni" ;;
+                7) month_name="Juli" ;; 8) month_name="August" ;; 9) month_name="September" ;;
+                10) month_name="Oktober" ;; 11) month_name="November" ;; 12) month_name="Dezember" ;;
+            esac
+            printf '%s' "${d}. ${month_name} ${y}"
+            ;;
+        tr)
+            case "$m" in
+                1) month_name="Ocak" ;; 2) month_name="Şubat" ;; 3) month_name="Mart" ;;
+                4) month_name="Nisan" ;; 5) month_name="Mayıs" ;; 6) month_name="Haziran" ;;
+                7) month_name="Temmuz" ;; 8) month_name="Ağustos" ;; 9) month_name="Eylül" ;;
+                10) month_name="Ekim" ;; 11) month_name="Kasım" ;; 12) month_name="Aralık" ;;
+            esac
+            printf '%s' "${d} ${month_name} ${y}"
+            ;;
+        fa)
+            case "$m" in
+                1) month_name="ژانویه" ;; 2) month_name="فوریه" ;; 3) month_name="مارس" ;;
+                4) month_name="آوریل" ;; 5) month_name="مه" ;; 6) month_name="ژوئن" ;;
+                7) month_name="ژوئیه" ;; 8) month_name="اوت" ;; 9) month_name="سپتامبر" ;;
+                10) month_name="اکتبر" ;; 11) month_name="نوامبر" ;; 12) month_name="دسامبر" ;;
+            esac
+            printf '%s' "${d} ${month_name} ${y}"
+            ;;
+        ru)
+            case "$m" in
+                1) month_name="января" ;; 2) month_name="февраля" ;; 3) month_name="марта" ;;
+                4) month_name="апреля" ;; 5) month_name="мая" ;; 6) month_name="июня" ;;
+                7) month_name="июля" ;; 8) month_name="августа" ;; 9) month_name="сентября" ;;
+                10) month_name="октября" ;; 11) month_name="ноября" ;; 12) month_name="декабря" ;;
+            esac
+            printf '%s' "${d} ${month_name} ${y} г."
+            ;;
+        ku)
+            case "$m" in
+                1) month_name="کانوونی دووەم" ;; 2) month_name="شوبات" ;; 3) month_name="ئادار" ;;
+                4) month_name="نیسان" ;; 5) month_name="ئایار" ;; 6) month_name="حوزەیران" ;;
+                7) month_name="تەممووز" ;; 8) month_name="ئاب" ;; 9) month_name="ئەیلوول" ;;
+                10) month_name="تشرینی یەکەم" ;; 11) month_name="تشرینی دووەم" ;; 12) month_name="کانوونی یەکەم" ;;
+            esac
+            printf '%s' "${d}ی ${month_name} ${y}"
+            ;;
+        zh|ja)
+            case "$m" in
+                1) month_name="1月" ;; 2) month_name="2月" ;; 3) month_name="3月" ;;
+                4) month_name="4月" ;; 5) month_name="5月" ;; 6) month_name="6月" ;;
+                7) month_name="7月" ;; 8) month_name="8月" ;; 9) month_name="9月" ;;
+                10) month_name="10月" ;; 11) month_name="11月" ;; 12) month_name="12月" ;;
+            esac
+            printf '%s' "${y}年${month_name}${d}日"
+            ;;
+        ur)
+            case "$m" in
+                1) month_name="جنوری" ;; 2) month_name="فروری" ;; 3) month_name="مارچ" ;;
+                4) month_name="اپریل" ;; 5) month_name="مئی" ;; 6) month_name="جون" ;;
+                7) month_name="جولائی" ;; 8) month_name="اگست" ;; 9) month_name="ستمبر" ;;
+                10) month_name="اکتوبر" ;; 11) month_name="نومبر" ;; 12) month_name="دسمبر" ;;
+            esac
+            printf '%s' "${d} ${month_name} ${y}"
+            ;;
+        pt)
+            case "$m" in
+                1) month_name="janeiro" ;; 2) month_name="fevereiro" ;; 3) month_name="março" ;;
+                4) month_name="abril" ;; 5) month_name="maio" ;; 6) month_name="junho" ;;
+                7) month_name="julho" ;; 8) month_name="agosto" ;; 9) month_name="setembro" ;;
+                10) month_name="outubro" ;; 11) month_name="novembro" ;; 12) month_name="dezembro" ;;
+            esac
+            printf '%s' "${d} de ${month_name} de ${y}"
+            ;;
+        id)
+            case "$m" in
+                1) month_name="Januari" ;; 2) month_name="Februari" ;; 3) month_name="Maret" ;;
+                4) month_name="April" ;; 5) month_name="Mei" ;; 6) month_name="Juni" ;;
+                7) month_name="Juli" ;; 8) month_name="Agustus" ;; 9) month_name="September" ;;
+                10) month_name="Oktober" ;; 11) month_name="November" ;; 12) month_name="Desember" ;;
+            esac
+            printf '%s' "${d} ${month_name} ${y}"
+            ;;
+        it)
+            case "$m" in
+                1) month_name="gennaio" ;; 2) month_name="febbraio" ;; 3) month_name="marzo" ;;
+                4) month_name="aprile" ;; 5) month_name="maggio" ;; 6) month_name="giugno" ;;
+                7) month_name="luglio" ;; 8) month_name="agosto" ;; 9) month_name="settembre" ;;
+                10) month_name="ottobre" ;; 11) month_name="novembre" ;; 12) month_name="dicembre" ;;
+            esac
+            printf '%s' "${d} ${month_name} ${y}"
+            ;;
+        hi)
+            case "$m" in
+                1) month_name="जनवरी" ;; 2) month_name="फ़रवरी" ;; 3) month_name="मार्च" ;;
+                4) month_name="अप्रैल" ;; 5) month_name="मई" ;; 6) month_name="जून" ;;
+                7) month_name="जुलाई" ;; 8) month_name="अगस्त" ;; 9) month_name="सितम्बर" ;;
+                10) month_name="अक्टूबर" ;; 11) month_name="नवम्बर" ;; 12) month_name="दिसम्बर" ;;
+            esac
+            printf '%s' "${d} ${month_name} ${y}"
+            ;;
+        nl)
+            case "$m" in
+                1) month_name="januari" ;; 2) month_name="februari" ;; 3) month_name="maart" ;;
+                4) month_name="april" ;; 5) month_name="mei" ;; 6) month_name="juni" ;;
+                7) month_name="juli" ;; 8) month_name="augustus" ;; 9) month_name="september" ;;
+                10) month_name="oktober" ;; 11) month_name="november" ;; 12) month_name="december" ;;
+            esac
+            printf '%s' "${d} ${month_name} ${y}"
+            ;;
+        ko)
+            case "$m" in
+                1) month_name="1월" ;; 2) month_name="2월" ;; 3) month_name="3월" ;;
+                4) month_name="4월" ;; 5) month_name="5월" ;; 6) month_name="6월" ;;
+                7) month_name="7월" ;; 8) month_name="8월" ;; 9) month_name="9월" ;;
+                10) month_name="10월" ;; 11) month_name="11월" ;; 12) month_name="12월" ;;
+            esac
+            printf '%s' "${y}년 ${month_name} ${d}일"
+            ;;
+        pl)
+            case "$m" in
+                1) month_name="stycznia" ;; 2) month_name="lutego" ;; 3) month_name="marca" ;;
+                4) month_name="kwietnia" ;; 5) month_name="maja" ;; 6) month_name="czerwca" ;;
+                7) month_name="lipca" ;; 8) month_name="sierpnia" ;; 9) month_name="września" ;;
+                10) month_name="października" ;; 11) month_name="listopada" ;; 12) month_name="grudnia" ;;
+            esac
+            printf '%s' "${d} ${month_name} ${y}"
+            ;;
+        uk)
+            case "$m" in
+                1) month_name="січня" ;; 2) month_name="лютого" ;; 3) month_name="березня" ;;
+                4) month_name="квітня" ;; 5) month_name="травня" ;; 6) month_name="червня" ;;
+                7) month_name="липня" ;; 8) month_name="серпня" ;; 9) month_name="вересня" ;;
+                10) month_name="жовтня" ;; 11) month_name="листопада" ;; 12) month_name="грудня" ;;
+            esac
+            printf '%s' "${d} ${month_name} ${y} р."
+            ;;
+        *)
+            printf '%s' "$date_str"
+            ;;
     esac
 }
+export -f raqib_format_date
+
+# raqib_current_date [lang_code] -> returns today's date formatted with month name
+raqib_current_date() {
+    raqib_format_date "$(date '+%Y-%m-%d')" "${1:-$LANG_CODE}"
+}
+export -f raqib_current_date
+
+# raqib_current_datetime [lang_code] -> returns today's date with month name + time
+raqib_current_datetime() {
+    printf '%s  %s' "$(raqib_current_date "${1:-$LANG_CODE}")" "$(date '+%H:%M:%S')"
+}
+export -f raqib_current_datetime
+
+# get_created_date -> returns the toolkit's creation date (2026-09-01)
+# formatted with month name according to the currently selected LANG_CODE.
+get_created_date() {
+    raqib_format_date "2026-09-01" "${1:-$LANG_CODE}"
+}
 export -f get_created_date
+
+# get_last_updated_date -> returns toolkit's last update date
+# formatted with month name according to the currently selected LANG_CODE.
+get_last_updated_date() {
+    raqib_format_date "${LAST_UPDATED:-2026-10-14}" "${1:-$LANG_CODE}"
+}
+export -f get_last_updated_date
 
 # =====================================================
 # قرنطنة وإزالة كاملة لملف خبيث (quarantine_and_eradicate.sh)
