@@ -21,6 +21,7 @@ if [ -z "${BASH_VERSINFO:-}" ] || [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
 fi
 
 VERSION="2.2"
+CREATED_DATE="2026-09-03"
 LAST_UPDATED="2026-10-14"
 
 # فرض ترميز UTF-8 بغض النظر عن إعدادات النظام — يمنع تقطيع الأحرف العربية
@@ -36,7 +37,14 @@ export LANG="${LC_ALL:-$LANG}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MODULES_DIR="$SCRIPT_DIR/modules"
 TOOLS_DIR="$SCRIPT_DIR/tools"
-export SCRIPT_DIR TOOLS_DIR
+export SCRIPT_DIR MODULES_DIR TOOLS_DIR VERSION CREATED_DATE LAST_UPDATED
+
+# تحميل وحدات الترجمة والوظائف الأساسية مبكراً لتكون متوفرة في البانر وكل الدوال
+source "$MODULES_DIR/common.sh"
+source "$MODULES_DIR/lang.sh"
+source "$MODULES_DIR/auto_translate.sh"
+raqib_load_translation_caches
+load_lang
 
 GREEN=$'\033[0;32m'
 CYAN=$'\033[0;36m'
@@ -254,10 +262,14 @@ EOF
     echo -e "  ${BOLD}${CYAN}RAQIB (رقيب) — $(t subtitle) v${VERSION}${NC}"
     echo -e "  Rapid Audit & Quick Incident-response Bash-toolkit"
 
-    local cur_dt hijri_dt
-    cur_dt="$(date '+%Y-%m-%d  %H:%M:%S')"
-    hijri_dt="$(raqib_hijri_date 2>/dev/null || echo '—')"
-    echo -e "  📅 ${cur_dt}   |   🕌 ${hijri_dt}   |   🛡️  Zero External Dependencies"
+    local cur_time greg_dt hijri_dt created_fmt updated_fmt
+    cur_time="$(date '+%H:%M:%S')"
+    greg_dt="$(raqib_gregorian_date "${LANG_CODE:-ar}")"
+    hijri_dt="$(raqib_hijri_date "${LANG_CODE:-ar}" 2>/dev/null || echo '—')"
+    created_fmt="$(raqib_gregorian_date "${LANG_CODE:-ar}" "${CREATED_DATE:-2026-09-03}")"
+    updated_fmt="$(raqib_gregorian_date "${LANG_CODE:-ar}" "${LAST_UPDATED:-2026-10-14}")"
+
+    echo -e "  📅 ${greg_dt}   |   ⏰ ${cur_time}   |   🕌 ${hijri_dt}   |   🛡️  Zero External Dependencies"
     echo -e "  ${GREY}--------------------------------------------------------------------------------${NC}"
 
     local op_name="${RAQIB_OPERATOR:-Operator Active}"
@@ -266,9 +278,10 @@ EOF
     local siem_state="Active"
     [ ! -s "${RAQIB_EVENTS_FILE:-.raqib_events.jsonl}" ] && siem_state="Standby"
 
-    printf "  ${YELLOW}[+] Author  :${NC} %-25s ${YELLOW}[+] Session :${NC} ${GREEN}%s (%s)${NC}\n" "Ali Alnuaimi (@Ali5667)" "$op_name" "$op_role"
-    printf "  ${YELLOW}[+] GitHub  :${NC} %-25s ${YELLOW}[+] Suite   :${NC} %s\n" "https://github.com/Ali5667" "85 Standalone Tools Loaded"
-    printf "  ${YELLOW}[+] Twitter :${NC} %-25s ${YELLOW}[+] SIEM    :${NC} .raqib_events.jsonl (${GREEN}%s${NC})\n" "@ali_cys45" "$siem_state"
+    printf "  ${YELLOW}[+] Author  :${NC} %-25s ${YELLOW}[+] Created :${NC} %s\n" "Ali Alnuaimi (@Ali5667)" "$created_fmt"
+    printf "  ${YELLOW}[+] GitHub  :${NC} %-25s ${YELLOW}[+] Session :${NC} ${GREEN}%s (%s)${NC}\n" "https://github.com/Ali5667" "$op_name" "$op_role"
+    printf "  ${YELLOW}[+] Twitter :${NC} %-25s ${YELLOW}[+] Suite   :${NC} %s\n" "@ali_cys45" "85 Standalone Tools Loaded"
+    printf "  ${YELLOW}[+] SIEM    :${NC} %-25s ${YELLOW}[+] Updated :${NC} %s (v${VERSION})\n" ".raqib_events.jsonl (${siem_state})" "$updated_fmt"
     echo -e "  ${GREY}--------------------------------------------------------------------------------${NC}"
     echo ""
 }
@@ -286,16 +299,131 @@ pause() {
 }
 export -f pause
 
-source "$MODULES_DIR/common.sh"
-source "$MODULES_DIR/lang.sh"
-source "$MODULES_DIR/auto_translate.sh"
-raqib_load_translation_caches
-load_lang
+# raqib_read_choice_live <prompt_text>
+# قراءة اختيار المستخدم مع ساعة حية متزامنة تحدث في كل ثانية دون تشويش الإدخال
+raqib_read_choice_live() {
+    local prompt_text="$1"
+    local choice=""
+    local key=""
+    local cur_time=""
 
-# لو أول مرة يشغل الأداة (ملف اللغة مو موجود)، طلع له قائمة اللغات
-if [ ! -f "$RAQIB_LANG_FILE" ]; then
-    menu_language
-fi
+    # في حال كان الإدخال غير تفاعلي (Piped / Scripted)
+    if [ ! -t 0 ]; then
+        read -r choice
+        echo "$choice"
+        return 0
+    fi
+
+    while true; do
+        cur_time="$(date '+%H:%M:%S')"
+        printf "\r\033[K%s \033[1;33m[⏰ %s]\033[0m: %s" "$prompt_text" "$cur_time" "$choice"
+
+        if IFS= read -r -s -n 1 -t 1 key; then
+            if [ -z "$key" ] || [ "$key" = $'\n' ] || [ "$key" = $'\r' ]; then
+                echo "" >&2
+                break
+            elif [ "$key" = $'\177' ] || [ "$key" = $'\b' ]; then
+                if [ ${#choice} -gt 0 ]; then
+                    choice="${choice:0:-1}"
+                fi
+            elif [[ "$key" =~ [a-zA-Z0-9] ]]; then
+                choice+="$key"
+            fi
+        fi
+    done
+    echo "$choice"
+}
+export -f raqib_read_choice_live
+
+# show_live_clock -> شاشة تفاعلية كاملة للساعة الحية ورادار الوقت والدفاع
+show_live_clock() {
+    local key=""
+    local greg_dt hijri_dt created_fmt updated_fmt
+    local cur_time host_str uptime_str
+    local op_name="${RAQIB_OPERATOR:-Operator Active}"
+    local op_role="${RAQIB_OPERATOR_ROLE:-Senior}"
+    local siem_file="${RAQIB_EVENTS_FILE:-.raqib_events.jsonl}"
+    local siem_count=0
+
+    # إخفاء المؤشر أثناء عرض شاشة الساعة الحية
+    printf "\033[?25l"
+    trap 'printf "\033[?25h"' RETURN INT TERM
+
+    while true; do
+        cur_time="$(date '+%H:%M:%S')"
+        greg_dt="$(raqib_gregorian_date "${LANG_CODE:-ar}")"
+        hijri_dt="$(raqib_hijri_date "${LANG_CODE:-ar}" 2>/dev/null || echo '—')"
+        created_fmt="$(raqib_gregorian_date "${LANG_CODE:-ar}" "${CREATED_DATE:-2026-09-03}")"
+        updated_fmt="$(raqib_gregorian_date "${LANG_CODE:-ar}" "${LAST_UPDATED:-2026-10-14}")"
+        host_str="$(hostname 2>/dev/null || echo "$HOSTNAME")"
+        uptime_str="$(uptime 2>/dev/null | sed 's/^[ \t]*//' || echo "Active")"
+        if [ -s "$siem_file" ]; then
+            siem_count="$(wc -l < "$siem_file" 2>/dev/null || echo 0)"
+        else
+            siem_count=0
+        fi
+
+        clear
+        echo -e "${GREEN}"
+        cat << "EOF"
+  ____      _    ___ ___ ____    _     _____     _______ 
+ |  _ \    / \  / _ \_ _| __ )  | |   |_ _\ \   / / ____|
+ | |_) |  / _ \| | | | ||  _ \  | |    | | \ \ / /|  _|  
+ |  _ <  / ___ \ |_| | || |_) | | |___ | |  \ V / | |___ 
+ |_| \_\/_/   \_\__\_\___|____/  |_____|___|  \_/  |_____|
+EOF
+        echo -e "${NC}"
+        echo -e "  ${BOLD}${CYAN}RAQIB (رقيب) — $(t live_clock_title)${NC}"
+        echo -e "  ${GREY}════════════════════════════════════════════════════════════════════════════════${NC}"
+        echo ""
+
+        # رسم الوقت الرقمي بالساعة والدقيقة والثانية بنمط 7-Segment أنيق
+        local r0="" r1="" r2=""
+        for (( i=0; i<${#cur_time}; i++ )); do
+            local ch="${cur_time:$i:1}"
+            case "$ch" in
+                0) r0+=" _  "; r1+="| | "; r2+="|_| " ;;
+                1) r0+="    "; r1+="  | "; r2+="  | " ;;
+                2) r0+=" _  "; r1+=" _| "; r2+="|_  " ;;
+                3) r0+=" _  "; r1+=" _| "; r2+=" _| " ;;
+                4) r0+="    "; r1+="|_| "; r2+="  | " ;;
+                5) r0+=" _  "; r1+="|_  "; r2+=" _| " ;;
+                6) r0+=" _  "; r1+="|_  "; r2+="|_| " ;;
+                7) r0+=" _  "; r1+="  | "; r2+="  | " ;;
+                8) r0+=" _  "; r1+="|_| "; r2+="|_| " ;;
+                9) r0+=" _  "; r1+="|_| "; r2+=" _| " ;;
+                :) r0+="   "; r1+=" ● "; r2+=" ● " ;;
+                *) r0+="   "; r1+="   "; r2+="   " ;;
+            esac
+        done
+
+        echo -e "         ${BOLD}${YELLOW}${r0}${NC}"
+        echo -e "         ${BOLD}${YELLOW}${r1}${NC}"
+        echo -e "         ${BOLD}${YELLOW}${r2}${NC}"
+        echo -e "                  ${CYAN}● LIVE UTC+LOCAL TICKING ●${NC}"
+        echo ""
+        echo -e "  ${GREY}────────────────────────────────────────────────────────────────────────────────${NC}"
+        echo -e "  📅 ${WHITE}$(t lc_gregorian):${NC}  ${GREEN}${greg_dt}${NC}  ${GREY}(الأشهر الجورجية بالأسماء مدمجة بالكامل)${NC}"
+        echo -e "  🕌 ${WHITE}$(t lc_hijri):${NC}      ${GREEN}${hijri_dt}${NC}"
+        echo -e "  🚀 ${WHITE}$(t lc_created):${NC}    ${CYAN}${created_fmt}${NC}  ${GREY}(تاريخ إنشاء منصة رقيب الدفاعية)${NC}"
+        echo -e "  🔄 ${WHITE}$(t lc_updated):${NC}    ${CYAN}${updated_fmt}${NC}  ${GREY}(الإصدار الحالي: v${VERSION})${NC}"
+        echo -e "  ${GREY}────────────────────────────────────────────────────────────────────────────────${NC}"
+        echo -e "  👤 ${YELLOW}[+] Operator:${NC}  ${op_name} (${op_role})"
+        echo -e "  💻 ${YELLOW}[+] Host:${NC}      ${host_str}"
+        echo -e "  📊 ${YELLOW}[+] SIEM Logs:${NC} ${siem_count} events recorded"
+        echo -e "  ⏱️  ${YELLOW}[+] System:${NC}    ${uptime_str}"
+        echo -e "  ${GREY}════════════════════════════════════════════════════════════════════════════════${NC}"
+        echo -e "  ${YELLOW}$(t lc_press_exit)${NC}"
+
+        if IFS= read -r -s -n 1 -t 1 key; then
+            if [ -n "$key" ] || [ "$key" = "" ]; then
+                break
+            fi
+        fi
+    done
+    printf "\033[?25h"
+}
+export -f show_live_clock
 
 source "$MODULES_DIR/monitoring.sh"
 source "$MODULES_DIR/logs.sh"
@@ -305,15 +433,6 @@ source "$MODULES_DIR/forensics.sh"
 source "$MODULES_DIR/hardening.sh"
 source "$MODULES_DIR/vuln_scan.sh"
 source "$TOOLS_DIR/ctf/ctf_menu.sh" 2>/dev/null || true
-
-raqib_login_attempts=0
-until raqib_operator_login; do
-    raqib_login_attempts=$((raqib_login_attempts + 1))
-    if [ "$raqib_login_attempts" -ge 3 ]; then
-        echo -e "${RED}$(t op_too_many_attempts)${NC}"
-        exit 1
-    fi
-done
 
 show_known_limitations() {
     show_banner
@@ -436,6 +555,7 @@ main_menu() {
             echo -e "  ${CYAN}10)${NC} 🌐  تغيير اللغة                       ${GREY}(20 fully supported languages)${NC}"
             echo -e "  ${CYAN}11)${NC} ⚠️  حدود معروفة بالأداة               ${GREY}(Transparency & technical boundaries)${NC}"
             echo -e "  ${CYAN}12)${NC} 🔄  التحقق من التحديثات               ${GREY}(Passive GitHub release check)${NC}"
+            echo -e "  ${CYAN}13)${NC} ⏰  الساعة الحية ورادار الوقت            ${GREEN}(Live Digital Clock, Dates & Uptime)${NC}"
             echo -e "  ${RED} 0)${NC} 🚪  خروج                              ${RED}(Clean session shutdown)${NC}"
         else
             echo -e "  ${CYAN} 1)${NC} 🛰️  Network Monitoring               ${CYAN}(12 tools - PortScan, ARP, SIEM, Collector)${NC}"
@@ -450,11 +570,13 @@ main_menu() {
             echo -e "  ${CYAN}10)${NC} 🌐  Change Language                   ${GREY}(20 fully supported languages)${NC}"
             echo -e "  ${CYAN}11)${NC} ⚠️  Known Limitations                 ${GREY}(Transparency & technical boundaries)${NC}"
             echo -e "  ${CYAN}12)${NC} 🔄  Check for Updates                 ${GREY}(Passive GitHub release check)${NC}"
+            echo -e "  ${CYAN}13)${NC} ⏰  Live Defense Clock & Telemetry        ${GREEN}(Live Digital Clock, Dates & Uptime)${NC}"
             echo -e "  ${RED} 0)${NC} 🚪  Exit RAQIB                        ${RED}(Clean session shutdown)${NC}"
         fi
         echo ""
-        read -rp "  ${BOLD}${YELLOW}Choice [0-12]:${NC} " choice
-        case $choice in
+        local choice
+        choice="$(raqib_read_choice_live "  ${BOLD}${YELLOW}Choice [0-13]${NC}")"
+        case "$choice" in
             1) menu_monitoring ;;
             2) menu_logs ;;
             3) menu_ids_ips ;;
@@ -467,14 +589,29 @@ main_menu() {
             10) menu_language ;;
             11) show_known_limitations ;;
             12) check_for_updates ;;
+            13|c|C|clock|time|ساعة) show_live_clock ;;
             0) echo -e "${GREEN}$(t goodbye)${NC}"; exit 0 ;;
             *) echo -e "${RED}$(t invalid_choice)${NC}"; sleep 1 ;;
         esac
     done
 }
 
+if [ -z "${BASH_SOURCE[0]}" ] || [ "${BASH_SOURCE[0]}" = "$0" ]; then
+    # لو أول مرة يشغل الأداة (ملف اللغة مو موجود)، طلع له قائمة اللغات
+    if [ ! -f "$RAQIB_LANG_FILE" ]; then
+        menu_language
+    fi
 
+    raqib_login_attempts=0
+    until raqib_operator_login; do
+        raqib_login_attempts=$((raqib_login_attempts + 1))
+        if [ "$raqib_login_attempts" -ge 3 ]; then
+            echo -e "${RED}$(t op_too_many_attempts)${NC}"
+            exit 1
+        fi
+    done
 
-show_eagle_intro
-main_menu
+    show_eagle_intro
+    main_menu
+fi
 

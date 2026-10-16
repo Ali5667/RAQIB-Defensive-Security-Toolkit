@@ -20,6 +20,124 @@ BOLD="${BOLD:-$'\033[1m'}"
 NC="${NC:-$'\033[0m'}"
 export GREEN CYAN YELLOW RED ORANGE CRIMSON WHITE GREY BOLD NC
 
+# ضمان توفر دوال التاريخ والترجمة متزامنة في كل أداة أو تقرير
+_COMMON_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -z "$(declare -F raqib_format_date 2>/dev/null)" ] && [ -f "$_COMMON_DIR/lang.sh" ]; then
+    source "$_COMMON_DIR/lang.sh" 2>/dev/null || true
+fi
+
+# raqib_hijri_date -> يطبع التاريخ الهجري الحالي (يوم/شهر بالاسم/سنة) حسب اللغة المختارة
+if [ -z "$(declare -F raqib_hijri_date 2>/dev/null)" ]; then
+    raqib_hijri_date() {
+        local lang="${1:-${LANG_CODE:-ar}}"
+        local py_cmd=""
+        if python3 -c "import sys; sys.exit(0)" >/dev/null 2>&1; then
+            py_cmd="python3"
+        elif python -c "import sys; sys.exit(0)" >/dev/null 2>&1; then
+            py_cmd="python"
+        elif py -3 -c "import sys; sys.exit(0)" >/dev/null 2>&1; then
+            py_cmd="py -3"
+        else
+            echo "—"
+            return
+        fi
+
+        $py_cmd - "$lang" << 'PYEOF'
+import sys, datetime
+
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
+lang = sys.argv[1].lower() if len(sys.argv) > 1 and sys.argv[1] else "ar"
+
+HIJRI_MONTHS = {
+    'ar': ['محرم','صفر','ربيع الأول','ربيع الآخر','جمادى الأولى','جمادى الآخرة','رجب','شعبان','رمضان','شوال','ذو القعدة','ذو الحجة'],
+    'en': ['Muharram','Safar','Rabi\' al-Awwal','Rabi\' al-Thani','Jumada al-Ula','Jumada al-Akhirah','Rajab','Sha\'ban','Ramadan','Shawwal','Dhu al-Qi\'dah','Dhu al-Hijjah'],
+    'fr': ['Mouharram','Safar','Rabi\' al-awwal','Rabi\' ath-thani','Joumada al-oula','Joumada ath-thaniya','Rajab','Cha\'bane','Ramadan','Chawwal','Dhou al-qi\'da','Dhou al-hijja'],
+    'es': ['Muharram','Safar','Rabi\' al-Awwal','Rabi\' al-Thani','Yumada al-Wla','Yumada al-Ajira','Rayab','Sha\'ban','Ramadán','Shawwal','Du al-Qa\'da','Du al-Hiyya'],
+    'de': ['Muharram','Safar','Rabi\' al-Awwal','Rabi\' ath-Thani','Dschumada l-ula','Dschumada l-achira','Radschab','Scha\'ban','Ramadan','Schawwal','Dhu l-qa\'da','Dhu l-Hiddscha'],
+    'tr': ['Muharrem','Safer','Rebiülevvel','Rebiülahir','Cemaziyelevvel','Cemaziyelahir','Recep','Şaban','Ramazan','Şevval','Zilkade','Zilhicce'],
+    'fa': ['محرم','صفر','ربیع‌الاول','ربیع‌الثانی','جمادی‌الاول','جمادی‌الثانی','رجب','شعبان','رمضان','شوال','ذی‌القعده','ذی‌الحجه'],
+    'ru': ['Мухаррам','Сафар','Раби аль-авваль','Раби ас-сани','Джумада аль-уля','Джумада аль-ахира','Раджаб','Шаабан','Рамадан','Шавваль','Зу-ль-каада','Зу-ль-хиджа'],
+    'ku': ['مۆحەڕەم','سەفەر','ڕەبیعولئەووەڵ','ڕەبیعولئاخیر','جومادەلئوولا','جومادەلئاخیرە','ڕەجەب','شەعبان','ڕەمەزان','شەووال','زولقەعدە','زولحیججە'],
+    'zh': ['穆哈兰姆月','色法尔月','赖比尔·敖外鲁月','赖比尔·阿色尼月','主马达·敖外鲁月','主马达·阿色尼月','热哲卜月','舍尔邦月','赖买丹月','闪瓦鲁月','都尔喀尔德月','都尔黑哲月'],
+    'ur': ['محرم','صفر','ربیع الاول','ربیع الثانی','جمادی الاول','جمادی الثانی','رجب','شعبان','رمضان','شوال','ذوالقعدہ','ذوالحجہ'],
+    'pt': ['Muharram','Safar','Rabi al-Awwal','Rabi al-Thani','Jumada al-Awwal','Jumada al-Thani','Rajab','Sha\'ban','Ramadan','Shawwal','Dhu al-Qi\'dah','Dhu al-Hijjah'],
+    'id': ['Muharram','Safar','Rabi\'ul Awal','Rabi\'ul Akhir','Jumadil Awal','Jumadil Akhir','Rajab','Sya\'ban','Ramadan','Syawal','Zulkaidah','Zulhijah'],
+    'it': ['Muharram','Safar','Rabi\' al-Awwal','Rabi\' al-Thani','Jumada al-Ula','Jumada al-Akhira','Rajab','Sha\'ban','Ramadan','Shawwal','Dhu al-Qi\'da','Dhu al-Hijja'],
+    'ja': ['ムハッラム','サファル','ラビー・ウル＝アウワル','ラビー・ウス＝サーニー','ジュマーダー・ル＝ウーラー','ジュマーダー・ス＝サーニー','ラジャブ','シャアバーン','ラマダーン','シャウワール','ズー・ル＝カイダ','ズー・ル＝ヒッジャ'],
+    'hi': ['मुहर्रम','सफ़र','रबी उल-अव्वल','रबी उस-सानी','जुमादा अल-अव्वल','जुमादा अल-सानी','रजब','शाबान','रमज़ान','शव्वाल','ज़ुल-क़ादा','ज़ुल-हिज्जा'],
+    'nl': ['Moeharram','Safar','Rabi\' al-awwal','Rabi\' al-thani','Djoemada al-awwal','Djoemada al-thani','Radjab','Sja\'ban','Ramadan','Sjawwal','Dhoe al-qi\'da','Dhoe al-hidjdja'],
+    'ko': ['무하람','사파르','라비 알아우왈','라비 알사니','주마다 알아우왈','주마다 알사니','라잡','샤아반','라마단','샤왈','두 알카아دا','두 알히자'],
+    'pl': ['Muharram','Safar','Rabi al-Awwal','Rabi al-Thani','Dżumada al-Ula','Dżumada al-Achira','Radżab','Szaban','Ramadan','Szawwal','Zu al-Kada','Zu al-Hidżdża'],
+    'uk': ['Мухаррам','Сафар','Рабі аль-авваль','Рабі ас-сані','Джумада аль-уля','Джумада аль-ахіра','Раджаб','Шаабан','Рамадан','Шавваль','Зуль-каада','Зуль-хіджжа'],
+}
+
+def greg_to_jdn(y, m, d):
+    a = (14 - m)//12
+    y2 = y + 4800 - a
+    m2 = m + 12*a - 3
+    return d + (153*m2+2)//5 + 365*y2 + y2//4 - y2//100 + y2//400 - 32045
+
+def jdn_to_hijri(jdn):
+    l = jdn - 1948440 + 10632
+    n = (l-1)//10631
+    l = l - 10631*n + 354
+    j = ((10985-l)//5316)*((50*l)//17719) + (l//5670)*((43*l)//15238)
+    l = l - ((30-j)//15)*((17719*j)//50) - (j//16)*((15238*j)//43) + 29
+    hm = (24*l)//709
+    hd = l - (709*hm)//24
+    hy = 30*n + j - 30
+    return hy, hm, hd
+
+now = datetime.date.today()
+jdn = greg_to_jdn(now.year, now.month, now.day)
+hy, hm, hd = jdn_to_hijri(jdn)
+
+months = HIJRI_MONTHS.get(lang, HIJRI_MONTHS['ar'])
+m_name = months[hm - 1]
+if lang == 'ar':
+    out = f"{hd} {m_name} {hy}هـ"
+elif lang == 'ur':
+    out = f"{hd} {m_name} {hy} ھ"
+elif lang == 'fa':
+    out = f"{hd} {m_name} {hy} ق"
+elif lang == 'ku':
+    out = f"{hd}ی {m_name}ی {hy}ک"
+elif lang == 'tr':
+    out = f"{hd} {m_name} {hy} H"
+elif lang in ('zh', 'ja'):
+    out = f"{m_name}{hd}日, {hy}年"
+elif lang == 'ko':
+    out = f"{hy}년 {m_name} {hd}일"
+elif lang in ('es', 'pt'):
+    out = f"{hd} de {m_name} de {hy} AH"
+elif lang == 'de':
+    out = f"{hd}. {m_name} {hy} d.H."
+elif lang == 'ru':
+    out = f"{hd} {m_name} {hy} г.х."
+elif lang == 'uk':
+    out = f"{hd} {m_name} {hy} р.х."
+elif lang == 'hi':
+    out = f"{hd} {m_name} {hy} हिजरी"
+elif lang == 'id':
+    out = f"{hd} {m_name} {hy} H"
+elif lang == 'it':
+    out = f"{hd} {m_name} {hy} d.E."
+elif lang == 'nl':
+    out = f"{hd} {m_name} {hy} n.H."
+else:
+    out = f"{hd} {m_name} {hy} AH"
+
+print(out)
+PYEOF
+    }
+    export -f raqib_hijri_date
+fi
+
 RAQIB_INTEL_SCRIPT="${TOOLS_DIR:-}/malware/10_raqib_intelligence.py"
 
 # raqib_intel_available -> صفر لو محرك الاستخبارات موجود وpython3 متوفر

@@ -4100,16 +4100,28 @@ raqib_current_date() {
 }
 export -f raqib_current_date
 
+# raqib_gregorian_date [lang_code] [date_iso] -> returns Gregorian date with Georgian month name
+raqib_gregorian_date() {
+    local lc="${1:-${LANG_CODE:-ar}}"
+    local dt="${2:-}"
+    if [ -n "$dt" ]; then
+        raqib_format_date "$dt" "$lc"
+    else
+        raqib_format_date "$(date '+%Y-%m-%d')" "$lc"
+    fi
+}
+export -f raqib_gregorian_date
+
 # raqib_current_datetime [lang_code] -> returns today's date with month name + time
 raqib_current_datetime() {
     printf '%s  %s' "$(raqib_current_date "${1:-$LANG_CODE}")" "$(date '+%H:%M:%S')"
 }
 export -f raqib_current_datetime
 
-# get_created_date -> returns the toolkit's creation date (2026-09-01)
+# get_created_date -> returns the toolkit's creation date (2026-09-03)
 # formatted with month name according to the currently selected LANG_CODE.
 get_created_date() {
-    raqib_format_date "2026-09-01" "${1:-$LANG_CODE}"
+    raqib_format_date "${CREATED_DATE:-2026-09-03}" "${1:-$LANG_CODE}"
 }
 export -f get_created_date
 
@@ -5391,6 +5403,169 @@ STR_FA[upd_up_to_date]="شما همین الان روی آخرین نسخه هس
 STR_RU[upd_up_to_date]="У вас уже установлена последняя версия. Обновлений нет."
 STR_KU[upd_up_to_date]="تۆ ئێستا لەسەر دواین وەشانیت. هیچ نوێکردنەوەیەک بەردەست نییە."
 STR_ZH[upd_up_to_date]="您已经是最新版本。没有可用的更新。"
+
+# =====================================================
+# الساعة الحية ورادار الوقت (Live Defense Clock)
+# =====================================================
+STR_AR[live_clock_menu]="الساعة الحية ورادار الوقت"
+STR_AR[live_clock_title]="الساعة الحية ورادار الوقت والدفاع"
+STR_AR[lc_gregorian]="التاريخ الميلادي (الجورجي)"
+STR_AR[lc_hijri]="التاريخ الهجري"
+STR_AR[lc_created]="تاريخ إنشاء رقيب"
+STR_AR[lc_updated]="آخر تحديث للمنظومة"
+STR_AR[lc_press_exit]="اضغط أي مفتاح أو Enter للعودة إلى القائمة الرئيسية..."
+
+STR_EN[live_clock_menu]="Live Defense Clock & Telemetry"
+STR_EN[live_clock_title]="Live Defense Clock & System Telemetry"
+STR_EN[lc_gregorian]="Gregorian Date"
+STR_EN[lc_hijri]="Hijri Date"
+STR_EN[lc_created]="RAQIB Creation Date"
+STR_EN[lc_updated]="Last Updated"
+STR_EN[lc_press_exit]="Press any key or Enter to return to main menu..."
+
+STR_FR[live_clock_menu]="Horloge de défense en direct et télémétrie"
+STR_FR[live_clock_title]="Horloge de défense en direct et télémétrie système"
+STR_FR[lc_gregorian]="Date grégorienne"
+STR_FR[lc_hijri]="Date hégirienne"
+STR_FR[lc_created]="Date de création de RAQIB"
+STR_FR[lc_updated]="Dernière mise à jour"
+STR_FR[lc_press_exit]="Appuyez sur une touche ou Entrée pour revenir au menu principal..."
+
+STR_ES[live_clock_menu]="Reloj de defensa en vivo y telemetría"
+STR_ES[live_clock_title]="Reloj de defensa en vivo y telemetría del sistema"
+STR_ES[lc_gregorian]="Fecha gregoriana"
+STR_ES[lc_hijri]="Fecha hiyri"
+STR_ES[lc_created]="Fecha de creación de RAQIB"
+STR_ES[lc_updated]="Última actualización"
+STR_ES[lc_press_exit]="Presione cualquier tecla o Enter para volver al menú principal..."
+
+STR_DE[live_clock_menu]="Live-Verteidigungsuhr & Telemetrie"
+STR_DE[live_clock_title]="Live-Verteidigungsuhr & Systemtelemetrie"
+STR_DE[lc_gregorian]="Gregorianisches Datum"
+STR_DE[lc_hijri]="Hidschri-Datum"
+STR_DE[lc_created]="RAQIB-Erstellungsdatum"
+STR_DE[lc_updated]="Zuletzt aktualisiert"
+STR_DE[lc_press_exit]="Beliebige Taste oder Eingabetaste drücken, um zum Hauptmenü zurückzukehren..."
+
+STR_TR[live_clock_menu]="Canlı Savunma Saati ve Telemetri"
+STR_TR[live_clock_title]="Canlı Savunma Saati ve Sistem Telemetrisi"
+STR_TR[lc_gregorian]="Miladi Tarih"
+STR_TR[lc_hijri]="Hicri Tarih"
+STR_TR[lc_created]="RAQIB Oluşturulma Tarihi"
+STR_TR[lc_updated]="Son Güncelleme"
+STR_TR[lc_press_exit]="Ana menüye dönmek için herhangi bir tuşa veya Enter'a basın..."
+
+STR_FA[live_clock_menu]="ساعت زنده دفاعی و تله‌متری"
+STR_FA[live_clock_title]="ساعت زنده دفاعی و تله‌متری سیستم"
+STR_FA[lc_gregorian]="تاریخ میلادی (گرگوری)"
+STR_FA[lc_hijri]="تاریخ هجری قمری"
+STR_FA[lc_created]="تاریخ ایجاد رقیب"
+STR_FA[lc_updated]="آخرین به‌روزرسانی"
+STR_FA[lc_press_exit]="برای بازگشت به منوی اصلی هر کلیدی یا Enter را فشار دهید..."
+
+STR_RU[live_clock_menu]="Живые защитные часы и телеметрия"
+STR_RU[live_clock_title]="Живые защитные часы и системная телеметрия"
+STR_RU[lc_gregorian]="Григорианская дата"
+STR_RU[lc_hijri]="Дата по Хиджре"
+STR_RU[lc_created]="Дата создания RAQIB"
+STR_RU[lc_updated]="Последнее обновление"
+STR_RU[lc_press_exit]="Нажмите любую клавишу или Enter для возврата в главное меню..."
+
+STR_KU[live_clock_menu]="کاتژمێری زیندووی بەرگری و تەلەمەتری"
+STR_KU[live_clock_title]="کاتژمێری زیندووی بەرگری و تەلەمەتری سیستەم"
+STR_KU[lc_gregorian]="مێژووی زایینی (گریگۆری)"
+STR_KU[lc_hijri]="مێژووی کۆچی"
+STR_KU[lc_created]="مێژووی دروستکردنی ڕەقیب"
+STR_KU[lc_updated]="دواین نوێکردنەوە"
+STR_KU[lc_press_exit]="بۆ گەڕانەوە بۆ پێڕستی سەرەکی دوگمەیەک یان Enter دابگرە..."
+
+STR_ZH[live_clock_menu]="实时防御时钟与遥测"
+STR_ZH[live_clock_title]="实时防御时钟与系统遥测"
+STR_ZH[lc_gregorian]="公历日期"
+STR_ZH[lc_hijri]="伊斯兰历日期"
+STR_ZH[lc_created]="RAQIB 创建日期"
+STR_ZH[lc_updated]="最后更新"
+STR_ZH[lc_press_exit]="按任意键或回车键返回主菜单..."
+
+STR_UR[live_clock_menu]="لائیو ڈیفنس کلاک اور ٹیلی میٹری"
+STR_UR[live_clock_title]="لائیو ڈیفنس کلاک اور سسٹم ٹیلی میٹری"
+STR_UR[lc_gregorian]="عیسوی تاریخ"
+STR_UR[lc_hijri]="ہجری تاریخ"
+STR_UR[lc_created]="رقیب کی تخلیق کی تاریخ"
+STR_UR[lc_updated]="آخری اپ ڈیٹ"
+STR_UR[lc_press_exit]="مین مینو میں واپس جانے کے لیے کوئی بھی کلید یا Enter دبائیں..."
+
+STR_PT[live_clock_menu]="Relógio de defesa ao vivo e telemetria"
+STR_PT[live_clock_title]="Relógio de defesa ao vivo e telemetria do sistema"
+STR_PT[lc_gregorian]="Data Gregoriana"
+STR_PT[lc_hijri]="Data Islâmica"
+STR_PT[lc_created]="Data de criação do RAQIB"
+STR_PT[lc_updated]="Última atualização"
+STR_PT[lc_press_exit]="Pressione qualquer tecla ou Enter para retornar ao menu principal..."
+
+STR_ID[live_clock_menu]="Jam Pertahanan Langsung & Telemetri"
+STR_ID[live_clock_title]="Jam Pertahanan Langsung & Telemetri Sistem"
+STR_ID[lc_gregorian]="Tanggal Masehi (Gregorian)"
+STR_ID[lc_hijri]="Tanggal Hijriah"
+STR_ID[lc_created]="Tanggal Pembuatan RAQIB"
+STR_ID[lc_updated]="Pembaruan Terakhir"
+STR_ID[lc_press_exit]="Tekan tombol apa saja atau Enter untuk kembali ke menu utama..."
+
+STR_IT[live_clock_menu]="Orologio di difesa in tempo reale e telemetria"
+STR_IT[live_clock_title]="Orologio di difesa in tempo reale e telemetria di sistema"
+STR_IT[lc_gregorian]="Data gregoriana"
+STR_IT[lc_hijri]="Data islamica"
+STR_IT[lc_created]="Data di creazione di RAQIB"
+STR_IT[lc_updated]="Ultimo aggiornamento"
+STR_IT[lc_press_exit]="Premi un tasto qualsiasi o Invio per tornare al menu principale..."
+
+STR_JA[live_clock_menu]="ライブ防衛時計とテレメトリ"
+STR_JA[live_clock_title]="リアルタイム防衛時計とシステムテレメトリ"
+STR_JA[lc_gregorian]="西暦（グレゴリオ暦）"
+STR_JA[lc_hijri]="ヒジュラ暦"
+STR_JA[lc_created]="RAQIB 作成日"
+STR_JA[lc_updated]="最終更新日"
+STR_JA[lc_press_exit]="任意のキーまたはEnterを押してメインメニューに戻ります..."
+
+STR_HI[live_clock_menu]="लाइव रक्षा घड़ी और टेलीमेट्री"
+STR_HI[live_clock_title]="लाइव रक्षा घड़ी और सिस्टम टेलीमेट्री"
+STR_HI[lc_gregorian]="ग्रेगोरियन कैलेंडर दिनांक"
+STR_HI[lc_hijri]="हिजरी दिनांक"
+STR_HI[lc_created]="RAQIB निर्माण दिनांक"
+STR_HI[lc_updated]="अंतिम अद्यतन"
+STR_HI[lc_press_exit]="मुख्य मेनू पर लौटने के लिए कोई भी कुंजी या Enter दबाएं..."
+
+STR_NL[live_clock_menu]="Live defensieklok & telemetrie"
+STR_NL[live_clock_title]="Live defensieklok & systeemtelemetrie"
+STR_NL[lc_gregorian]="Gregoriaanse datum"
+STR_NL[lc_hijri]="Hijri-datum"
+STR_NL[lc_created]="Aanmaakdatum RAQIB"
+STR_NL[lc_updated]="Laatst bijgewerkt"
+STR_NL[lc_press_exit]="Druk op een willekeurige toets of Enter om terug te keren naar het hoofdmenu..."
+
+STR_KO[live_clock_menu]="실시간 방어 시계 및 원격 측정"
+STR_KO[live_clock_title]="실시간 방어 시계 및 시스템 원격 측정"
+STR_KO[lc_gregorian]="그레고리력 날짜"
+STR_KO[lc_hijri]="히즈라력 날짜"
+STR_KO[lc_created]="RAQIB 생성일"
+STR_KO[lc_updated]="마지막 업데이트"
+STR_KO[lc_press_exit]="메인 메뉴로 돌아가려면 아무 키나 Enter를 누르세요..."
+
+STR_PL[live_clock_menu]="Zegar obrony na żywo i telemetria"
+STR_PL[live_clock_title]="Zegar obrony na żywo i telemetria systemowa"
+STR_PL[lc_gregorian]="Data gregoriańska"
+STR_PL[lc_hijri]="Data hidżry"
+STR_PL[lc_created]="Data utworzenia RAQIB"
+STR_PL[lc_updated]="Ostatnia aktualizacja"
+STR_PL[lc_press_exit]="Naciśnij dowolny klawisz lub Enter, aby wrócić do menu głównego..."
+
+STR_UK[live_clock_menu]="Живий захисний годинник та телеметрія"
+STR_UK[live_clock_title]="Живий захисний годинник та системна телеметрія"
+STR_UK[lc_gregorian]="Григоріанська дата"
+STR_UK[lc_hijri]="Дата за Гіджрою"
+STR_UK[lc_created]="Дата створення RAQIB"
+STR_UK[lc_updated]="Останнє оновлення"
+STR_UK[lc_press_exit]="Натисніть будь-яку клавішу або Enter, щоб повернутися до головного меню..."
 
 # Load saved language preference (defaults to Arabic)
 load_lang() {
