@@ -12,7 +12,7 @@
 ### Defensive Security Toolkit
 
 **The only zero-dependency incident-response platform built entirely from scratch —  
-85 standalone tools · 20 languages (100% complete) · real-time monitoring · CTF mode · threat intelligence**
+96 standalone tools · 20 languages (100% complete) · real-time monitoring · CTF mode · threat intelligence**
 
 [![License: GNU GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-2.2-blue.svg)](VERSION)
@@ -20,10 +20,10 @@
 [![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white)](https://python.org)
 [![Platform: Linux | macOS | WSL](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20WSL-informational)](#-requirements)
 [![Languages: 20 (100%)](https://img.shields.io/badge/languages-20%20(100%25)-brightgreen)](modules/lang.sh)
-[![Tools: 85](https://img.shields.io/badge/tools-85-red)](tools/)
+[![Tools: 96](https://img.shields.io/badge/tools-96-red)](tools/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-[Overview](#-overview) • [Demo](#-interactive-demo) • [Architecture](#-architecture) • [Quick Start](#-quick-start) • [Tools](#-tools-85) • [Rootkit Detector](#-rootkit-detector-guide) • [Email Header Analyzer](#-email-header-analyzer-guide) • [Samples & Testing](#-samples--testing-dataset-guide) • [Threat Intelligence](#-threat-intelligence) • [Accuracy](#-accuracy-benchmark) • [العربية](README.ar.md)
+[Overview](#-overview) • [Demo](#-interactive-demo) • [Architecture](#-architecture) • [Quick Start](#-quick-start) • [Tools](#-tools--security-engines-96) • [New v2.2 Engines](#-new-in-raqib-v22-advanced-analytical--automation-engines) • [Rootkit Detector](#-rootkit-detector-guide) • [Email Header Analyzer](#-email-header-analyzer-guide) • [Samples & Testing](#-samples--testing-dataset-guide) • [Threat Intelligence](#-threat-intelligence) • [Accuracy](#-accuracy-benchmark) • [العربية](README.ar.md)
 
 </div>
 
@@ -35,7 +35,7 @@
 
 Every single tool is written from scratch against core POSIX utilities (`ss`, `find`, `awk`, `grep`, `openssl`, `/dev/tcp`, `python3` stdlib). No Nmap. No Wireshark. No third-party security binaries. Just clean, auditable code that runs on a minimal Alpine container or a fully-locked-down box.
 
-85 tools across 8 operational domains (including 22 specialized CTF & Wargames tools), **wired together as one integrated incident-response workflow** — not a pile of disconnected scripts.
+96 tools across 8 operational domains (including 24 specialized CTF & Wargames tools), **wired together as one integrated incident-response workflow** — not a pile of disconnected scripts.
 
 > ⚠️ **Authorized use only.** Scanning tools are for *your own infrastructure* or systems you have explicit written authorization to assess.
 
@@ -124,23 +124,26 @@ raqib/
 │   └── corpus/                          ← Adversarial test corpus
 │
 └── tools/
-    ├── monitoring/ (15)                 ← Network + SIEM + alerting + fleet collection
-    ├── logs/       (5)                  ← Log analysis and parsing
-    ├── ids_ips/    (6)                  ← Intrusion detection and IP blocking
-    ├── malware/    (13)                 ← Static analysis + threat intelligence engine
+    ├── monitoring/ (16)                 ← Network + SIEM + alerting + Prometheus exporter
+    ├── logs/       (6)                  ← Log analysis, parsing & statistical anomaly detection
+    ├── ids_ips/    (8)                  ← Intrusion detection, TLS C2 fingerprinting & rate limiting
+    ├── malware/    (17)                 ← Static analysis, ML classification, Sigma rules & threat intel
     │   ├── rootkit_detector.md          ← [MD File] Complete Rootkit Detector documentation
     │   ├── rootkit_detector.sh          ← Rootkit Scanner (kernel/proc/memfd/eBPF/preload)
+    │   ├── ml_classifier.py             ← Pure-Python ML Classifier (Decision Tree + Naive Bayes)
+    │   ├── sigma_translator.py          ← Sigma YAML rule translator to regex & YARA-lite
     │   ├── resources/rootkit/           ← Detection resource lists
     │   └── rules/                       ← Rules and feeds
     │
-    ├── forensics/  (6)                  ← Digital forensics + timeline
+    ├── forensics/  (7)                  ← Digital forensics, live memory carving & email analysis
+    │   ├── advanced_forensics.sh        ← Live memory carving, process lineage & binary verification
     │   ├── email_header_analyzer.md     ← [MD File] Complete Email Header Analyzer documentation
     │   ├── email_header_analyzer.py     ← Email spoofing/phishing header triage engine
     │   └── resources/email/             ← Detection resource lists
     │
-    ├── hardening/  (8)                  ← System hardening + audit trail
-    ├── vuln_scan/  (8)                  ← Vulnerability and permission scanning
-    └── ctf/        (22)                 ← CTF / Wargames mode (Crypto/Stego/Forensics/Web/Binary)
+    ├── hardening/  (9)                  ← System hardening, CIS Benchmark auditing & audit trail
+    ├── vuln_scan/  (9)                  ← Vulnerability, secrets & Git history scanning
+    └── ctf/        (24)                 ← CTF / Wargames mode (Crypto/Stego/Forensics/Web/Binary)
 ```
 
 ---
@@ -173,11 +176,11 @@ chmod +x raqib.sh
 
 ---
 
-## 📋 Tools & Security Engines (85)
+## 📋 Tools & Security Engines (96)
 
-> **Architecture Overview**: RAQIB provides **85 total security tools, analytical engines, and daemons** — 63 core defensive incident-response & audit tools distributed across 7 primary categories, plus 22 dedicated CTF & competition tools.
+> **Architecture Overview**: RAQIB provides **96 total security tools, analytical engines, and daemons** — 72 core defensive incident-response & audit tools distributed across 7 primary categories, plus 24 dedicated CTF & competition tools.
 
-### 🛰️ Network Monitoring (12)
+### 🛰️ Network Monitoring (13)
 
 | # | Tool | Description |
 |---|---|---|
@@ -193,8 +196,9 @@ chmod +x raqib.sh
 | 10 | **Watchdog Setup** | Background daemon that continuously monitors all 7 categories |
 | 11 | **Collector Server** | Central JSON event aggregator for multi-host fleet monitoring |
 | 12 | **Collector Client Setup** | Configure a host to forward its events to the collector |
+| 13 | **Multi-Channel Alerter** | Unified webhook alerts (Discord/Slack/Teams/Telegram) + SQLite event store + Prometheus `/metrics` exporter |
 
-### 📋 Log Analysis (5)
+### 📋 Log Analysis (6)
 
 | # | Tool | Description |
 |---|---|---|
@@ -203,8 +207,9 @@ chmod +x raqib.sh
 | 3 | **Top Repeated Lines** | Surfaces recurring error patterns via frequency analysis |
 | 4 | **Log Timeline** | Extracts events within an arbitrary time window |
 | 5 | **Web Access Analyzer** | Top IPs, status codes, most-requested paths from access logs |
+| 6 | **Log Anomaly Detector** | Statistical Z-score spike detection (>3σ) + parsers for Nginx, Apache, Traefik, Docker JSON, Kubernetes audit + SQLi/XSS/Command Injection detection |
 
-### 🚨 Intrusion Detection (6)
+### 🚨 Intrusion Detection (8)
 
 | # | Tool | Description |
 |---|---|---|
@@ -214,8 +219,10 @@ chmod +x raqib.sh
 | 4 | **Cron Auditor** | Flags recently-modified cron jobs across all users |
 | 5 | **Connection Rate Watcher** | Two-snapshot delta to catch sudden connection spikes |
 | 6 | **IP Blocker** | UFW/iptables/nftables rule insertion with audit logging |
+| 7 | **TLS Fingerprint Detector** | JA3/JA4 fingerprinting from TLS Client Hello packets to unmask C2 agents (Cobalt Strike, Sliver, Havoc, Metasploit) via PCAP or live capture |
+| 8 | **Adaptive Rate Limiter** | Multi-tier defense (Warn → Limit → Tarpit → Block) with nftables/iptables integration & whitelist support |
 
-### 🦠 Malware Analysis — Static (13)
+### 🦠 Malware Analysis — Static (15)
 
 | # | Tool | Description |
 |---|---|---|
@@ -232,8 +239,10 @@ chmod +x raqib.sh
 | 11 | **Threat Intel Lookup** | Query and update local IOC database (Feodo/URLhaus/CISA KEV) — offline queries |
 | 12 | **Unknown File Triage** | Weighted explainable heuristic scoring (6 signal types) — no ML, every point justified |
 | 13 | **Rootkit Detector** | Hidden processes (`/proc` vs `ps`), memfd/temp execution, module hiding, LKM blocklists, `ld.so.preload`, altered binaries, eBPF kprobes |
+| 14 | **ML Classifier** | Pure-Python lightweight weighted decision tree (16 calibrated features) + Gaussian Naive Bayes + baseline training with zero external dependencies |
+| 15 | **Sigma Rule Translator** | Native pure-Python YAML parser translating Sigma detection rules into high-performance `grep -iE` queries & RAQIB YARA-lite rules |
 
-### 🔍 Digital Forensics (6)
+### 🔍 Digital Forensics (7)
 
 | # | Tool | Description |
 |---|---|---|
@@ -243,8 +252,9 @@ chmod +x raqib.sh
 | 4 | **Disk Usage Snapshot** | Folder-size comparison between two points in time |
 | 5 | **Sudo Log Review** | Every executed sudo command + failed sudo attempts |
 | 6 | **Email Header Analyzer** | SPF/DKIM/DMARC verdicts, Received-chain anomaly analysis, From/Reply-To mismatches, Date skew, lure keywords |
+| 7 | **Advanced Forensics Suite** | Live memory carving (`/proc/PID/mem`), process lineage & orphan tree analysis, and package manager binary integrity verification (`debsums/rpm -V`) |
 
-### 🛡️ System Hardening (8)
+### 🛡️ System Hardening (9)
 
 | # | Tool | Description |
 |---|---|---|
@@ -256,8 +266,9 @@ chmod +x raqib.sh
 | 6 | **Report Decryptor** | AES-256-GCM report decryption (RQBv1 + RQBv2 format support) |
 | 7 | **Audit Log Viewer** | Structured event log browser — by operator, recent, pending |
 | 8 | **Pending Actions Review** | Senior-only approval queue for destructive actions |
+| 9 | **CIS Benchmark Auditor** | Comprehensive 20+ rule CIS compliance scoring (A-F grade) with 1-click automated remediation and rollback safety |
 
-### 🎯 Vulnerability Scanning (5)
+### 🎯 Vulnerability Scanning (6)
 
 | # | Tool | Description |
 |---|---|---|
@@ -266,15 +277,16 @@ chmod +x raqib.sh
 | 3 | **Weak Permissions Scanner** | 777/666 files, world-readable SSH keys, SUID in unusual paths |
 | 4 | **SSL Certificate Checker** | Expiry countdown + cipher suite + chain validation |
 | 5 | **Default Credentials Scanner** | Weak/hardcoded passwords in configs and source files |
+| 6 | **Secret & API Key Scanner** | High-entropy & 20+ credential leak patterns (AWS, GCP, GitHub, JWT, Keys) across files and Git commit history + local CISA KEV matching |
 
 ---
 
-## 🏴 CTF / Wargames Mode (22 tools)
+## 🏴 CTF / Wargames Mode (24 tools)
 
 Launched from the main menu — a complete, self-contained toolkit for security competitions:
 
 <details>
-<summary><b>🔐 Cryptography (5)</b></summary>
+<summary><b>🔐 Cryptography (6)</b></summary>
 
 | # | Tool | Capability |
 |---|---|---|
@@ -283,6 +295,7 @@ Launched from the main menu — a complete, self-contained toolkit for security 
 | 3 | RSA Helper | Factoring (small primes) / e=3 attack / Wiener attack |
 | 4 | Hash Identifier | MD5/SHA1/SHA256/bcrypt/NTLM/Argon2 pattern matching |
 | 5 | Vigenère Cracker | Kasiski test + Index of Coincidence key recovery |
+| 6 | Cipher Auto-Solver | Multi-layered automated cipher detector and solver (15+ encodings, double-encoding detection, XOR brute-force, English scoring) |
 </details>
 
 <details>
@@ -290,10 +303,10 @@ Launched from the main menu — a complete, self-contained toolkit for security 
 
 | # | Tool | Capability |
 |---|---|---|
-| 6 | LSB Extractor | Bit-plane extraction from PNG/BMP — brute-tests 6 channel combos |
-| 7 | Metadata Reader | EXIF parsing (no exiftool required) + hidden strings + steghide |
-| 8 | Magic Bytes Check | Polyglot detection + extension spoofing identification |
-| 9 | Audio Stego | Spectrogram (Sox) + Morse code detection + DTMF analysis |
+| 7 | LSB Extractor | Bit-plane extraction from PNG/BMP — brute-tests 6 channel combos |
+| 8 | Metadata Reader | EXIF parsing (no exiftool required) + hidden strings + steghide |
+| 9 | Magic Bytes Check | Polyglot detection + extension spoofing identification |
+| 10 | Audio Stego | Spectrogram (Sox) + Morse code detection + DTMF analysis |
 </details>
 
 <details>
@@ -301,20 +314,21 @@ Launched from the main menu — a complete, self-contained toolkit for security 
 
 | # | Tool | Capability |
 |---|---|---|
-| 10 | PCAP Analyzer | Protocol stats / HTTP extraction / credential recovery — no Wireshark |
-| 11 | File Carver | Embedded file extraction (binwalk-lite) — 20+ magic signatures |
-| 12 | Strings Hunter | Smart flag-pattern search + Base64 decode + suspicious string clustering |
-| 13 | Timeline Builder | Chronological artifact timeline from files/logs/EXIF |
+| 11 | PCAP Analyzer | Protocol stats / HTTP extraction / credential recovery — no Wireshark |
+| 12 | File Carver | Embedded file extraction (binwalk-lite) — 20+ magic signatures |
+| 13 | Strings Hunter | Smart flag-pattern search + Base64 decode + suspicious string clustering |
+| 14 | Timeline Builder | Chronological artifact timeline from files/logs/EXIF |
 </details>
 
 <details>
-<summary><b>🌐 Web Exploitation (3)</b></summary>
+<summary><b>🌐 Web Exploitation (4)</b></summary>
 
 | # | Tool | Capability |
 |---|---|---|
-| 14 | Header Inspector | Security header audit + Method tampering + hidden path discovery |
-| 15 | Cookie/JWT Decoder | JWT decode + Flask session + cookie security flags |
-| 16 | Robots & Secrets | robots.txt + sitemap + 60-path CTF enumeration + source analysis |
+| 15 | Header Inspector | Security header audit + Method tampering + hidden path discovery |
+| 16 | Cookie/JWT Decoder | JWT decode + Flask session + cookie security flags |
+| 17 | Robots & Secrets | robots.txt + sitemap + 60-path CTF enumeration + source analysis |
+| 18 | HTTP Request Builder & Tester | Interactive REPL console with automated injection probes (SQLi, XSS, LFI, SSTI), JWT decoder, and CORS analyzer |
 </details>
 
 <details>
@@ -322,9 +336,9 @@ Launched from the main menu — a complete, self-contained toolkit for security 
 
 | # | Tool | Capability |
 |---|---|---|
-| 17 | ELF Analyzer | Header/sections/symbols/strings — no objdump required |
-| 18 | Packing Detector | UPX + 14 packer signatures + entropy analysis + auto-unpack |
-| 19 | BOF Helper | Pattern generation + offset calculation + exploitation templates |
+| 19 | ELF Analyzer | Header/sections/symbols/strings — no objdump required |
+| 20 | Packing Detector | UPX + 14 packer signatures + entropy analysis + auto-unpack |
+| 21 | BOF Helper | Pattern generation + offset calculation + exploitation templates |
 </details>
 
 <details>
@@ -338,6 +352,159 @@ Launched from the main menu — a complete, self-contained toolkit for security 
 </details>
 
 ---
+
+## 🚀 New in RAQIB v2.2: Advanced Analytical & Automation Engines
+
+> RAQIB v2.2 introduces **11 new standalone analytical engines** built entirely in **Pure Python & POSIX Bash** without requiring external third-party dependencies.
+
+### 1. Pure-Python ML Classifier (`tools/malware/ml_classifier.py`)
+- **Architecture**: A calibrated 16-feature weighted Decision Tree combined with a Gaussian Naive Bayes classifier.
+- **Signals**: File entropy, script obfuscation patterns, reverse shell strings, high unprintable ratios, UPX headers, and compiler artifacts.
+- **Capabilities**: Heuristic classification, bulk directory scanning, baseline model training on known-clean OS trees, and explainable feature breakdowns.
+```bash
+# Classify a suspicious binary or script
+python3 tools/malware/ml_classifier.py classify /path/to/suspect_file
+
+# Bulk scan a webroot with JSON output
+python3 tools/malware/ml_classifier.py classify-dir /var/www/html/ --json
+
+# Train the baseline model on known-clean system binaries
+python3 tools/malware/ml_classifier.py train-baseline /bin/
+```
+
+### 2. Sigma Rule Translator (`tools/malware/sigma_translator.py`)
+- **Architecture**: Zero-dependency YAML parser written in pure Python.
+- **Capabilities**: Compiles Sigma detection rules into optimized POSIX `grep -iE` regular expressions or RAQIB YARA-lite rule syntax, with native mapping to Linux log targets (Auth, Syslog, Nginx, Apache).
+```bash
+# Translate a Sigma YAML rule to an actionable grep command
+python3 tools/malware/sigma_translator.py rule.yml
+
+# Convert Sigma rule to RAQIB YARA-lite syntax
+python3 tools/malware/sigma_translator.py rule.yml --format yara-lite
+
+# Translate rules and scan an auth log immediately
+python3 tools/malware/sigma_translator.py ./sigma_rules/ --scan /var/log/auth.log
+```
+
+### 3. TLS / C2 Fingerprint Detector (`tools/ids_ips/tls_fingerprint_detector.sh`)
+- **Architecture**: Extracts JA3/JA4 MD5 hashes directly from TLS Client Hello packets.
+- **Capabilities**: Built-in signatures for popular adversary C2 frameworks (**Cobalt Strike, Sliver, Havoc, Metasploit, Brute Ratel**). Supports offline PCAP analysis, active socket scanning, and live traffic sniffing via `tcpdump`.
+```bash
+# Live traffic capture on an interface
+sudo bash tools/ids_ips/tls_fingerprint_detector.sh --live eth0
+
+# Analyze recorded packet capture (PCAP)
+sudo bash tools/ids_ips/tls_fingerprint_detector.sh --pcap capture.pcap
+
+# Scan currently open outbound connections
+sudo bash tools/ids_ips/tls_fingerprint_detector.sh --scan-conns
+```
+
+### 4. Adaptive Rate Limiter & Tarpit (`tools/ids_ips/adaptive_rate_limiter.sh`)
+- **Architecture**: Multi-stage escalating defensive throttle integrated with **nftables** and **iptables**.
+- **Defense Escalation**: `Warn` → `Rate-Limit` → `Tarpit` (slow down attacker TCP connections) → `Block`.
+```bash
+# Analyze connection spikes and apply adaptive limits automatically
+sudo bash tools/ids_ips/adaptive_rate_limiter.sh --auto
+
+# Immediately throttle and tarpit an abusive IP
+sudo bash tools/ids_ips/adaptive_rate_limiter.sh --tarpit 192.168.1.100
+
+# View current firewall defense tables
+sudo bash tools/ids_ips/adaptive_rate_limiter.sh --status
+```
+
+### 5. Multi-Channel Alerter & Prometheus Exporter (`tools/monitoring/raqib_alerter.py`)
+- **Architecture**: Asynchronous webhook dispatcher with SQLite event persistence and Prometheus `/metrics` endpoint.
+- **Integrations**: Discord, Slack, Mattermost, Microsoft Teams, and Telegram.
+```bash
+# Send a test alert to all configured channels
+python3 tools/monitoring/raqib_alerter.py test
+
+# Launch Prometheus exporter daemon on port 9109 (scraped by Grafana)
+python3 tools/monitoring/raqib_alerter.py exporter --port 9109
+
+# Continuously watch RAQIB events and alert on critical events
+python3 tools/monitoring/raqib_alerter.py watch
+```
+
+### 6. Advanced Forensics Suite (`tools/forensics/advanced_forensics.sh`)
+- **Architecture**: Direct userland memory carving via `/proc/PID/mem`, process lineage reconstruction, and package manager checksum auditing.
+- **Capabilities**: Uncovers fileless in-memory payloads (URLs, shell commands, socket endpoints), identifies orphan processes and hijacked lineages, and validates core binaries via `debsums / rpm -V / pacman -Qk`.
+```bash
+# Carve in-memory strings, commands, and URLs from a suspect process
+sudo bash tools/forensics/advanced_forensics.sh --carve-mem 1337
+
+# Trace full process tree and flag hidden/orphan processes
+sudo bash tools/forensics/advanced_forensics.sh --process-tree
+
+# Audit system binary integrity against official package signatures
+sudo bash tools/forensics/advanced_forensics.sh --verify-binaries
+```
+
+### 7. Statistical Log Anomaly Detector (`tools/logs/log_anomaly_detector.py`)
+- **Architecture**: Rolling Z-score anomaly detection (>3σ) coupled with targeted attack signature matching.
+- **Parsers**: Nginx, Apache, Traefik, Docker JSON logs, Kubernetes audit logs, and standard RFC Syslog. Detects SQLi, XSS, Path Traversal, SSTI, and Log4Shell.
+```bash
+# Analyze web access log with Z-score activity spikes
+python3 tools/logs/log_anomaly_detector.py --log /var/log/nginx/access.log --format nginx
+
+# Scan Docker container logs with JSON output
+python3 tools/logs/log_anomaly_detector.py --log /var/lib/docker/containers/*/*.log --format docker --json
+```
+
+### 8. CIS Benchmark Auditor with Auto-Remediation (`tools/hardening/cis_benchmark_auditor.sh`)
+- **Architecture**: 20+ automated CIS Linux benchmark checks (Level 1 & Level 2 controls).
+- **Features**: Generates a compliance score percentage and letter grade (A through F), provides 1-click automated hardening, and creates timestamped rollbacks before modifying configuration files.
+```bash
+# Run non-destructive compliance audit
+sudo bash tools/hardening/cis_benchmark_auditor.sh --audit
+
+# Audit and automatically remediate failed security controls
+sudo bash tools/hardening/cis_benchmark_auditor.sh --remediate
+
+# Revert system configurations to pre-remediation backup
+sudo bash tools/hardening/cis_benchmark_auditor.sh --rollback
+```
+
+### 9. Secret & API Key Scanner (`tools/vuln_scan/raqib_secret_scanner.py`)
+- **Architecture**: High-speed regex and entropy scanner evaluating files, configs, and Git commit history.
+- **Detections**: 20+ secret classes (AWS keys, GCP service accounts, Azure tokens, GitHub PATs, Slack webhooks, private SSH keys, JWT tokens) plus CISA KEV software vulnerability correlation.
+```bash
+# Scan a directory tree for leaked credentials
+python3 tools/vuln_scan/raqib_secret_scanner.py scan /path/to/codebase/
+
+# Inspect Git commit history (last 50 commits) for deleted secrets
+python3 tools/vuln_scan/raqib_secret_scanner.py scan-git /path/to/repo/ --depth 50
+
+# Match installed system software against CISA Known Exploited Vulnerabilities
+python3 tools/vuln_scan/raqib_secret_scanner.py check-kev
+```
+
+### 10. CTF Cipher Identifier & Auto-Solver (`tools/ctf/crypto/cipher_solver.py`)
+- **Architecture**: Automated cryptographic heuristic scoring based on English character and bigram distributions.
+- **Supported Ciphers**: Base64, Base32, Base58, Hex, Binary, Octal, Decimal, URL encoding, Morse code, ROT1-25, Caesar, Atbash, Vigenère, XOR brute-force (1-4 bytes), and recursive double-encoding discovery.
+```bash
+# Automatically identify and solve an encoded string
+python3 tools/ctf/crypto/cipher_solver.py "U2FsdGVkX1+..."
+
+# Brute-force multi-byte XOR cipher
+python3 tools/ctf/crypto/cipher_solver.py --xor-brute "1a2b3c4d..."
+```
+
+### 11. CTF HTTP Request Builder & Security Tester (`tools/ctf/web/http_request_builder.py`)
+- **Architecture**: Standalone terminal REPL web console built with Python `urllib` stdlib.
+- **Capabilities**: Interactive request manipulation, automated payload injection (40+ test vectors for SQLi, XSS, LFI, SSTI), security header evaluation, CORS verification, and JWT inspection (including `alg=none` and expiration checks).
+```bash
+# Launch interactive HTTP console (Burp Suite alternative)
+python3 tools/ctf/web/http_request_builder.py --interactive
+
+# Automated injection fuzzing against an endpoint
+python3 tools/ctf/web/http_request_builder.py test http://target.local/vuln.php?id=1 --attack all
+
+# Decode and audit a JWT token
+python3 tools/ctf/web/http_request_builder.py jwt "eyJhbGciOi..."
+```
 
 ## 🛡️ Rootkit Detector Guide
 
