@@ -4118,10 +4118,10 @@ raqib_current_datetime() {
 }
 export -f raqib_current_datetime
 
-# get_created_date -> returns the toolkit's creation date (2026-09-03)
+# get_created_date -> returns the toolkit's creation date (2026-09-01)
 # formatted with month name according to the currently selected LANG_CODE.
 get_created_date() {
-    raqib_format_date "${CREATED_DATE:-2026-09-03}" "${1:-$LANG_CODE}"
+    raqib_format_date "${CREATED_DATE:-2026-09-01}" "${1:-$LANG_CODE}"
 }
 export -f get_created_date
 

@@ -21,7 +21,7 @@ if [ -z "${BASH_VERSINFO:-}" ] || [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
 fi
 
 VERSION="2.2"
-CREATED_DATE="2026-09-03"
+CREATED_DATE="2026-09-01"
 LAST_UPDATED="2026-10-14"
 
 # فرض ترميز UTF-8 بغض النظر عن إعدادات النظام — يمنع تقطيع الأحرف العربية
@@ -266,10 +266,10 @@ EOF
     cur_time="$(date '+%H:%M:%S')"
     greg_dt="$(raqib_gregorian_date "${LANG_CODE:-ar}")"
     hijri_dt="$(raqib_hijri_date "${LANG_CODE:-ar}" 2>/dev/null || echo '—')"
-    created_fmt="$(raqib_gregorian_date "${LANG_CODE:-ar}" "${CREATED_DATE:-2026-09-03}")"
+    created_fmt="$(raqib_gregorian_date "${LANG_CODE:-ar}" "${CREATED_DATE:-2026-09-01}")"
     updated_fmt="$(raqib_gregorian_date "${LANG_CODE:-ar}" "${LAST_UPDATED:-2026-10-14}")"
 
-    echo -e "  📅 ${greg_dt}   |   ⏰ ${cur_time}   |   🕌 ${hijri_dt}   |   🛡️  Zero External Dependencies"
+    echo -e "  📅 ${greg_dt}   |   ⏰ ${cur_time}   |   🕌 ${hijri_dt}"
     echo -e "  ${GREY}--------------------------------------------------------------------------------${NC}"
 
     local op_name="${RAQIB_OPERATOR:-Operator Active}"
@@ -278,10 +278,10 @@ EOF
     local siem_state="Active"
     [ ! -s "${RAQIB_EVENTS_FILE:-.raqib_events.jsonl}" ] && siem_state="Standby"
 
-    printf "  ${YELLOW}[+] Author  :${NC} %-25s ${YELLOW}[+] Created :${NC} %s\n" "Ali Alnuaimi (@Ali5667)" "$created_fmt"
-    printf "  ${YELLOW}[+] GitHub  :${NC} %-25s ${YELLOW}[+] Session :${NC} ${GREEN}%s (%s)${NC}\n" "https://github.com/Ali5667" "$op_name" "$op_role"
-    printf "  ${YELLOW}[+] Twitter :${NC} %-25s ${YELLOW}[+] Suite   :${NC} %s\n" "@ali_cys45" "85 Standalone Tools Loaded"
-    printf "  ${YELLOW}[+] SIEM    :${NC} %-25s ${YELLOW}[+] Updated :${NC} %s (v${VERSION})\n" ".raqib_events.jsonl (${siem_state})" "$updated_fmt"
+    printf "  ${YELLOW}[+] Author  :${NC} %-30s ${YELLOW}[+] Created :${NC} %s\n" "Ali Alnuaimi (@Ali5667)" "$created_fmt"
+    printf "  ${YELLOW}[+] GitHub  :${NC} %-30s ${YELLOW}[+] Updated :${NC} %s (v${VERSION})\n" "https://github.com/Ali5667" "$updated_fmt"
+    printf "  ${YELLOW}[+] Twitter :${NC} %-30s ${YELLOW}[+] Session :${NC} ${GREEN}%s (%s)${NC}\n" "@ali_cys45" "$op_name" "$op_role"
+    printf "  ${YELLOW}[+] SIEM    :${NC} %s\n" ".raqib_events.jsonl (${siem_state})"
     echo -e "  ${GREY}--------------------------------------------------------------------------------${NC}"
     echo ""
 }
@@ -299,42 +299,6 @@ pause() {
 }
 export -f pause
 
-# raqib_read_choice_live <prompt_text>
-# قراءة اختيار المستخدم مع ساعة حية متزامنة تحدث في كل ثانية دون تشويش الإدخال
-raqib_read_choice_live() {
-    local prompt_text="$1"
-    local choice=""
-    local key=""
-    local cur_time=""
-
-    # في حال كان الإدخال غير تفاعلي (Piped / Scripted)
-    if [ ! -t 0 ]; then
-        read -r choice
-        echo "$choice"
-        return 0
-    fi
-
-    while true; do
-        cur_time="$(date '+%H:%M:%S')"
-        printf "\r\033[K%s \033[1;33m[⏰ %s]\033[0m: %s" "$prompt_text" "$cur_time" "$choice"
-
-        if IFS= read -r -s -n 1 -t 1 key; then
-            if [ -z "$key" ] || [ "$key" = $'\n' ] || [ "$key" = $'\r' ]; then
-                echo "" >&2
-                break
-            elif [ "$key" = $'\177' ] || [ "$key" = $'\b' ]; then
-                if [ ${#choice} -gt 0 ]; then
-                    choice="${choice:0:-1}"
-                fi
-            elif [[ "$key" =~ [a-zA-Z0-9] ]]; then
-                choice+="$key"
-            fi
-        fi
-    done
-    echo "$choice"
-}
-export -f raqib_read_choice_live
-
 # show_live_clock -> شاشة تفاعلية كاملة للساعة الحية ورادار الوقت والدفاع
 show_live_clock() {
     local key=""
@@ -349,13 +313,16 @@ show_live_clock() {
     printf "\033[?25l"
     trap 'printf "\033[?25h"' RETURN INT TERM
 
+    # حساب التواريخ الثابتة واسم المضيف مرة واحدة في البداية لمنع استهلاك المعالج والوميض
+    greg_dt="$(raqib_gregorian_date "${LANG_CODE:-ar}")"
+    hijri_dt="$(raqib_hijri_date "${LANG_CODE:-ar}" 2>/dev/null || echo '—')"
+    created_fmt="$(raqib_gregorian_date "${LANG_CODE:-ar}" "${CREATED_DATE:-2026-09-01}")"
+    updated_fmt="$(raqib_gregorian_date "${LANG_CODE:-ar}" "${LAST_UPDATED:-2026-10-14}")"
+    host_str="$(hostname 2>/dev/null || echo "$HOSTNAME")"
+
+    clear
     while true; do
         cur_time="$(date '+%H:%M:%S')"
-        greg_dt="$(raqib_gregorian_date "${LANG_CODE:-ar}")"
-        hijri_dt="$(raqib_hijri_date "${LANG_CODE:-ar}" 2>/dev/null || echo '—')"
-        created_fmt="$(raqib_gregorian_date "${LANG_CODE:-ar}" "${CREATED_DATE:-2026-09-03}")"
-        updated_fmt="$(raqib_gregorian_date "${LANG_CODE:-ar}" "${LAST_UPDATED:-2026-10-14}")"
-        host_str="$(hostname 2>/dev/null || echo "$HOSTNAME")"
         uptime_str="$(uptime 2>/dev/null | sed 's/^[ \t]*//' || echo "Active")"
         if [ -s "$siem_file" ]; then
             siem_count="$(wc -l < "$siem_file" 2>/dev/null || echo 0)"
@@ -363,7 +330,8 @@ show_live_clock() {
             siem_count=0
         fi
 
-        clear
+        # إعادة المؤشر لأعلى الشاشة بدون مسح كامل لمنع الوميض
+        printf "\033[H"
         echo -e "${GREEN}"
         cat << "EOF"
   ____      _    ___ ___ ____    _     _____     _______ 
@@ -403,25 +371,24 @@ EOF
         echo -e "                  ${CYAN}● LIVE UTC+LOCAL TICKING ●${NC}"
         echo ""
         echo -e "  ${GREY}────────────────────────────────────────────────────────────────────────────────${NC}"
-        echo -e "  📅 ${WHITE}$(t lc_gregorian):${NC}  ${GREEN}${greg_dt}${NC}  ${GREY}(الأشهر الجورجية بالأسماء مدمجة بالكامل)${NC}"
+        echo -e "  📅 ${WHITE}$(t lc_gregorian):${NC}  ${GREEN}${greg_dt}${NC}"
         echo -e "  🕌 ${WHITE}$(t lc_hijri):${NC}      ${GREEN}${hijri_dt}${NC}"
-        echo -e "  🚀 ${WHITE}$(t lc_created):${NC}    ${CYAN}${created_fmt}${NC}  ${GREY}(تاريخ إنشاء منصة رقيب الدفاعية)${NC}"
-        echo -e "  🔄 ${WHITE}$(t lc_updated):${NC}    ${CYAN}${updated_fmt}${NC}  ${GREY}(الإصدار الحالي: v${VERSION})${NC}"
+        echo -e "  🚀 ${WHITE}$(t lc_created):${NC}    ${CYAN}${created_fmt}${NC}"
+        echo -e "  🔄 ${WHITE}$(t lc_updated):${NC}    ${CYAN}${updated_fmt}${NC}  ${GREY}(v${VERSION})${NC}"
         echo -e "  ${GREY}────────────────────────────────────────────────────────────────────────────────${NC}"
         echo -e "  👤 ${YELLOW}[+] Operator:${NC}  ${op_name} (${op_role})"
         echo -e "  💻 ${YELLOW}[+] Host:${NC}      ${host_str}"
         echo -e "  📊 ${YELLOW}[+] SIEM Logs:${NC} ${siem_count} events recorded"
         echo -e "  ⏱️  ${YELLOW}[+] System:${NC}    ${uptime_str}"
         echo -e "  ${GREY}════════════════════════════════════════════════════════════════════════════════${NC}"
-        echo -e "  ${YELLOW}$(t lc_press_exit)${NC}"
+        echo -e "  ${YELLOW}$(t lc_press_exit)${NC}      "
 
-        if IFS= read -r -s -n 1 -t 1 key; then
-            if [ -n "$key" ] || [ "$key" = "" ]; then
-                break
-            fi
+        if IFS= read -r -s -n 1 -t 1 key 2>/dev/null; then
+            break
         fi
     done
     printf "\033[?25h"
+    clear
 }
 export -f show_live_clock
 
@@ -575,7 +542,11 @@ main_menu() {
         fi
         echo ""
         local choice
-        choice="$(raqib_read_choice_live "  ${BOLD}${YELLOW}Choice [0-13]${NC}")"
+        if [ "${LANG_CODE:-ar}" = "ar" ]; then
+            read -rp "  ${BOLD}${YELLOW}اختر [0-13]: ${NC}" choice
+        else
+            read -rp "  ${BOLD}${YELLOW}Choice [0-13]: ${NC}" choice
+        fi
         case "$choice" in
             1) menu_monitoring ;;
             2) menu_logs ;;
