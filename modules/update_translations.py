@@ -36,6 +36,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(SCRIPT_DIR)
 LANG_SH_PATH = os.path.join(SCRIPT_DIR, "lang.sh")
 CACHE_DIR = os.path.join(SCRIPT_DIR, "lang_cache")
+LANGUAGES_DIR = os.path.join(SCRIPT_DIR, "languages")
 
 # All 20 supported language codes in RAQIB
 SUPPORTED_LANGUAGES = [
@@ -74,35 +75,51 @@ GREY = "\033[1;30m"
 NC = "\033[0m"
 
 
-def parse_lang_file(filepath=LANG_SH_PATH):
+def parse_lang_file(filepath=None):
     """
-    Parses modules/lang.sh and returns:
+    Parses language files.
+    If filepath is given, parses that specific file.
+    Otherwise, if modules/languages/ exists, parses modular language files.
+    Falls back to modules/lang.sh if needed.
+    Returns:
       - translations: dict of dicts {lang_code: {key: value}}
       - all_keys: set of all distinct keys across EN and AR
     """
-    if not os.path.isfile(filepath):
-        print(f"{RED}[!] Error: File not found: {filepath}{NC}", file=sys.stderr)
-        sys.exit(1)
-
     translations = defaultdict(dict)
     pattern = re.compile(r'^\s*STR_([A-Za-z]+)\[([a-zA-Z0-9_]+)\]\s*=\s*(.*)$')
 
-    with open(filepath, "r", encoding="utf-8", errors="replace") as f:
-        for line in f:
-            line_clean = line.strip()
-            if not line_clean.startswith("STR_"):
-                continue
-            m = pattern.match(line_clean)
-            if m:
-                lang = m.group(1).lower()
-                key = m.group(2)
-                raw_val = m.group(3).strip()
-                # Strip leading and trailing quotes if present
-                if (raw_val.startswith('"') and raw_val.endswith('"')) or (raw_val.startswith("'") and raw_val.endswith("'")):
-                    val = raw_val[1:-1]
-                else:
-                    val = raw_val
-                translations[lang][key] = val
+    files_to_parse = []
+    if filepath and os.path.isfile(filepath):
+        files_to_parse = [filepath]
+    elif os.path.isdir(LANGUAGES_DIR) and any(os.path.isfile(os.path.join(LANGUAGES_DIR, f"{c}.sh")) for c, _, _ in SUPPORTED_LANGUAGES):
+        files_to_parse = [
+            os.path.join(LANGUAGES_DIR, f"{c}.sh")
+            for c, _, _ in SUPPORTED_LANGUAGES
+            if os.path.isfile(os.path.join(LANGUAGES_DIR, f"{c}.sh"))
+        ]
+    elif os.path.isfile(LANG_SH_PATH):
+        files_to_parse = [LANG_SH_PATH]
+    else:
+        print(f"{RED}[!] Error: No language files found in {LANGUAGES_DIR} or {LANG_SH_PATH}{NC}", file=sys.stderr)
+        sys.exit(1)
+
+    for target_path in files_to_parse:
+        with open(target_path, "r", encoding="utf-8", errors="replace") as f:
+            for line in f:
+                line_clean = line.strip()
+                if not line_clean.startswith("STR_"):
+                    continue
+                m = pattern.match(line_clean)
+                if m:
+                    lang = m.group(1).lower()
+                    key = m.group(2)
+                    raw_val = m.group(3).strip()
+                    # Strip leading and trailing quotes if present
+                    if (raw_val.startswith('"') and raw_val.endswith('"')) or (raw_val.startswith("'") and raw_val.endswith("'")):
+                        val = raw_val[1:-1]
+                    else:
+                        val = raw_val
+                    translations[lang][key] = val
 
     all_keys = set(translations["en"].keys()) | set(translations["ar"].keys())
     return translations, all_keys
@@ -334,6 +351,39 @@ def append_to_lang_sh(new_by_lang):
     print(f"  {GREEN}✔ Successfully updated {LANG_SH_PATH} with all missing translations!{NC}")
 
 
+def update_language_files(new_by_lang):
+    """
+    Appends new translations to individual modules/languages/<code}.sh files.
+    Creates a backup copy (.bak) beforehand.
+    """
+    if not new_by_lang:
+        return
+
+    os.makedirs(LANGUAGES_DIR, exist_ok=True)
+    for code, kv in new_by_lang.items():
+        if not kv:
+            continue
+        lc_upper = code.upper()
+        name = LANG_CODE_TO_NAME.get(code, code)
+        lang_file = os.path.join(LANGUAGES_DIR, f"{code}.sh")
+        backup_path = lang_file + ".bak"
+
+        if os.path.isfile(lang_file):
+            try:
+                import shutil
+                shutil.copyfile(lang_file, backup_path)
+            except Exception:
+                pass
+
+        with open(lang_file, "a", encoding="utf-8") as f:
+            f.write(f"\n# ----- New Synchronized Translations [{len(kv)} keys] -----\n")
+            for k in sorted(kv.keys()):
+                esc_val = escape_bash_string(kv[k])
+                f.write(f'STR_{lc_upper}[{k}]="{esc_val}"\n')
+
+        print(f"  {GREEN}✔ Successfully updated {lang_file} with {len(kv)} keys!{NC}")
+
+
 def save_to_cache(new_by_lang):
     """Saves new translations to modules/lang_cache/<CODE>.sh."""
     os.makedirs(CACHE_DIR, exist_ok=True)
@@ -406,6 +456,8 @@ def main():
     if total_translated > 0:
         if args.cache_only:
             save_to_cache(new_by_lang)
+        elif os.path.isdir(LANGUAGES_DIR):
+            update_language_files(new_by_lang)
         else:
             append_to_lang_sh(new_by_lang)
 

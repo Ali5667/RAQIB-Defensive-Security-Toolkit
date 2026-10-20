@@ -21,8 +21,17 @@ raqib_lang_completeness() {
     local code="$1"
     local lc_upper
     lc_upper="$(echo "$code" | tr '[:lower:]' '[:upper:]')"
+    # Ensure reference English file is loaded
+    if [ -z "${STR_EN[lang_name]}" ]; then
+        local en_file="$MODULES_DIR/languages/en.sh"
+        [ -f "$en_file" ] && source "$en_file"
+    fi
+    # Ensure target language file is loaded
+    local lang_file="$MODULES_DIR/languages/${code}.sh"
+    [ -f "$lang_file" ] && source "$lang_file"
+
     local -n arr="STR_${lc_upper}" 2>/dev/null
-    local -n en_arr="STR_EN"
+    local -n en_arr="STR_EN" 2>/dev/null
     local total=${#en_arr[@]}
     local have=0
     local k
@@ -68,8 +77,17 @@ raqib_auto_translate_missing() {
     local code="$1"
     local lc_upper
     lc_upper="$(echo "$code" | tr '[:lower:]' '[:upper:]')"
+    # Ensure reference English file is loaded
+    if [ -z "${STR_EN[lang_name]}" ]; then
+        local en_file="$MODULES_DIR/languages/en.sh"
+        [ -f "$en_file" ] && source "$en_file"
+    fi
+    # Ensure target language file is loaded
+    local lang_file="$MODULES_DIR/languages/${code}.sh"
+    [ -f "$lang_file" ] && source "$lang_file"
+
     local -n arr="STR_${lc_upper}" 2>/dev/null
-    local -n en_arr="STR_EN"
+    local -n en_arr="STR_EN" 2>/dev/null
 
     local missing_keys=()
     local k
@@ -94,7 +112,7 @@ raqib_auto_translate_missing() {
     if [ -n "$pycmd" ] && [ -f "$MODULES_DIR/update_translations.py" ]; then
         echo -e "${CYAN}▶ $(t at_translating)${NC}"
         "$pycmd" "$MODULES_DIR/update_translations.py" --lang "$code"
-        source "$MODULES_DIR/lang.sh" 2>/dev/null || true
+        raqib_load_lang "$code" 2>/dev/null || true
         return 0
     fi
 
