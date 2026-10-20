@@ -129,9 +129,7 @@ show_eagle_intro() {
     else
         radar_scan "$SCRIPT_DIR/assets/eagle_logo_2.txt"
     fi
-    sleep 0.5
-    print_banner_info
-    sleep 0.6
+    sleep 1.2
 }
 export -f show_eagle_intro
 
