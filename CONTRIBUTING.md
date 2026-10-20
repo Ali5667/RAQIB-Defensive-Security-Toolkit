@@ -18,9 +18,9 @@ and new tools are all welcome.
 - **New YARA-lite detection rules** — add lines in `name|weight|regex` format to
   `tools/malware/rules/webshell_lite.rules`, and add a matching labeled sample (malicious
   and/or clean) to `tests/corpus/` so `tests/run_accuracy_eval.sh` can validate it.
-- **New or improved translations** — `modules/lang.sh` holds every language's strings as
-  `STR_<LANG>[key]="..."`. Keep the same key set as `STR_EN` (see the file for the full
-  list) and match existing tone/terminology.
+- **New or improved translations** — each language has its own independent file in
+  `modules/languages/<lang>.sh` holding strings as `STR_<LANG>[key]="..."`. Keep the same
+  key set as `modules/languages/en.sh` and match existing tone/terminology.
 - **New tools** — follow the existing structure under `tools/<category>/`, wire the menu
   entry into the matching file under `modules/`, and add translation strings for every
   language you can (English + Arabic at minimum).

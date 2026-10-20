@@ -19,7 +19,7 @@
 [![Bash 4+](https://img.shields.io/badge/Bash-4%2B-4EAA25?logo=gnu-bash&logoColor=white)](https://www.gnu.org/software/bash/)
 [![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white)](https://python.org)
 [![Platform: Linux | macOS | WSL](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20WSL-informational)](#-requirements)
-[![Languages: 20 (100%)](https://img.shields.io/badge/languages-20%20(100%25)-brightgreen)](modules/lang.sh)
+[![Languages: 20 (100%)](https://img.shields.io/badge/languages-20%20(100%25)-brightgreen)](modules/languages/)
 [![Tools: 96](https://img.shields.io/badge/tools-96-red)](tools/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
@@ -72,7 +72,7 @@ The toolkit runs directly inside your terminal with an ASCII radar animation, au
 <tr><td>🔐</td><td><b>AES-256-GCM encrypted reports</b><br>Every saved report can be encrypted with AES-256-GCM + Argon2id KDF (memory-hard, GPU-resistant) in one keystroke. Self-describing format: old reports (Scrypt) remain decryptable forever.</td></tr>
 <tr><td>🏴</td><td><b>Complete CTF / Wargames mode</b><br>22 purpose-built tools across Crypto, Stego, Forensics, Web, and Binary — from Vigenère cracking to ELF analysis to PCAP parsing. Flag Hunter + Writeup Logger included.</td></tr>
 <tr><td>👤</td><td><b>Operator identity + approval workflow</b><br>PBKDF2 hashed operator accounts. Two roles (analyst/senior). Every destructive action goes through a pending-approval queue reviewable by senior operators only.</td></tr>
-<tr><td>🌍</td><td><b>20 languages, 505 strings each</b><br>Every message, prompt, error, and report — fully translated. Missing string? The optional LibreTranslate bridge fills it live and caches locally.</td></tr>
+<tr><td>🌍</td><td><b>20 languages, 674 strings each (100% complete)</b><br>Modular per-language files (<code>modules/languages/</code>). Only the active language is loaded into memory on-demand, with automatic RAM cleanup upon switching — keeping RAQIB ultra-lightweight on Kali Linux and low-RAM environments.</td></tr>
 <tr><td>📈</td><td><b>Honest accuracy benchmark</b><br><code>tests/run_accuracy_eval.sh</code> imports the actual detection code and reports Precision/Recall/F1 against a manually-labeled adversarial corpus.</td></tr>
 </table>
 
@@ -102,7 +102,11 @@ raqib/
 │   │                                       • Smooth sub-block (1/8th Unicode) progress bars with live ETA
 │   │                                       • Live single-line target scanner (draw_scan_line) & cyber flicker
 │   │                                       • Universal cross-platform audio player (macOS/Linux/WSL/Windows)
-│   ├── lang.sh                          ← 20×667 = 13,340 translation strings (100% complete)
+│   ├── lang.sh                          ← Modular lightweight dynamic i18n loader (loads active lang on-demand)
+│   ├── languages/                       ← 20 modular language files (ar, en, fr, es, de, tr, fa, ru, etc.)
+│   │                                       • 20 × 674 = 13,480 translation strings (100% complete)
+│   │                                       • Only active language loaded into RAM (keeps Kali OS & low-spec VMs ultra-light)
+│   │                                       • Dynamic memory cleanup (unsets old language arrays on language switch)
 │   ├── auto_translate.sh                ← Automated on-demand translation bridge
 │   ├── update_translations.py           ← Python batch translation synchronizer (format specifier protection)
 │   ├── raqib_updater.py                 ← Advanced toolkit updater & integrity manager (snapshots, rollback, verify)

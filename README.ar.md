@@ -19,7 +19,7 @@
 [![Bash 4+](https://img.shields.io/badge/Bash-4%2B-4EAA25?logo=gnu-bash&logoColor=white)](https://www.gnu.org/software/bash/)
 [![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white)](https://python.org)
 [![Platform: Linux | macOS | WSL](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20WSL-informational)](#-المتطلبات)
-[![Languages: 20 (100%)](https://img.shields.io/badge/languages-20%20(100%25)-brightgreen)](modules/lang.sh)
+[![Languages: 20 (100%)](https://img.shields.io/badge/languages-20%20(100%25)-brightgreen)](modules/languages/)
 [![Tools: 96](https://img.shields.io/badge/tools-96-red)](tools/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
@@ -72,7 +72,7 @@
 <tr><td>🔐</td><td><b>تقارير مشفرة بـ AES-256-GCM</b><br>يمكن تشفير كل تقرير محفوظ بـ AES-256-GCM + Argon2id KDF بضغطة زر واحدة. صيغة تصف نفسها: التقارير القديمة (Scrypt) تظل قابلة لفك التشفير للأبد.</td></tr>
 <tr><td>🏴</td><td><b>وضع التحديات والاختراق (CTF / Wargames) المتكامل</b><br>22 أداة مخصصة لمجالات التشفير، إخفاء البيانات (Stego)، التحقيقات الجنائية الرقمية، الويب، والهندسة العكسية للملفات الثنائية. يشمل أداة البحث عن الأعلام (Flag Hunter) ومسجل تقارير الحلول (Writeup Logger).</td></tr>
 <tr><td>👤</td><td><b>هوية المشغل + سير عمل الموافقات</b><br>حسابات للمشغلين مشفرة بـ PBKDF2. دوران (محلل/كبير المحللين). كل إجراء إتلافي يمر عبر طابور انتظار مراجعة يتطلب موافقة من المشغلين الكبار فقط.</td></tr>
-<tr><td>🌍</td><td><b>20 لغة مكتملة 100% (667 مفتاح = 13,340 نص)</b><br>كل رسالة، أمر، خطأ، تقرير، وقائمة مترجمة بالكامل 100%. يتضمن أداة بايثون فائقة السرعة <code>modules/update_translations.py</code> للمزامنة الذكية وحماية المتغيرات وتوليد كاشات الترجمة.</td></tr>
+<tr><td>🌍</td><td><b>20 لغة مكتملة 100% (674 مفتاح = 13,480 نص) بنظام تركيبي خفيف</b><br>كل لغة بملف مستقل منفصل (<code>modules/languages/</code>). يتم استدعاء وتحميل ملف اللغة المختارة فقط في الذاكرة عند الحاجة مع تفريغ فوري للغة السابقة عند التبديل، لتوفير أقصى قدر من الخفة والسرعة على توزيعات Kali Linux والأنظمة ذات الموارد المحدودة.</td></tr>
 <tr><td>✨</td><td><b>واجهة سينمائية ومؤثرات بصرية وصوتية</b><br>مؤشرات تحميل تفاعلية متعددة الأنماط (Cyber Spinners)، شريط تقدم ناعم بأجزاء الثُمن لليونيكود (1/8th Unicode)، عارض فحص الأهداف المباشر في سطر واحد، ومشغل صوت نسر ترحيبي عابر للمنصات (Linux, macOS, WSL, Windows).</td></tr>
 <tr><td>📈</td><td><b>تقييم دقة صادق</b><br>نص الاختبار <code>tests/run_accuracy_eval.sh</code> يستورد كود الاكتشاف الحقيقي ويصدر تقارير للـ (Precision/Recall/F1) مقابل مجموعة اختبار تم تصنيفها يدوياً.</td></tr>
 </table>
@@ -103,7 +103,11 @@ raqib/
 │   │                                       • شريط تقدم ناعم بأجزاء الرموز (1/8th Unicode)
 │   │                                       • عارض فحص الأهداف المباشر (draw_scan_line) وتأثير الوميض
 │   │                                       • مشغل صوت نسر ترحيبي عابر للمنصات (Linux/macOS/WSL/Windows)
-│   ├── lang.sh                          ← 20×667 = 13,340 نص مترجم (مكتملة 100%)
+│   ├── lang.sh                          ← محرك الترجمة الديناميكي الخفيف (تحميل اللغة النشطة عند الطلب فقط)
+│   ├── languages/                       ← 20 ملف لغة تركيبي مستقل (ar, en, fr, es, de, tr, fa, ru, etc.)
+│   │                                       • 20 × 674 = 13,480 نص مترجم (مكتملة 100%)
+│   │                                       • تحميل اللغة المختارة فقط في الذاكرة (خفة وسرعة فائقة على Kali Linux)
+│   │                                       • تحرير تلقائي للذاكرة RAM عند تبديل اللغة أثناء التشغيل
 │   ├── auto_translate.sh                ← جسر الترجمة التلقائي عند الطلب
 │   ├── update_translations.py           ← أداة بايثون لمزامنة وتحديث الترجمات وحماية المتغيرات
 │   ├── raqib_updater.py                 ← أداة بايثون المتقدمة لإدارة التحديثات الذاتية والنسخ الاحتياطي التلقائي
