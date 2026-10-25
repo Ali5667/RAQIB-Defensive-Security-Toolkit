@@ -799,6 +799,69 @@ Overall (weighted)    99.2%    97.2%   98.2%    98.2%
 
 ---
 
+## 🧠 Threat Intelligence Subsystem (SQLite & ATT&CK)
+
+RAQIB features an embedded, offline-first Threat Intelligence Engine built on **SQLite with Write-Ahead Logging (WAL)**. It equips defensive operators with real-time indicator cross-referencing and behavioral profiling without internet exposure during live triage.
+
+### 🌐 Intelligence Feeds & Retention (TTL)
+| Source | Type | Ingestion & Validation | TTL / Refresh Interval |
+|---|---|---|---|
+| **Feodo Tracker** | C2 IP Blocklist | Public JSON stream parsed with strict Python `ipaddress` validation (filters invalid, loopback, multicast) | **30-Day Expiration** (purged automatically); checked every **24 hours** |
+| **MITRE ATT&CK** | Malware & Techniques | STIX 2.x enterprise bundle; filters out `revoked: true` and `x_mitre_deprecated: true` objects | Refreshed every **7 days** |
+
+### 🔒 Merge Rule & Analyst Protection (`verified=1`)
+- **Immutability of Verified Rows**: Any malware family or behavior rule marked `verified = 1` by an analyst is **permanently immutable**. Automated synchronizations will never overwrite, alter, or replace it.
+- **Automated Staging**: New feeds enter isolated staging tables (`staging_ioc_ips`, `staging_malware_families`, `staging_malware_behaviors`) and merge into production with `verified = 0`.
+
+### 🛡️ Pre-Flight Ingestion Safeguards
+Before moving data from staging to production, feeds undergo five strict pre-flight checks:
+1. **Protocol Constraint**: Strict **HTTPS only**; insecure protocols (`http://`, `ftp://`) are rejected immediately.
+2. **Streaming Size Limit**: Stream aborts if size exceeds thresholds (30 MB for Feodo, 120 MB for ATT&CK) to thwart resource exhaustion.
+3. **Connection Timeout**: Strict 35-second socket timeout.
+4. **Format & Sanity Validation**: JSON structure and non-empty record validation.
+5. **Atomic Rollback & Audit Log**: If any check fails, staging is immediately purged, zero production rows are modified, and failure telemetry is logged to `update_log`.
+
+### 🚀 Command-Line Usage & Concurrency Lock
+Updates utilize an exclusive inter-process lock (`raqib_update.lock`) to prevent race conditions:
+
+```bash
+# Update all feeds (skips if updated recently)
+raqib update --source all
+
+# Force update Feodo Tracker only
+raqib update --source feodo --force
+
+# Force update MITRE ATT&CK only
+raqib update --source attack --force
+
+# Query IP threat intelligence & behaviors
+raqib lookup 198.51.100.14
+
+# Check engine metrics & audit log
+raqib status
+```
+
+### ⚙️ Background Scheduling (systemd)
+Deploy the provided systemd service and timer on Debian/Kali/Ubuntu servers:
+
+```bash
+sudo cp tools/systemd/raqib-update.* /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now raqib-update.timer
+```
+
+### 🔍 Matcher & Behavioral Profiling (Non-Definitive)
+When searching by IP, RAQIB correlates the address with known threat groups and associated MITRE ATT&CK techniques:
+- **Family without behavior profile**: Returns `behavior: "unknown"`.
+- **Non-definitive verdict**: Results provide contextual evidence and observational matches, not an absolute dogmatic verdict. Operators are advised to correlate with system logs before containment.
+
+### ⚠️ Threat Intelligence Limitations
+- **Observational only**: IOC absence does not guarantee that an IP is benign.
+- **Dynamic Infrastructure**: Threat actors frequently abandon or rotate C2 IPs.
+- **Offline Reliability**: In offline environments, feeds should be loaded using `--offline` from local JSON fixtures.
+
+---
+
 ## 🛠️ Troubleshooting & Common Issues
 
 | Issue | Cause & Solution |

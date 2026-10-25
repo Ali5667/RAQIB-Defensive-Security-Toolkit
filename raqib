@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# =============================================================================
+# RAQIB (رقيب) - Universal Command Line Interface
+# =============================================================================
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+INTEL_SCRIPT="$SCRIPT_DIR/tools/malware/10_raqib_intelligence.py"
+
+# If arguments are passed, handle non-interactive commands
+if [ "$#" -gt 0 ]; then
+    case "$1" in
+        update|lookup|search|analyze|status)
+            if command -v python3 >/dev/null 2>&1; then
+                exec python3 "$INTEL_SCRIPT" "$@"
+            elif command -v python >/dev/null 2>&1; then
+                exec python "$INTEL_SCRIPT" "$@"
+            else
+                echo "[!] Error: python3 is required to run RAQIB commands." >&2
+                exit 1
+            fi
+            ;;
+        --help|-h)
+            echo "RAQIB Defensive Security Toolkit CLI"
+            echo "Usage:"
+            echo "  raqib update --source feodo|attack|all [--force]"
+            echo "  raqib lookup <IP>"
+            echo "  raqib status"
+            echo "  raqib                  (Launch interactive defensive suite)"
+            exit 0
+            ;;
+    esac
+fi
+
+# Fallback to interactive mode
+exec bash "$SCRIPT_DIR/raqib.sh" "$@"

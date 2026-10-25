@@ -1,0 +1,50 @@
+[
+  {
+    "ip_address": "198.51.100.14",
+    "port": 443,
+    "status": "online",
+    "hostname": null,
+    "as_number": 64512,
+    "as_name": "TEST-C2-NET",
+    "country": "DE",
+    "first_seen": "2026-10-20 12:00:00",
+    "last_online": "2026-10-25",
+    "malware": "QakBot"
+  },
+  {
+    "ip_address": "203.0.113.88",
+    "port": 8080,
+    "status": "online",
+    "hostname": "c2.evil-tracker.example",
+    "as_number": 64513,
+    "as_name": "ROGUE-TRANSIT",
+    "country": "US",
+    "first_seen": "2026-10-24 08:30:00",
+    "last_online": "2026-10-25",
+    "malware": "Pikabot"
+  },
+  {
+    "ip_address": "192.0.2.77",
+    "port": 2222,
+    "status": "online",
+    "hostname": null,
+    "as_number": 64514,
+    "as_name": "ISOLATED-HOSTS",
+    "country": "NL",
+    "first_seen": "2026-10-22 00:00:00",
+    "last_online": "2026-10-25",
+    "malware": "UnknownFamilyXYZ"
+  },
+  {
+    "ip_address": "999.888.777.666",
+    "port": 443,
+    "status": "online",
+    "malware": "InvalidIpMalware"
+  },
+  {
+    "ip_address": "127.0.0.1",
+    "port": 80,
+    "status": "online",
+    "malware": "LoopbackMalware"
+  }
+]

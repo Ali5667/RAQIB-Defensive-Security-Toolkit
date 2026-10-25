@@ -1,0 +1,19 @@
+[Unit]
+Description=RAQIB Threat Intelligence Background Updater
+Documentation=https://github.com/Ali5667/RAQIB-Defensive-Security-Toolkit
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+# Change WorkingDirectory and ExecStart to match your installation directory if not in /opt/raqib
+WorkingDirectory=/opt/raqib
+ExecStart=/usr/bin/python3 /opt/raqib/tools/malware/10_raqib_intelligence.py update --source all
+StandardOutput=journal
+StandardError=journal
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

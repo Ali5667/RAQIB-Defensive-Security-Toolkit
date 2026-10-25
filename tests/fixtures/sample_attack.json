@@ -1,0 +1,116 @@
+{
+  "type": "bundle",
+  "id": "bundle--raqib-test-fixture",
+  "spec_version": "2.0",
+  "objects": [
+    {
+      "type": "attack-pattern",
+      "id": "attack-pattern--001",
+      "name": "Command and Scripting Interpreter: PowerShell",
+      "description": "Adversaries may use PowerShell commands and scripts for execution.",
+      "kill_chain_phases": [
+        {"kill_chain_name": "mitre-attack", "phase_name": "execution"}
+      ],
+      "external_references": [
+        {"source_name": "mitre-attack", "external_id": "T1059.001"}
+      ],
+      "revoked": false,
+      "x_mitre_deprecated": false
+    },
+    {
+      "type": "attack-pattern",
+      "id": "attack-pattern--002",
+      "name": "Application Layer Protocol: Web Protocols",
+      "description": "Adversaries may communicate using application layer protocols (HTTP/HTTPS).",
+      "kill_chain_phases": [
+        {"kill_chain_name": "mitre-attack", "phase_name": "command-and-control"}
+      ],
+      "external_references": [
+        {"source_name": "mitre-attack", "external_id": "T1071.001"}
+      ],
+      "revoked": false,
+      "x_mitre_deprecated": false
+    },
+    {
+      "type": "attack-pattern",
+      "id": "attack-pattern--deprecated",
+      "name": "Deprecated Technique",
+      "external_references": [
+        {"source_name": "mitre-attack", "external_id": "T9999"}
+      ],
+      "revoked": false,
+      "x_mitre_deprecated": true
+    },
+    {
+      "type": "malware",
+      "id": "malware--qakbot-id",
+      "name": "QakBot",
+      "description": "QakBot is a modular banking Trojan and loader active since at least 2007.",
+      "x_mitre_aliases": ["QBot", "QuakBot", "Pinkslipbot"],
+      "external_references": [
+        {"source_name": "mitre-attack", "external_id": "S0650"}
+      ],
+      "revoked": false,
+      "x_mitre_deprecated": false
+    },
+    {
+      "type": "malware",
+      "id": "malware--pikabot-id",
+      "name": "Pikabot",
+      "description": "Pikabot is a modular malware loader designed to execute arbitrary commands.",
+      "aliases": ["Pika-Loader"],
+      "external_references": [
+        {"source_name": "mitre-attack", "external_id": "S1128"}
+      ],
+      "revoked": false,
+      "x_mitre_deprecated": false
+    },
+    {
+      "type": "malware",
+      "id": "malware--revoked-id",
+      "name": "DeadMalware",
+      "description": "This malware object is marked as revoked by MITRE.",
+      "revoked": true,
+      "x_mitre_deprecated": false
+    },
+    {
+      "type": "relationship",
+      "id": "relationship--qakbot-powershell",
+      "relationship_type": "uses",
+      "source_ref": "malware--qakbot-id",
+      "target_ref": "attack-pattern--001",
+      "description": "QakBot utilizes PowerShell for code injection and discovery.",
+      "revoked": false,
+      "x_mitre_deprecated": false
+    },
+    {
+      "type": "relationship",
+      "id": "relationship--qakbot-http",
+      "relationship_type": "uses",
+      "source_ref": "malware--qakbot-id",
+      "target_ref": "attack-pattern--002",
+      "description": "QakBot communicates with C2 servers over HTTPS.",
+      "revoked": false,
+      "x_mitre_deprecated": false
+    },
+    {
+      "type": "relationship",
+      "id": "relationship--pikabot-http",
+      "relationship_type": "uses",
+      "source_ref": "malware--pikabot-id",
+      "target_ref": "attack-pattern--002",
+      "description": "Pikabot sends beacon data via HTTPS POST requests.",
+      "revoked": false,
+      "x_mitre_deprecated": false
+    },
+    {
+      "type": "relationship",
+      "id": "relationship--revoked-rel",
+      "relationship_type": "uses",
+      "source_ref": "malware--revoked-id",
+      "target_ref": "attack-pattern--001",
+      "revoked": true,
+      "x_mitre_deprecated": false
+    }
+  ]
+}

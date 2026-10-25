@@ -566,6 +566,34 @@ main_menu() {
 }
 
 if [ -z "${BASH_SOURCE[0]}" ] || [ "${BASH_SOURCE[0]}" = "$0" ]; then
+    # دعم الأوامر المباشرة من سطر الأوامر (Non-interactive CLI dispatch)
+    if [ "$#" -gt 0 ]; then
+        case "$1" in
+            update)
+                shift
+                python3 "$RAQIB_INTEL_SCRIPT" update "$@"
+                exit $?
+                ;;
+            lookup|search)
+                shift
+                python3 "$RAQIB_INTEL_SCRIPT" lookup "$@"
+                exit $?
+                ;;
+            intel|intelligence)
+                shift
+                python3 "$RAQIB_INTEL_SCRIPT" "$@"
+                exit $?
+                ;;
+            --help|-h)
+                echo "Usage: ./raqib.sh [update|lookup|intel] [options]"
+                echo "       ./raqib.sh update --source feodo|attack|all"
+                echo "       ./raqib.sh lookup <IP>"
+                echo "       ./raqib.sh                  (interactive UI)"
+                exit 0
+                ;;
+        esac
+    fi
+
     # لو أول مرة يشغل الأداة (ملف اللغة مو موجود)، طلع له قائمة اللغات
     if [ ! -f "$RAQIB_LANG_FILE" ]; then
         menu_language
