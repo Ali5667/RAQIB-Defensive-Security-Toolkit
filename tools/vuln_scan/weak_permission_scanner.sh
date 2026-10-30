@@ -13,6 +13,14 @@ echo -e "${CYAN}${TOOL_TITLE}${NC}"
 echo -e "${GREY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
+# ─── حرس المنصة: أذونات يونكس (777/666/owner) — على ويندوز ACL ───
+if raqib_is_windows; then
+    raqib_linux_only \
+        "فاحص الصلاحيات الضعيفة: دلالات يونكس (777/owner) — على ويندوز تُدار الصلاحيات عبر ACL" \
+        "Weak permission scanner: Unix permission semantics; Windows manages ACLs instead" || true
+    exit 2
+fi
+
 read -rp "$(t vul3_prompt_dir)  [افتراضي: /]: " dir
 dir="${dir:-/}"
 [ ! -d "$dir" ] && { echo -e "${RED}$(t c_dir_not_found)${NC}"; exit 1; }

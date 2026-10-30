@@ -26,6 +26,14 @@ echo ""
 
 REPORT=""
 
+# ─── حرس المنصة: الفحوص تعتمد /proc + auditd + debsums/rpm -V → لينكس فقط ───
+if ! raqib_is_linux; then
+    raqib_linux_only \
+        "التحقيقات المتقدمة: فحص الذاكرة الحية، تتبع Auditd، سلامة الحزم" \
+        "Advanced Forensics: live memory carving, auditd process lineage, package integrity" || true
+    exit 2
+fi
+
 # ═══════════════════════════════════════════════════════════════════
 # 1) Live Memory Carving
 # ═══════════════════════════════════════════════════════════════════

@@ -5,9 +5,12 @@
 #
 # وضع تنفيذ صامت داخلي — يستدعيه pending_actions_review.sh بعد الموافقة،
 # مو المستخدم مباشرة. يشغّل الحظر الفعلي بدون أي قائمة/سؤال تفاعلي.
+# يدعم: ufw > firewalld > iptables (لينكس) + netsh advfirewall (ويندوز أصلي).
 if [ "${1:-}" = "--execute-block" ]; then
     ip="$2"
-    if command -v ufw >/dev/null 2>&1 && ufw status 2>/dev/null | grep -qi active; then
+    if raqib_is_windows && command -v netsh.exe >/dev/null 2>&1; then
+        netsh.exe advfirewall firewall add rule name="RAQIB-BLOCK-$ip" dir=in action=block remoteip="$ip" >/dev/null 2>&1
+    elif command -v ufw >/dev/null 2>&1 && ufw status 2>/dev/null | grep -qi active; then
         ufw insert 1 deny from "$ip" to any comment "RAQIB-BLOCK-$ip" >/dev/null 2>&1
     elif command -v firewall-cmd >/dev/null 2>&1 && firewall-cmd --state 2>/dev/null | grep -qi running; then
         firewall-cmd --add-rich-rule="rule family='ipv4' source address='$ip' reject" --permanent >/dev/null 2>&1 && firewall-cmd --reload >/dev/null 2>&1
@@ -23,16 +26,36 @@ fi
 
 echo -e "${CYAN}$(t ipb_title)${NC}"
 
-if [ "$EUID" -ne 0 ]; then
-    echo -e "${RED}$(t ipb_needs_root)${NC}"
-    exit 1
+# على ويندوز لا وجود لـ EUID root لكن نتحقق من netsh المتاح (يتطلب قيادة مسؤول Netsh)
+_is_windows_host=0
+raqib_is_windows && _is_windows_host=1
+
+if [ "$_is_windows_host" -eq 1 ]; then
+    if ! command -v netsh.exe >/dev/null 2>&1; then
+        echo -e "${RED}$(raqib_tr "netsh.exe غير متاح — شغّل RAQIB من Git Bash/WSL." "netsh.exe not available — run RAQIB from Git Bash / WSL.")${NC}"
+        exit 1
+    fi
+else
+    if [ "$EUID" -ne 0 ]; then
+        echo -e "${RED}$(t ipb_needs_root)${NC}"
+        exit 1
+    fi
 fi
 
 STATE_FILE="$HOME/.raqib_blocked_ips"
 touch "$STATE_FILE" 2>/dev/null
 
 detect_fw() {
-    if command -v ufw >/dev/null 2>&1 && ufw status 2>/dev/null | grep -qi active; then
+    # ويندوز أولاً على بيئة ويندوز أصليّة — netsh يتطلب صلاحية إدارية
+    if [ "$_is_windows_host" -eq 1 ]; then
+        if command -v netsh.exe >/dev/null 2>&1; then
+            if netsh.exe advfirewall show allprofiles state 2>/dev/null | grep -qi "ON"; then
+                echo "netsh"
+            else
+                echo "netsh-off"
+            fi
+        fi
+    elif command -v ufw >/dev/null 2>&1 && ufw status 2>/dev/null | grep -qi active; then
         echo "ufw"
     elif command -v firewall-cmd >/dev/null 2>&1 && firewall-cmd --state 2>/dev/null | grep -qi running; then
         echo "firewalld"
@@ -47,6 +70,11 @@ if [ "$fw" = "none" ]; then
     echo -e "${RED}$(t ipb_no_firewall)${NC}"
     exit 1
 fi
+if [ "$fw" = "netsh-off" ]; then
+    echo -e "${RED}$(raqib_tr "جدار ويندوز معطّل (كل الملفات الشخصية) — فمكّنه من إعدادات Windows Security أولاً." "Windows Firewall is disabled (all profiles) — enable it from Windows Security first.")${NC}"
+    finding_add critical "Cannot block IP: Windows Firewall is disabled"
+    exit 1
+fi
 echo -e "${YELLOW}$(tf ipb_using_fw "$fw")${NC}"
 
 echo ""
@@ -59,6 +87,7 @@ read -rp "  $(t choice_label)" opt
 block_ip() {
     local ip="$1"
     case "$fw" in
+        netsh) netsh.exe advfirewall firewall add rule name="RAQIB-BLOCK-$ip" dir=in action=block remoteip="$ip" >/dev/null 2>&1 ;;
         ufw) ufw insert 1 deny from "$ip" to any comment "RAQIB-BLOCK-$ip" >/dev/null 2>&1 ;;
         firewalld) firewall-cmd --add-rich-rule="rule family='ipv4' source address='$ip' reject" --permanent >/dev/null 2>&1 && firewall-cmd --reload >/dev/null 2>&1 ;;
         iptables) iptables -I INPUT 1 -s "$ip" -m comment --comment "RAQIB-BLOCK-$ip" -j DROP >/dev/null 2>&1 ;;
@@ -69,6 +98,7 @@ block_ip() {
 unblock_ip() {
     local ip="$1"
     case "$fw" in
+        netsh) netsh.exe advfirewall firewall delete rule name="RAQIB-BLOCK-$ip" >/dev/null 2>&1 ;;
         ufw) ufw delete deny from "$ip" to any >/dev/null 2>&1 ;;
         firewalld) firewall-cmd --remove-rich-rule="rule family='ipv4' source address='$ip' reject" --permanent >/dev/null 2>&1 && firewall-cmd --reload >/dev/null 2>&1 ;;
         iptables)

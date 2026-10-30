@@ -12,18 +12,18 @@
 ### Defensive Security Toolkit
 
 **The only zero-dependency incident-response platform built entirely from scratch —  
-96 standalone tools · 20 languages (100% complete) · real-time monitoring · CTF mode · threat intelligence**
+97 standalone tools · 20 languages (100% complete) · real-time monitoring · CTF mode · threat intelligence**
 
 [![License: GNU GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-2.2-blue.svg)](VERSION)
 [![Bash 4+](https://img.shields.io/badge/Bash-4%2B-4EAA25?logo=gnu-bash&logoColor=white)](https://www.gnu.org/software/bash/)
 [![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white)](https://python.org)
-[![Platform: Linux | macOS | WSL](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20WSL-informational)](#-requirements)
+[![Platform: Linux | Windows | macOS | WSL](https://img.shields.io/badge/platform-Linux%20%7C%20Windows%20%7C%20macOS%20%7C%20WSL-informational)](#-requirements)
 [![Languages: 20 (100%)](https://img.shields.io/badge/languages-20%20(100%25)-brightgreen)](modules/languages/)
-[![Tools: 96](https://img.shields.io/badge/tools-96-red)](tools/)
+[![Tools: 97](https://img.shields.io/badge/tools-97-red)](tools/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-[Overview](#-overview) • [Demo](#-interactive-demo) • [Architecture](#-architecture) • [Quick Start](#-quick-start) • [Tools](#-tools--security-engines-96) • [New v2.2 Engines](#-new-in-raqib-v22-advanced-analytical--automation-engines) • [Rootkit Detector](#-rootkit-detector-guide) • [Email Header Analyzer](#-email-header-analyzer-guide) • [Samples & Testing](#-samples--testing-dataset-guide) • [Threat Intelligence](#-threat-intelligence) • [Accuracy](#-accuracy-benchmark) • [العربية](README.ar.md)
+[Overview](#-overview) • [Demo](#-interactive-demo) • [Architecture](#-architecture) • [Quick Start](#-quick-start) • [Tools](#-tools--security-engines-97) • [New v2.2 Engines](#-new-in-raqib-v22-advanced-analytical--automation-engines) • [Rootkit Detector](#-rootkit-detector-guide) • [Email Header Analyzer](#-email-header-analyzer-guide) • [Samples & Testing](#-samples--testing-dataset-guide) • [Threat Intelligence](#-threat-intelligence) • [Accuracy](#-accuracy-benchmark) • [العربية](README.ar.md)
 
 </div>
 
@@ -35,7 +35,7 @@
 
 Every single tool is written from scratch against core POSIX utilities (`ss`, `find`, `awk`, `grep`, `openssl`, `/dev/tcp`, `python3` stdlib). No Nmap. No Wireshark. No third-party security binaries. Just clean, auditable code that runs on a minimal Alpine container or a fully-locked-down box.
 
-96 tools across 8 operational domains (including 24 specialized CTF & Wargames tools), **wired together as one integrated incident-response workflow** — not a pile of disconnected scripts.
+97 tools across 8 operational domains (including 24 specialized CTF & Wargames tools), **wired together as one integrated incident-response workflow** — not a pile of disconnected scripts. Native Windows support: run from Git Bash (MSYS) or WSL — the Windows Defense Suite audits firewall profiles, TCP connections, event-log logons, scheduled tasks and Defender using PowerShell only.
 
 > ⚠️ **Authorized use only.** Scanning tools are for *your own infrastructure* or systems you have explicit written authorization to assess.
 
@@ -154,6 +154,8 @@ raqib/
 
 ## ⚙️ Quick Start
 
+### Linux / Kali / WSL2
+
 ```bash
 # Clone
 git clone https://github.com/Ali5667/RAQIB-Defensive-Security-Toolkit.git
@@ -166,23 +168,36 @@ chmod +x raqib.sh
 # macOS: brew install bash && /opt/homebrew/bin/bash raqib.sh
 ```
 
+### Windows (native — no WSL needed)
+
+```bat
+:: Double-click raqib.bat, or from cmd:
+git clone https://github.com/Ali5667/RAQIB-Defensive-Security-Toolkit.git
+cd RAQIB-Defensive-Security-Toolkit
+raqib.bat
+```
+
+The launcher auto-locates Git Bash (Git for Windows recommended), and scans natively using PowerShell: firewall profiles, listening sockets, TCP↔process mapping, failed-logon events (4625), scheduled-task persistence, Windows Defender status and startup keys. Tools that need Linux (/proc, systemd, iptables) degrade gracefully with a clear pointer — or run everything inside WSL2.
+
 ### Requirements
 
 | Requirement | Notes |
 |---|---|
-| **Bash 4+** | macOS ships with Bash 3 — `brew install bash` |
+| **Bash 4+** | macOS ships with Bash 3 — `brew install bash`. Windows: bundled with Git Bash |
 | **Python 3.8+** | For entropy, intelligence engine, encryption, SIEM export |
-| `find`, `awk`, `grep`, `ss`, `openssl` | Core utilities — present on any Linux |
+| `find`, `awk`, `grep`, `ss`, `openssl` | Core utilities — present on any Linux; ported automatically on macOS/Windows |
+| **Windows: Git for Windows + PowerShell** | PowerShell 5.1+ (built into the OS) powers the Windows Defense Suite; admin rights for event-log & Defender checks |
 | `curl` *(optional)* | Reputation checks, rule updates, Telegram alerts |
 | `yara` *(optional)* | Real YARA rule layer on top of the YARA-lite engine |
 | `afplay`/`pw-play`/`paplay`/`aplay`/`powershell` *(optional)* | Eagle startup sound (macOS, PipeWire, PulseAudio, ALSA, Windows/WSL) |
 | `python3 cryptography` *(optional)* | Report encryption (AES-256-GCM) |
+| `winget` *(optional, Windows)* | Outdated-applications checker (App Installer) |
 
 ---
 
-## 📋 Tools & Security Engines (96)
+## 📋 Tools & Security Engines (97)
 
-> **Architecture Overview**: RAQIB provides **96 total security tools, analytical engines, and daemons** — 72 core defensive incident-response & audit tools distributed across 7 primary categories, plus 24 dedicated CTF & competition tools.
+> **Architecture Overview**: RAQIB provides **97 total security tools, analytical engines, and daemons** — 73 core defensive incident-response & audit tools distributed across 7 primary categories, plus 24 dedicated CTF & competition tools.
 
 ### 🛰️ Network Monitoring (13)
 
@@ -258,30 +273,51 @@ chmod +x raqib.sh
 | 6 | **Email Header Analyzer** | SPF/DKIM/DMARC verdicts, Received-chain anomaly analysis, From/Reply-To mismatches, Date skew, lure keywords |
 | 7 | **Advanced Forensics Suite** | Live memory carving (`/proc/PID/mem`), process lineage & orphan tree analysis, and package manager binary integrity verification (`debsums/rpm -V`) |
 
-### 🛡️ System Hardening (9)
+### 🛡️ System Hardening (10)
 
 | # | Tool | Description |
 |---|---|---|
 | 1 | **Permission Auditor** | World-writable files, SUID/SGID binaries |
-| 2 | **SSH Config Auditor** | sshd_config vs. CIS/NIST best practices |
+| 2 | **SSH Config Auditor** | sshd_config vs. CIS/NIST best practices (Linux/macOS + Windows OpenSSH Server config) |
 | 3 | **Service Lister** | Enabled services + alerts for risky ones (telnet, ftp, rsh) |
 | 4 | **Password Policy Checker** | login.defs + PAM + no-password accounts |
-| 5 | **Firewall Status Checker** | UFW/firewalld/iptables status and default policy |
+| 5 | **Firewall Status Checker** | UFW/firewalld/iptables status + Windows Firewall profiles + macOS PF |
 | 6 | **Report Decryptor** | AES-256-GCM report decryption (RQBv1 + RQBv2 format support) |
 | 7 | **Audit Log Viewer** | Structured event log browser — by operator, recent, pending |
 | 8 | **Pending Actions Review** | Senior-only approval queue for destructive actions |
 | 9 | **CIS Benchmark Auditor** | Comprehensive 20+ rule CIS compliance scoring (A-F grade) with 1-click automated remediation and rollback safety |
+| 10 | **Windows Defense Suite** 🪟 *(new)* | Native Windows triage: firewall profiles, TCP↔process map + external endpoints, failed logon (4625) analysis, scheduled-task persistence, Defender status/threats, Run/RunOnce/Startup/services autoruns, hosts audit |
 
 ### 🎯 Vulnerability Scanning (6)
 
 | # | Tool | Description |
 |---|---|---|
 | 1 | **Open Ports vs. Services** | Flags known-risky exposed ports with CVE context |
-| 2 | **Outdated Packages** | apt/yum/pip outdated packages with severity hints |
+| 2 | **Outdated Packages** | apt/yum/pip outdated packages with severity hints (+ `winget` on Windows) |
 | 3 | **Weak Permissions Scanner** | 777/666 files, world-readable SSH keys, SUID in unusual paths |
 | 4 | **SSL Certificate Checker** | Expiry countdown + cipher suite + chain validation |
 | 5 | **Default Credentials Scanner** | Weak/hardcoded passwords in configs and source files |
 | 6 | **Secret & API Key Scanner** | High-entropy & 20+ credential leak patterns (AWS, GCP, GitHub, JWT, Keys) across files and Git commit history + local CISA KEV matching |
+
+---
+
+## 🪟 Windows Defense Suite (new)
+
+Built exclusively on **OS-native tooling** (PowerShell cmdlets, Event Log, Scheduled Tasks, Windows Defender) — the same philosophy RAQIB applies on Linux with `ss`/`iptables` (no third-party binaries). Available at **System Hardening → 9** from Git Bash (or WSL), driven by the new `modules/platform.sh` portability layer:
+
+| Sub-check | What it does |
+|---|---|
+| 🔥 **Firewall profiles** | Domain/Private/Public state + default inbound/outbound policy — critical finding when inbound = ALLOW |
+| 🔗 **Connections ↔ process** | `Get-NetTCPConnection` + `Get-Process` — flags established connections to non-LAN external IPs for Threat-Intel review |
+| 🚨 **Failed logon triage** | Event 4625 over 48 h — attacker-IP ranking with severity bars; thresholds 20/100/500 → medium/high/critical |
+| ⏰ **Scheduled-task persistence** | Executes actions pointing at TEMP/user-writable paths or LOLBins (`-enc`, `mshta`, `regsvr32`, `.vbs`...) |
+| 🛡️ **Defender status** | AV + real-time protection state, signature age, live-scan flag, last 10 `Get-MpThreatDetection` |
+| 🚀 **Autoruns** | Run/RunOnce keys (5 hive variants), Startup folders, auto-start service paths (temp/AppData = suspicious) |
+| 📥 **hosts file audit** | Explicit DNS entries (blocked or suspicious when > 3 non-comment lines) |
+
+All findings flow into the unified `finding_add` pipeline → `.raqib_events.jsonl` / SIEM correlation / Telegram alerts, and produce a `windows_defense_scan.txt` report.
+
+> On Linux/macOS the suite exits politely with bilingual guidance pointing back at the Linux equivalents — the whole toolkit also runs fully inside WSL2.
 
 ---
 

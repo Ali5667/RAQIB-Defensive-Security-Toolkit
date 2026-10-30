@@ -13,6 +13,14 @@ echo -e "${CYAN}${TOOL_TITLE}${NC}"
 echo -e "${GREY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
+# ─── حرس المنصة: SUID/SGID/world-writable دلالات يونكس — على ويندوز الصلاحيات عبر ACL ───
+if raqib_is_windows; then
+    raqib_linux_only \
+        "مدقق الصلاحيات: SUID/SGID + world-writable — على ويندوز تُدار الصلاحيات عبر ACL" \
+        "Permission auditor: SUID/SGID/world-writable are Unix semantics; Windows uses ACLs instead" || true
+    exit 2
+fi
+
 read -rp "$(t har1_prompt_dir)  [افتراضي: /]: " dir
 dir="${dir:-/}"
 

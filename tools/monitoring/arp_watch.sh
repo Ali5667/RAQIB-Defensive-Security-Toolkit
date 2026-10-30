@@ -22,13 +22,38 @@ BASELINE="$BASELINE_DIR/arp_baseline.txt"
 REPORT=""
 
 # ─── دالة جمع جدول ARP ───────────────────────────────────────
+# بنية السطر الموحدة: <IP> <MAC> <State>
+# ويندوز: arp.exe (بنوم من Git Bash) — ماك: arp -an — لينكس: ip neigh
 capture_arp() {
-    if command -v ip >/dev/null 2>&1; then
-        ip neigh show 2>/dev/null | awk '{print $1, $5, $6}' | sort
-    elif command -v arp >/dev/null 2>&1; then
-        arp -an 2>/dev/null | awk '{gsub(/[()]/, "", $2); print $2, $4, $7}' | sort
+    if raqib_is_windows; then
+        if command -v arp.exe >/dev/null 2>&1; then
+            arp.exe -a 2>/dev/null | awk '
+                /Interface:/ { next }
+                NF >= 2 && $1 ~ /^[0-9]{1,3}\./ {
+                    mac = $2
+                    gsub(/-/, ":", mac)
+                    st = ($3 != "" ? $3 : "dynamic")
+                    print $1, mac, st
+                }' | sort
+        fi
+    elif raqib_is_macos; then
+        arp -an 2>/dev/null | awk '
+            / at / {
+                ip = $2
+                gsub(/[()]/, "", ip)
+                mac = $4
+                gsub(/[()]/, "", mac)
+                if (mac == "incomplete" || mac == "") { mac = "FAILED" }
+                print ip, mac, "active"
+            }' | sort
     else
-        echo ""
+        if command -v ip >/dev/null 2>&1; then
+            ip neigh show 2>/dev/null | awk '{print $1, $5, $6}' | sort
+        elif command -v arp >/dev/null 2>&1; then
+            arp -an 2>/dev/null | awk '{gsub(/[()]/, "", $2); print $2, $4, $7}' | sort
+        else
+            echo ""
+        fi
     fi
 }
 

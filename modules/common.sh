@@ -26,6 +26,12 @@ if [ -z "$(declare -F raqib_format_date 2>/dev/null)" ] && [ -f "$_COMMON_DIR/la
     source "$_COMMON_DIR/lang.sh" 2>/dev/null || true
 fi
 
+# طبقة المنصات: كشف النظام (Linux/WSL/macOS/Windows) + shims الأوامر الناقصة
+# تُحمّل قبل أي أداة — لا تغيّر أي حرف في سلوك لينكس الأصلي
+if [ -f "$_COMMON_DIR/platform.sh" ]; then
+    source "$_COMMON_DIR/platform.sh"
+fi
+
 # raqib_hijri_date -> يطبع التاريخ الهجري الحالي (يوم/شهر بالاسم/سنة) حسب اللغة المختارة
 if [ -z "$(declare -F raqib_hijri_date 2>/dev/null)" ]; then
     raqib_hijri_date() {

@@ -14,6 +14,14 @@ echo ""
 
 REPORT=""
 
+# ─── حرس المنصة: login.defs / PAM / /etc/shadow — لينكس فقط ───
+if ! raqib_is_linux; then
+    raqib_linux_only \
+        "مدقق سياسة كلمات المرور: login.defs / PAM / /etc/shadow" \
+        "Password policy checker: login.defs / PAM / /etc/shadow" || true
+    exit 2
+fi
+
 # ─── 1. /etc/login.defs ───────────────────────────────────────
 FILE="/etc/login.defs"
 echo -e "${BOLD}${YELLOW}◉ إعدادات $(t har4_from_file "$FILE")${NC}"

@@ -17,6 +17,20 @@ echo ""
 
 REPORT=""
 
+# ─── حرس المنصة: cron غير موجود على ويندوز — نظيره الأصلي Scheduled Tasks ───
+if raqib_is_windows; then
+    raqib_linux_only \
+        "مدقق cron — النظام الأصلي على ويندوز هو Scheduled Tasks" \
+        "cron auditor — the Windows-native equivalent is Scheduled Tasks" || true
+    exit 2
+fi
+
+# ملاحظة macOS: فحص crontab للمستخدم يعمل؛ البقية مسارات لينكس — LaunchAgents عبر ماسح الاستمرارية
+if raqib_is_macos; then
+    echo -e "  ${GREY}$(raqib_tr "على macOS: فحص crontab للمستخدم يعمل؛ و /etc/cron.d وsystemd timers مخصصة للينكس — للـ LaunchAgents استخدم ماسح الاستمرارية." "On macOS: the current-user crontab check works; /etc/cron.d and systemd timers are Linux-specific — use the Persistence Scanner for LaunchAgents.")${NC}"
+    echo ""
+fi
+
 # ─── أنماط خطيرة بالكرون ──────────────────────────────────
 CRON_DANGER_PATTERNS='wget\s|curl\s.*\|.*sh|/dev/tcp|nc\s+-e|bash\s+-i|python.*socket|rm\s+-rf\s+/|chmod\s+777|/tmp/|/var/tmp/|/dev/shm/|base64\s+-d|nohup.*&'
 CRON_SUSPICIOUS_PATTERNS='wget\s|curl\s|python[23]?\s+-c|perl\s+-e|ruby\s+-e|php\s+-r|dd\s+if=|socat\s|openssl\s+s_client'

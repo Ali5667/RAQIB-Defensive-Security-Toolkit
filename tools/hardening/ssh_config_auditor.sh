@@ -15,6 +15,10 @@ echo ""
 
 CONFIG="/etc/ssh/sshd_config"
 [ -n "$1" ] && CONFIG="$1"
+# ويندوز: خادم OpenSSH الأصلي يحتفظ بإعداده في ProgramData
+if [ ! -f "$CONFIG" ] && raqib_is_windows; then
+    CONFIG="/c/ProgramData/ssh/sshd_config"
+fi
 if [ ! -f "$CONFIG" ]; then
     read -rp "$(t har2_prompt_config)  [افتراضي: /etc/ssh/sshd_config]: " CONFIG
     CONFIG="${CONFIG:-/etc/ssh/sshd_config}"
@@ -22,6 +26,10 @@ fi
 [ ! -f "$CONFIG" ] && { echo -e "${RED}$(t c_file_not_found)${NC}"; exit 1; }
 
 echo -e "${GREY}  الملف: $CONFIG${NC}"
+# ملاحظة ويندوز: فحوص المجموعات/authorized_keys أقل تطبيقاً على OpenSSH لويندوز
+if raqib_is_windows; then
+    echo -e "${GREY}  $(raqib_tr "يُدقق إعداد OpenSSH لويندوز؛ فحوص المجموعات وauthorized_keys أقل تطبيقاً هنا." "Auditing Windows OpenSSH Server config; group/authorized_keys checks are less applicable.")${NC}"
+fi
 echo ""
 
 REPORT_LINES=""

@@ -166,9 +166,74 @@ $nft_out
 "
 fi
 
+# ─── 4b. Windows Firewall (netsh / Get-NetFirewallProfile) ───────────────────
+# فلسفة المشروع: أدوات النظام الأصلية فقط — نعتمد Powershell/netsh على ويندوز
+# مثلما نعتمد ss وiptables على لينكس. لا يغيّر شيئاً على لينكس نفسه.
+if raqib_has_windows_bridge; then
+    fw_found=1
+    echo ""
+    echo -e "${BOLD}${CYAN}━━ Windows Firewall (Get-NetFirewallProfile) ━━${NC}"
+    wf_out="$(raqib_win_ps '
+        Get-NetFirewallProfile | ForEach-Object {
+            "{0}|{1}|{2}|{3}" -f $_.Name, $_.Enabled, $_.DefaultInboundAction, $_.DefaultOutboundAction
+        }
+    ')"
+    if [ -z "$wf_out" ]; then
+        echo -e "  ${YELLOW}$(raqib_tr "تعذّر قراءة حالة جدار ويندوز — جرّب من Git Bash مباشرة أو بلا قيود." "Could not read Windows Firewall profile state — try running from Git Bash directly.")${NC}"
+    else
+        wf_name=""; wf_enabled=""; wf_in=""; wf_out_act=""
+        while IFS='|' read -r wf_name wf_enabled wf_in wf_out_act; do
+            [ -z "$wf_name" ] && continue
+            if [ "$wf_enabled" = "True" ]; then
+                echo -e "  ${GREEN}[OK]${NC} $wf_name: enabled  |  inbound=$wf_in  outbound=$wf_out_act"
+            else
+                echo -e "  ${CRIMSON}[X]${NC} $wf_name: DISABLED"
+                finding_add critical "Windows Firewall profile '$wf_name' is DISABLED"
+            fi
+            if [ "$wf_enabled" = "True" ] && [ "${wf_in,,}" = "allow" ]; then
+                echo -e "  ${RED}[CRITICAL] inbound default = ALLOW${NC}"
+                finding_add critical "Windows Firewall profile '$wf_name' inbound default policy = ALLOW"
+            fi
+        done <<< "$wf_out"
+        REPORT+="=== Windows Firewall (profiles) ===
+$wf_out
+
+"
+    fi
+fi
+
+# ─── 4c. macOS PF (Packet Filter) ───────────────────────────────────────────
+# pfctl يتطلب sudo — نفحص إذا النظام ماك ونجرب نقراءة الحالة
+if raqib_is_macos; then
+    fw_found=1
+    echo ""
+    echo -e "${BOLD}${CYAN}━━ macOS PF (Packet Filter) ━━${NC}"
+    if command -v pfctl >/dev/null 2>&1; then
+        pf_out="$(pfctl -s info 2>/dev/null)"
+        if [ -n "$pf_out" ]; then
+            pf_enabled="$(printf '%s\n' "$pf_out" | grep -io "Status: [A-Za-z]*" | head -1)"
+            if printf '%s' "$pf_enabled" | grep -qi "disabled"; then
+                echo -e "  ${RED}[HIGH] PF is DISABLED (Status: ${pf_enabled#Status: })${NC}"
+                finding_add high "macOS firewall PF is disabled"
+            else
+                echo -e "  ${GREEN}[OK]${NC} ${pf_enabled:-Status: unknown}"
+            fi
+            echo "$pf_out" | head -10
+            REPORT+="=== macOS PF ===
+$pf_out
+
+"
+        else
+            echo -e "  ${YELLOW}$(raqib_tr "(pfctl يحتاج sudo — نفذ: sudo pfctl -s info" "(pfctl needs sudo — run: sudo pfctl -s info)")${NC}"
+        fi
+    else
+        echo -e "  ${YELLOW}$(raqib_tr "(pfctl غير متاح على هذا النظام" "(pfctl not available on this system)")${NC}"
+    fi
+fi
+
 # ─── 5. ما في جدار ناري ──────────────────────────────────────
 if [ "$fw_found" -eq 0 ]; then
-    echo -e "${RED}[CRITICAL] لا يوجد جدار ناري مُفعّل! (UFW/firewalld/iptables)${NC}"
+    echo -e "${RED}[CRITICAL] لا يوجد جدار ناري مُفعّل! (UFW/firewalld/iptables/Windows Firewall/PF)${NC}"
     finding_add critical "No active firewall detected on this system"
 fi
 

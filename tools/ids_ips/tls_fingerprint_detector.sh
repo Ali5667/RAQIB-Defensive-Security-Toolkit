@@ -76,12 +76,12 @@ analyze_pcap() {
     echo -e "${YELLOW}◉ $(t ids7_analyzing_pcap 2>/dev/null || echo 'Analyzing PCAP file')${NC}: $pcap_file"
     echo ""
 
-    if ! command -v python3 >/dev/null 2>&1; then
-        echo -e "${RED}  python3 required for PCAP analysis${NC}"
+    if ! _raqib_py >/dev/null 2>&1; then
+        echo -e "${RED}  python3/python required for PCAP analysis${NC}"
         return 1
     fi
 
-    python3 - "$pcap_file" "$JA3_DB_FILE" << 'PYEOF'
+    $(_raqib_py) - "$pcap_file" "$JA3_DB_FILE" << 'PYEOF'
 import sys, struct, hashlib, os
 
 pcap_file = sys.argv[1]
@@ -304,7 +304,12 @@ live_capture() {
     local duration="${3:-30}"
 
     if ! command -v tcpdump >/dev/null 2>&1; then
-        echo -e "${RED}  tcpdump required for live capture (apt install tcpdump)${NC}"
+        if raqib_is_windows; then
+            echo -e "${RED}  tcpdump غير متوفر على ويندوز — شغّل الوضع الحي من WSL2 أو ملف PCAP جاهز (الخيار 1).${NC}"
+            echo -e "${RED}  tcpdump is not available on Windows — run live capture from WSL2, or use a pre-made PCAP (option 1).${NC}"
+        else
+            echo -e "${RED}  tcpdump required for live capture (apt install tcpdump)${NC}"
+        fi
         return 1
     fi
 
@@ -363,7 +368,10 @@ check_current_connections() {
         foreign_port=$(echo "$line" | awk '{print $5}' | grep -oE ':[0-9]+$' | tr -d ':')
         local badge="${GREEN}[OK]${NC}"
         case "$foreign_port" in
-            50050|4443|8443) badge="${ORANGE}[SUSPICIOUS PORT]${NC}"; finding_add medium 2>/dev/null ;;
+            50050|4443|8443)
+                badge="${ORANGE}[SUSPICIOUS PORT]${NC}"
+                finding_add medium "Connection to suspicious C2-like port: $foreign_port"
+                ;;
         esac
         echo -e "  $badge $line"
     done <<< "$connections"

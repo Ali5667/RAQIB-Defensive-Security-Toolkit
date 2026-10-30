@@ -1,7 +1,7 @@
 #!/bin/bash
 # =====================================================
 #  Outdated Packages Checker — فاحص الحزم المنتهية
-#  يدعم: apt/yum/dnf/pacman/zypper/apk/snap/flatpak
+#  يدعم: apt/yum/dnf/pacman/zypper/apk ✓ لينكس — winget (ويندوز)
 #  يحلل: حزم أمنية حرجة، kernel updates، pip/npm/gem،
 #  CVE حزم معروفة، تاريخ آخر تحديث، auto-update status
 # =====================================================
@@ -141,6 +141,37 @@ elif command -v zypper >/dev/null 2>&1; then
     echo "$zypper_out" | head -30
     count=$(printf '%s\n' "$zypper_out" | grep -c '\S')
     [ "$count" -gt 0 ] && finding_add medium "Zypper: $count updates available"
+
+elif command -v winget.exe >/dev/null 2>&1 && raqib_is_windows; then
+    PKG_MGR="winget"
+    echo -e "  ${CYAN}مدير الحزم: winget (Windows App Installer)${NC}"
+    echo ""
+
+    winget_upgradable=$(run_with_spinner "$(t vul2_updating) " -- \
+        bash -c "winget.exe upgrade --include-unknown 2>/dev/null | grep -v '^\\s*$' | grep -v '^ *Name *Id'")
+    # استخراج الصفوف ذات عمود Available صالح (رقم أو "Upgrade"):
+    # الأعمدة: Name Id Version Available [Source] — Available = $(NF-1) إذا وجد Source
+    winget_rows=$(printf '%s\n' "$winget_upgradable" | awk '
+        NF >= 5 && ($(NF-1) ~ /^[0-9]/ || $(NF-1) == "Upgrade") { print; next }
+        NF == 4 && ($NF ~ /^[0-9]/ || $NF == "Upgrade") { print }')
+    count=$(printf '%s\n' "$winget_rows" | grep -c '\S' 2>/dev/null || echo 0)
+
+    if [ "$count" -gt 0 ]; then
+        TOTAL_UPGRADABLE=$((TOTAL_UPGRADABLE + count))
+        echo -e "  ${BOLD}$count تطبيق قابل للتحديث${NC}"
+        printf '%s\n' "$winget_rows" | head -20
+        [ "$count" -gt 20 ] && echo -e "  ${GREY}  ... و$((count - 20)) إضافية${NC}"
+
+        if [ "$count" -gt 30 ]; then
+            finding_add high "Windows host significantly outdated: $count packages (winget)"
+        elif [ "$count" -gt 10 ]; then
+            finding_add medium "Windows host has $count outdated packages (winget)"
+        else
+            finding_add low "winget: $count outdated packages"
+        fi
+    else
+        echo -e "  ${GREEN}جميع التطبيقات محدّثة (أو winget لا يطلع مخرجات كاملة بدون تفاعل) ✅${NC}"
+    fi
 
 elif command -v apk >/dev/null 2>&1; then
     PKG_MGR="apk"

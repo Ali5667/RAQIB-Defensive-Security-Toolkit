@@ -15,6 +15,15 @@ echo ""
 
 REPORT=""
 
+# ─── حرس المنصة: systemd / SysV / xinetd — لينكس فقط ───
+# (ماك: launchctl — ويندوز: Get-Service داخل حزمة دفاع ويندوز)
+if ! raqib_is_linux; then
+    raqib_linux_only \
+        "قائمة الخدمات: systemd / SysV / xinetd" \
+        "Service lister: systemd / SysV / xinetd only" || true
+    exit 2
+fi
+
 # ─── قواميس الخدمات الخطيرة ───────────────────────────────
 declare -A DANGEROUS_SERVICES
 DANGEROUS_SERVICES["telnet"]="critical|Telnet: لا تشفير — استبدل بـ SSH"

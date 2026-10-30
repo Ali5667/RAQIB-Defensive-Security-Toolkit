@@ -15,6 +15,8 @@
 if [ -z "${BASH_VERSINFO:-}" ] || [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
     echo "RAQIB requires Bash 4 or newer (found: ${BASH_VERSION:-unknown})." >&2
     echo "RAQIB يتطلب Bash 4 أو أحدث (النسخة الحالية: ${BASH_VERSION:-غير معروفة})." >&2
+    echo "  - Windows (Git Bash): bash raqib.sh  أو شغّل raqib.bat مباشرة" >&2
+    echo "  - Windows (WSL2)    : wsl --install ثم شغّله من لينكس داخل WSL" >&2
     echo "  - macOS: brew install bash   ثم شغّل الأداة بـ:  /opt/homebrew/bin/bash raqib.sh" >&2
     echo "  - Linux: bash --version يفترض يطلع 4+ افتراضياً؛ لو أقدم حدّث الحزمة bash." >&2
     exit 1
@@ -45,6 +47,22 @@ source "$MODULES_DIR/lang.sh"
 source "$MODULES_DIR/auto_translate.sh"
 raqib_load_translation_caches
 load_lang
+
+# طبقة الأنظمة متعددة المنصات — تُزرع هنا أيضاً لضمان الرصيد عند تشغيل raqib.sh مباشرة
+source "$MODULES_DIR/platform.sh" 2>/dev/null || true
+
+# RAQIB_OS_LABEL — تسمية منصة لطيفة للبانر
+raqib_os_label() {
+    case "${RAQIB_OS:-unknown}" in
+        linux)  echo "Linux" ;;
+        wsl)    echo "Windows (WSL2 · ${WSL_DISTRO_NAME:-WSL})" ;;
+        darwin) echo "macOS ($(uname -m 2>/dev/null || echo arm))" ;;
+        msys)   echo "Windows (Git Bash)" ;;
+        cygwin) echo "Windows (Cygwin)" ;;
+        *)      echo "Unknown (${OSTYPE:-n/a})" ;;
+    esac
+}
+export -f raqib_os_label
 
 GREEN=$'\033[0;32m'
 CYAN=$'\033[0;36m'
@@ -280,6 +298,7 @@ EOF
     printf "  ${YELLOW}[+] GitHub  :${NC} %-30s ${YELLOW}[+] Updated :${NC} %s (v${VERSION})\n" "https://github.com/Ali5667" "$updated_fmt"
     printf "  ${YELLOW}[+] Twitter :${NC} %-30s ${YELLOW}[+] Session :${NC} ${GREEN}%s (%s)${NC}\n" "@ali_cys45" "$op_name" "$op_role"
     printf "  ${YELLOW}[+] SIEM    :${NC} %s\n" ".raqib_events.jsonl (${siem_state})"
+    printf "  ${YELLOW}[+] Platform:${NC} %s\n" "$(raqib_os_label 2>/dev/null || echo "${RAQIB_OS:-Linux}")"
     echo -e "  ${GREY}--------------------------------------------------------------------------------${NC}"
     echo ""
 }
