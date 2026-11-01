@@ -40,6 +40,10 @@ declare -g -A LANG_NAMES=(
 
 _RAQIB_CURRENT_LOADED_LANG=""
 
+# كاش اسم مصفوفة اللغة بالحروف الكبيرة (STR_KO...) — يمنع spawn لـ tr عند كل نص.
+_RAQIB_LANG_UPPER=""
+_RAQIB_LANG_UPPER_CODE=""
+
 # ----------------------------------------------------------------------------
 # raqib_load_lang <lang_code>
 # Dynamically loads a single language file into memory.
@@ -71,7 +75,9 @@ raqib_load_lang() {
         source "$lang_file"
         _RAQIB_CURRENT_LOADED_LANG="$code"
         LANG_CODE="$code"
-        export _RAQIB_CURRENT_LOADED_LANG LANG_CODE
+        _RAQIB_LANG_UPPER_CODE="$code"
+        _RAQIB_LANG_UPPER="$(echo "$code" | tr '[:lower:]' '[:upper:]')"
+        export _RAQIB_CURRENT_LOADED_LANG LANG_CODE _RAQIB_LANG_UPPER _RAQIB_LANG_UPPER_CODE
         return 0
     else
         echo "[-] Language file not found: $lang_file" >&2
@@ -115,7 +121,13 @@ t() {
     fi
 
     local lc_upper
-    lc_upper="$(echo "${LANG_CODE:-ar}" | tr '[:lower:]' '[:upper:]')"
+    if [ -n "${_RAQIB_LANG_UPPER:-}" ] && [ "${_RAQIB_LANG_UPPER_CODE:-}" = "${LANG_CODE:-ar}" ]; then
+        lc_upper="$_RAQIB_LANG_UPPER"
+    else
+        lc_upper="$(echo "${LANG_CODE:-ar}" | tr '[:lower:]' '[:upper:]')"
+        _RAQIB_LANG_UPPER="$lc_upper"
+        _RAQIB_LANG_UPPER_CODE="${LANG_CODE:-ar}"
+    fi
     local -n arr="STR_${lc_upper}" 2>/dev/null
     local val="${arr[$key]}"
 

@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: Polski (Polish) [pl]
-#  Total Keys: 674
+#  Total Keys: 692
 # ============================================================================
 
 declare -g -A STR_PL 2>/dev/null || declare -A STR_PL 2>/dev/null || true
@@ -541,6 +541,24 @@ STR_PL[par_self_warning]="⚠️ Sam o to poprosiłeś — w prawdziwej konfigur
 STR_PL[par_skipped]="Pominięte (pozostaje w oczekiwaniu)."
 STR_PL[par_title]="✅ Oczekujące sprawdzenie działań"
 STR_PL[press_enter]="Naciśnij Enter, aby wrócić..."
+STR_PL[pt_adv_forensics]="Zaawansowana analiza śledcza (pamięć/pochodzenie procesów/weryfikacja plików binarnych)"
+STR_PL[pt_cred_leak]="Sprawdzanie wycieku poświadczeń i sekretów (pliki/historia Git)"
+STR_PL[pt_email_analyzer]="Analizator nagłówków e-mail (podszywanie się/phishing/SPF-DKIM-DMARC)"
+STR_PL[pt_eml_prompt]="Ścieżka do pliku e-mail (.eml): "
+STR_PL[pt_file_not_found]="Nie znaleziono pliku: {file}"
+STR_PL[pt_install_git]="Zainstaluj Git for Windows, aby korzystać z natywnego RAQIB w Windows, lub użyj WSL2, aby uzyskać pełne funkcje Linuksa."
+STR_PL[pt_linux_dep]="To narzędzie zależy od podsystemu specyficznego dla Linuksa (np. /proc, systemd lub iptables)."
+STR_PL[pt_linux_exclusive]="To narzędzie jest wyłącznie dla Linuksa — użyj obsługiwanych odpowiedników (skaner trwałości, sprawdzanie zapory, raport historii logowań)."
+STR_PL[pt_linux_only]="⚠️  Funkcja dostępna tylko w Linux"
+STR_PL[pt_macos]="W macOS:"
+STR_PL[pt_python_missing]="To narzędzie wymaga Pythona 3, ale nie został znaleziony."
+STR_PL[pt_rootkit]="Detektor rootkitów (jądro/ukryte procesy/eBPF/preload)"
+STR_PL[pt_win_defense]="🪟 Pakiet ochrony Windows (zaplanowane zadania, Defender, dziennik zdarzeń, autostart)"
+STR_PL[pt_win_host_req]="Wymaga natywnego hosta Windows (Git Bash) z powershell.exe i dostępem do systemu."
+STR_PL[pt_win_suite]="Wzmacnianie systemu → Pakiet ochrony Windows"
+STR_PL[pt_win_try]="W Windows: wypróbuj natywny pakiet ochrony Windows:"
+STR_PL[pt_windows_only]="⚠️  Funkcja dostępna tylko w Windows"
+STR_PL[pt_wsl_hint]="lub uruchom to narzędzie w całości w WSL2, aby uzyskać pełny zestaw funkcji Linuksa."
 STR_PL[qe_actions_title]="Żądana akcja:"
 STR_PL[qe_bytes]="bajtów"
 STR_PL[qe_cancelled]="Anulowano."

@@ -86,16 +86,22 @@ raqib_win_ps() {
 export -f raqib_win_ps
 
 # -----------------------------------------------------
-#  نصّ ثنائي اللغة للمنصات الجديدة — الترجمة من RealLang.registry
-#  الاستخدام: raqib_tr "نص عربي" "English text"
+#  نصّ متعدد اللغات للمنصات الجديدة — يقرأ من ملفات الـ20 لغة.
+#  كل عبارة لها مفتاح pt_*، والعربي/الإنجليزي يبقيان احتياطاً فقط.
+#  الاستخدام: raqib_tr pt_key "نص عربي احتياطي" "English fallback"
 # -----------------------------------------------------
 raqib_tr() {
-    local ar_text="$1" en_text="$2"
-    if [ "${LANG_CODE:-ar}" = "ar" ]; then
-        printf '%s' "$ar_text"
-    else
-        printf '%s' "$en_text"
+    local key="$1" ar_text="${2:-}" en_text="${3:-${2:-}}"
+    case "${LANG_CODE:-ar}" in
+        ar) printf '%s' "$ar_text"; return 0 ;;
+        en) printf '%s' "$en_text"; return 0 ;;
+    esac
+    local val=""
+    if declare -F t >/dev/null 2>&1; then
+        val="$(t "$key" 2>/dev/null)"
     fi
+    [ -z "$val" ] && val="$en_text"
+    printf '%s' "$val"
 }
 export -f raqib_tr
 
@@ -107,17 +113,19 @@ export -f raqib_tr
 raqib_linux_only() {
     local feature_ar="$1"
     local feature_en="${2:-$1}"
+    local feature="$feature_ar"
+    [ "${LANG_CODE:-ar}" != "ar" ] && feature="$feature_en"
     echo ""
-    echo -e "${BOLD}${ORANGE}$(raqib_tr "⚠️  ميزة مخصّصة لأنظمة Linux" "⚠️  Linux-only feature")${NC}: ${YELLOW}$(raqib_tr "$feature_ar" "$feature_en")${NC}"
+    echo -e "${BOLD}${ORANGE}$(raqib_tr pt_linux_only "⚠️  ميزة مخصّصة لأنظمة Linux" "⚠️  Linux-only feature")${NC}: ${YELLOW}${feature}${NC}"
     echo ""
-    echo -e "  ${GREY}$(raqib_tr "هذه الأداة تعتمد على مكوّن مخصّص لـ Linux (مثل /proc أو systemd أو iptables)." "This tool depends on a Linux-specific subsystem (e.g. /proc, systemd or iptables).")${NC}"
+    echo -e "  ${GREY}$(raqib_tr pt_linux_dep "هذه الأداة تعتمد على مكوّن مخصّص لـ Linux (مثل /proc أو systemd أو iptables)." "This tool depends on a Linux-specific subsystem (e.g. /proc, systemd or iptables).")${NC}"
     if raqib_has_windows_bridge; then
-        echo -e "  ${CYAN}➤ $(raqib_tr "على ويندوز: جرّب حزمة الدفاع الأصلية:" "On Windows: try the native Windows Defense Suite:")${NC} ${BOLD}$(raqib_tr "تقوية الأنظمة → حزمة دفاع ويندوز" "System Hardening → Windows Defense Suite")${NC}"
-        echo -e "  ${CYAN}➤ $(raqib_tr "أو شغّل الأداة كاملة داخل WSL2 (كل ميزات لينكس)." "or run this tool fully inside WSL2 for the full Linux feature set.")${NC}"
+        echo -e "  ${CYAN}➤ $(raqib_tr pt_win_try "على ويندوز: جرّب حزمة الدفاع الأصلية:" "On Windows: try the native Windows Defense Suite:")${NC} ${BOLD}$(raqib_tr pt_win_suite "تقوية الأنظمة → حزمة دفاع ويندوز" "System Hardening → Windows Defense Suite")${NC}"
+        echo -e "  ${CYAN}➤ $(raqib_tr pt_wsl_hint "أو شغّل الأداة كاملة داخل WSL2 (كل ميزات لينكس)." "or run this tool fully inside WSL2 for the full Linux feature set.")${NC}"
     else
-        echo -e "  ${CYAN}➤ $(raqib_tr "ثبّت Git for Windows ليصبح RAQIB يعمل كأصلية على ويندوز، أو WSL2 لميزات لينكس كاملة." "Install Git for Windows for a native Windowsized RAQIB, or use WSL2 for full Linux features.")${NC}"
+        echo -e "  ${CYAN}➤ $(raqib_tr pt_install_git "ثبّت Git for Windows ليصبح RAQIB يعمل كأصلية على ويندوز، أو WSL2 لميزات لينكس كاملة." "Install Git for Windows for a native Windowsized RAQIB, or use WSL2 for full Linux features.")${NC}"
     fi
-    echo -e "  ${CYAN}➤ $(raqib_tr "على macOS:" "On macOS:")${NC} ${GREY}$(raqib_tr "هذه الأداة لينكس حصراً — استخدم الأدوات المكافئة المدعومة (ماسح الاستمرارية، فاحص الجدار، سجل الدخول)." "This tool is Linux-exclusive - use the supported equivalents (persistence scanner, firewall checker, login history report).")${NC}"
+    echo -e "  ${CYAN}➤ $(raqib_tr pt_macos "على macOS:" "On macOS:")${NC} ${GREY}$(raqib_tr pt_linux_exclusive "هذه الأداة لينكس حصراً — استخدم الأدوات المكافئة المدعومة (ماسح الاستمرارية، فاحص الجدار، سجل الدخول)." "This tool is Linux-exclusive - use the supported equivalents (persistence scanner, firewall checker, login history report).")${NC}"
     echo ""
     return 2
 }
@@ -127,9 +135,11 @@ export -f raqib_linux_only
 raqib_windows_only() {
     local feature_ar="$1"
     local feature_en="${2:-$1}"
+    local feature="$feature_ar"
+    [ "${LANG_CODE:-ar}" != "ar" ] && feature="$feature_en"
     echo ""
-    echo -e "${BOLD}${ORANGE}$(raqib_tr "⚠️  ميزة مخصّصة لأنظمة Windows" "⚠️  Windows-only feature")${NC}: ${YELLOW}$(raqib_tr "$feature_ar" "$feature_en")${NC}"
-    echo -e "  ${GREY}$(raqib_tr "تشتغل من ويندوز أصلي (Git Bash) — تحتاج powershell.exe ووصولاً إلى واجهات النظام." "Requires a native Windows host (Git Bash) with powershell.exe and system access.")${NC}"
+    echo -e "${BOLD}${ORANGE}$(raqib_tr pt_windows_only "⚠️  ميزة مخصّصة لأنظمة Windows" "⚠️  Windows-only feature")${NC}: ${YELLOW}${feature}${NC}"
+    echo -e "  ${GREY}$(raqib_tr pt_win_host_req "تشتغل من ويندوز أصلي (Git Bash) — تحتاج powershell.exe ووصولاً إلى واجهات النظام." "Requires a native Windows host (Git Bash) with powershell.exe and system access.")${NC}"
     echo ""
     return 2
 }

@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: Deutsch (German) [de]
-#  Total Keys: 674
+#  Total Keys: 692
 # ============================================================================
 
 declare -g -A STR_DE 2>/dev/null || declare -A STR_DE 2>/dev/null || true
@@ -541,6 +541,24 @@ STR_DE[par_self_warning]="⚠️ Sie haben dies selbst beantragt – in einem ec
 STR_DE[par_skipped]="Übersprungen (bleibt ausstehend)."
 STR_DE[par_title]="✅ Überprüfung ausstehender Maßnahmen"
 STR_DE[press_enter]="Drücke Enter, um zurückzukehren..."
+STR_DE[pt_adv_forensics]="Erweiterte Forensik (Speicher/Prozessabstammung/Binärdatei-Prüfung)"
+STR_DE[pt_cred_leak]="Prüfer für preisgegebene Anmeldedaten und Geheimnisse (Dateien/Git-Verlauf)"
+STR_DE[pt_email_analyzer]="E-Mail-Header-Analyse (Spoofing/Phishing/SPF-DKIM-DMARC)"
+STR_DE[pt_eml_prompt]="Pfad zur E-Mail-Datei (.eml): "
+STR_DE[pt_file_not_found]="Datei nicht gefunden: {file}"
+STR_DE[pt_install_git]="Installieren Sie Git for Windows für ein natives RAQIB unter Windows oder nutzen Sie WSL2 für den vollen Linux-Funktionsumfang."
+STR_DE[pt_linux_dep]="Dieses Tool hängt von einem Linux-spezifischen Subsystem ab (z. B. /proc, systemd oder iptables)."
+STR_DE[pt_linux_exclusive]="Dieses Tool ist ausschließlich für Linux – verwenden Sie die unterstützten Entsprechungen (Persistenz-Scanner, Firewall-Prüfer, Anmeldeverlaufsbericht)."
+STR_DE[pt_linux_only]="⚠️  Nur unter Linux verfügbar"
+STR_DE[pt_macos]="Unter macOS:"
+STR_DE[pt_python_missing]="Python 3 wird für dieses Tool benötigt, wurde aber nicht gefunden."
+STR_DE[pt_rootkit]="Rootkit-Erkennung (Kernel/versteckte Prozesse/eBPF/Preload)"
+STR_DE[pt_win_defense]="🪟 Windows-Verteidigungssuite (geplante Aufgaben, Defender, Ereignisprotokoll, Autostarts)"
+STR_DE[pt_win_host_req]="Erfordert einen nativen Windows-Host (Git Bash) mit powershell.exe und Systemzugriff."
+STR_DE[pt_win_suite]="Systemhärtung → Windows-Verteidigungssuite"
+STR_DE[pt_win_try]="Unter Windows: Probieren Sie die native Windows-Verteidigungssuite:"
+STR_DE[pt_windows_only]="⚠️  Nur unter Windows verfügbar"
+STR_DE[pt_wsl_hint]="oder führen Sie dieses Tool vollständig in WSL2 aus, um den vollen Linux-Funktionsumfang zu nutzen."
 STR_DE[qe_actions_title]="Angeforderte Aktion:"
 STR_DE[qe_bytes]="Bytes"
 STR_DE[qe_cancelled]="Abgebrochen."

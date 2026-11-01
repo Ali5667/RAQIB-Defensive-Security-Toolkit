@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: हिन्दी (Hindi) [hi]
-#  Total Keys: 674
+#  Total Keys: 692
 # ============================================================================
 
 declare -g -A STR_HI 2>/dev/null || declare -A STR_HI 2>/dev/null || true
@@ -541,6 +541,24 @@ STR_HI[par_self_warning]="⚠️ आपने स्वयं यह अनु�
 STR_HI[par_skipped]="छोड़ दिया गया (लंबित रहता है)।"
 STR_HI[par_title]="✅ लंबित कार्रवाइयों की समीक्षा"
 STR_HI[press_enter]="वापस लौटने के लिए Enter दबाएं..."
+STR_HI[pt_adv_forensics]="उन्नत फ़ॉरेंसिक (मेमोरी/प्रोसेस वंशावली/बाइनरी सत्यापन)"
+STR_HI[pt_cred_leak]="क्रेडेंशियल और सीक्रेट लीक चेकर (फ़ाइलें/Git इतिहास)"
+STR_HI[pt_email_analyzer]="ईमेल हेडर विश्लेषक (स्पूफ़िंग/फ़िशिंग/SPF-DKIM-DMARC)"
+STR_HI[pt_eml_prompt]="ईमेल फ़ाइल का पथ (.eml): "
+STR_HI[pt_file_not_found]="फ़ाइल नहीं मिली: {file}"
+STR_HI[pt_install_git]="विंडोज़ पर नेटिव RAQIB के लिए Git for Windows इंस्टॉल करें, या पूरी Linux सुविधाओं के लिए WSL2 उपयोग करें।"
+STR_HI[pt_linux_dep]="यह टूल Linux-विशिष्ट सबसिस्टम पर निर्भर है (जैसे /proc, systemd या iptables)।"
+STR_HI[pt_linux_exclusive]="यह टूल केवल Linux के लिए है — समर्थित समकक्षों का उपयोग करें (पर्सिस्टेंस स्कैनर, फ़ायरवॉल चेकर, लॉगिन इतिहास रिपोर्ट)।"
+STR_HI[pt_linux_only]="⚠️  केवल Linux सुविधा"
+STR_HI[pt_macos]="macOS पर:"
+STR_HI[pt_python_missing]="इस टूल के लिए Python 3 आवश्यक है लेकिन नहीं मिला।"
+STR_HI[pt_rootkit]="रूटकिट डिटेक्टर (कर्नेल/छिपी प्रोसेस/eBPF/प्रीलोड)"
+STR_HI[pt_win_defense]="🪟 विंडोज़ डिफ़ेंस सूट (निर्धारित कार्य, Defender, इवेंट लॉग, ऑटोरन)"
+STR_HI[pt_win_host_req]="नेटिव विंडोज़ होस्ट (Git Bash) आवश्यक है, powershell.exe और सिस्टम एक्सेस के साथ।"
+STR_HI[pt_win_suite]="सिस्टम हार्डनिंग → विंडोज़ डिफ़ेंस सूट"
+STR_HI[pt_win_try]="विंडोज़ पर: नेटिव विंडोज़ डिफ़ेंस सूट आज़माएँ:"
+STR_HI[pt_windows_only]="⚠️  केवल Windows सुविधा"
+STR_HI[pt_wsl_hint]="या पूरी Linux सुविधाओं के लिए इस टूल को WSL2 के अंदर पूरी तरह चलाएँ।"
 STR_HI[qe_actions_title]="   अनुरोधित कार्रवाई:"
 STR_HI[qe_bytes]="   बाइट्स"
 STR_HI[qe_cancelled]="   रद्द कर दिया गया।"

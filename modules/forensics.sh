@@ -6,10 +6,12 @@ source "$MODULES_DIR/common.sh"
 run_email_header_analyzer() {
     local eml
     echo ""
-    read -rp "  $(raqib_tr "مسار ملف البريد (.eml): " "Email file path (.eml): ")" eml
+    read -rp "  $(raqib_tr pt_eml_prompt "مسار ملف البريد (.eml): " "Email file path (.eml): ")" eml
     eml="${eml%\"}"; eml="${eml#\"}"
     if [ ! -f "$eml" ]; then
-        echo -e "${RED}$(raqib_tr "الملف غير موجود: $eml" "File not found: $eml")${NC}"
+        local nf
+        nf="$(raqib_tr pt_file_not_found "الملف غير موجود: {file}" "File not found: {file}")"
+        echo -e "${RED}${nf//\{file\}/$eml}${NC}"
         return 1
     fi
     run_tool "$TOOLS_DIR/forensics/email_header_analyzer.py" "$eml"
@@ -24,8 +26,8 @@ menu_forensics() {
             "$(t f3)" \
             "$(t f4)" \
             "$(t f5)" \
-            "$(raqib_tr "الطب الشرعي المتقدم (ذاكرة/سلالة العمليات/التحقق من الثنائيات)" "Advanced Forensics (memory/process lineage/binary verification)")" \
-            "$(raqib_tr "محلل ترويسات البريد (تزييف/تصيد/SPF-DKIM-DMARC)" "Email Header Analyzer (spoofing/phishing/SPF-DKIM-DMARC)")"
+            "$(raqib_tr pt_adv_forensics "الطب الشرعي المتقدم (ذاكرة/سلالة العمليات/التحقق من الثنائيات)" "Advanced Forensics (memory/process lineage/binary verification)")" \
+            "$(raqib_tr pt_email_analyzer "محلل ترويسات البريد (تزييف/تصيد/SPF-DKIM-DMARC)" "Email Header Analyzer (spoofing/phishing/SPF-DKIM-DMARC)")"
         read -rp "  $(t choice_label)" c
         case $c in
             1) run_tool "$TOOLS_DIR/forensics/login_history_report.sh" ;;

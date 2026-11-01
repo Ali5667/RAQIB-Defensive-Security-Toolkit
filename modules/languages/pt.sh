@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: Português (Portuguese) [pt]
-#  Total Keys: 674
+#  Total Keys: 692
 # ============================================================================
 
 declare -g -A STR_PT 2>/dev/null || declare -A STR_PT 2>/dev/null || true
@@ -541,6 +541,24 @@ STR_PT[par_self_warning]="⚠️ Você mesmo solicitou isso – em uma configura
 STR_PT[par_skipped]="Ignorado (permanece pendente)."
 STR_PT[par_title]="✅ Revisão de ações pendentes"
 STR_PT[press_enter]="Pressione Enter para retornar..."
+STR_PT[pt_adv_forensics]="Forense Avançada (memória/linhagem de processos/verificação de binários)"
+STR_PT[pt_cred_leak]="Verificador de Vazamento de Credenciais e Segredos (arquivos/histórico do Git)"
+STR_PT[pt_email_analyzer]="Analisador de Cabeçalhos de E-mail (spoofing/phishing/SPF-DKIM-DMARC)"
+STR_PT[pt_eml_prompt]="Caminho do arquivo de e-mail (.eml): "
+STR_PT[pt_file_not_found]="Arquivo não encontrado: {file}"
+STR_PT[pt_install_git]="Instale o Git for Windows para um RAQIB nativo no Windows, ou use o WSL2 para todos os recursos do Linux."
+STR_PT[pt_linux_dep]="Esta ferramenta depende de um subsistema específico do Linux (por exemplo, /proc, systemd ou iptables)."
+STR_PT[pt_linux_exclusive]="Esta ferramenta é exclusiva do Linux — use os equivalentes compatíveis (scanner de persistência, verificador de firewall, relatório de histórico de login)."
+STR_PT[pt_linux_only]="⚠️  Recurso exclusivo do Linux"
+STR_PT[pt_macos]="No macOS:"
+STR_PT[pt_python_missing]="O Python 3 é necessário para esta ferramenta, mas não foi encontrado."
+STR_PT[pt_rootkit]="Detector de Rootkit (kernel/processos ocultos/eBPF/preload)"
+STR_PT[pt_win_defense]="🪟 Suíte de Defesa do Windows (tarefas agendadas, Defender, Log de Eventos, autoruns)"
+STR_PT[pt_win_host_req]="Requer um host Windows nativo (Git Bash) com powershell.exe e acesso ao sistema."
+STR_PT[pt_win_suite]="Fortalecimento do Sistema → Suíte de Defesa do Windows"
+STR_PT[pt_win_try]="No Windows: experimente a Suíte de Defesa do Windows nativa:"
+STR_PT[pt_windows_only]="⚠️  Recurso exclusivo do Windows"
+STR_PT[pt_wsl_hint]="ou execute esta ferramenta inteiramente dentro do WSL2 para todos os recursos do Linux."
 STR_PT[qe_actions_title]="   Ação solicitada:"
 STR_PT[qe_bytes]="   bytes"
 STR_PT[qe_cancelled]="   Cancelado."

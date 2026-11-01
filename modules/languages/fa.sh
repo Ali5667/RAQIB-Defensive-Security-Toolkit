@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: فارسی (Persian) [fa]
-#  Total Keys: 674
+#  Total Keys: 692
 # ============================================================================
 
 declare -g -A STR_FA 2>/dev/null || declare -A STR_FA 2>/dev/null || true
@@ -541,6 +541,24 @@ STR_FA[par_self_warning]="⚠️ شما خودتان این را درخواست 
 STR_FA[par_skipped]="رد شد (در انتظار می ماند)."
 STR_FA[par_title]="✅ بررسی اقدامات در انتظار"
 STR_FA[press_enter]="برای بازگشت Enter را فشار دهید..."
+STR_FA[pt_adv_forensics]="جرم‌یابی پیشرفته (حافظه/شجره پردازش‌ها/بررسی باینری)"
+STR_FA[pt_cred_leak]="شناساگر نشت اعتبارنامه‌ها و اسرار (فایل‌ها/تاریخچه Git)"
+STR_FA[pt_email_analyzer]="تحلیلگر سرایمیل (جعل هویت/فیشینگ/SPF-DKIM-DMARC)"
+STR_FA[pt_eml_prompt]="مسیر فایل ایمیل (.eml): "
+STR_FA[pt_file_not_found]="فایل یافت نشد: {file}"
+STR_FA[pt_install_git]="برای RAQIB بومی در ویندوز، Git for Windows را نصب کنید، یا برای همه ویژگی‌های لینوکس از WSL2 استفاده کنید."
+STR_FA[pt_linux_dep]="این ابزار به زیرسیستمی مخصوص لینوکس وابسته است (مثلاً /proc یا systemd یا iptables)."
+STR_FA[pt_linux_exclusive]="این ابزار مخصوص لینوکس است — از معادل‌های پشتیبانی‌شده استفاده کنید (اسکنر ماندگاری، بررسی‌کننده فایروال، گزارش تاریخچه ورود)."
+STR_FA[pt_linux_only]="⚠️  ویژگی مخصوص لینوکس"
+STR_FA[pt_macos]="در macOS:"
+STR_FA[pt_python_missing]="برای این ابزار Python 3 لازم است اما یافت نشد."
+STR_FA[pt_rootkit]="شناساگر روت‌کیت (هسته/پردازش‌های پنهان/eBPF/پیش‌بارگذاری)"
+STR_FA[pt_win_defense]="🪟 بسته دفاعی ویندوز (وظایف زمان‌بندی‌شده، Defender، رویدادنگار، اجرای خودکار)"
+STR_FA[pt_win_host_req]="نیازمند میزبان بومی ویندوز (Git Bash) با powershell.exe و دسترسی به سیستم است."
+STR_FA[pt_win_suite]="سخت‌سازی سیستم → بسته دفاعی ویندوز"
+STR_FA[pt_win_try]="در ویندوز: بسته دفاعی بومی ویندوز را امتحان کنید:"
+STR_FA[pt_windows_only]="⚠️  ویژگی مخصوص ویندوز"
+STR_FA[pt_wsl_hint]="یا این ابزار را به‌طور کامل در WSL2 اجرا کنید تا همه ویژگی‌های لینوکس را داشته باشید."
 STR_FA[qe_actions_title]="عملیات درخواستی:"
 STR_FA[qe_bytes]="بایت"
 STR_FA[qe_cancelled]="لغو شد."

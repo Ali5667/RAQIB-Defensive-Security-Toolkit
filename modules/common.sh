@@ -730,7 +730,7 @@ run_tool() {
             # أدوات بايثون تُشغَّل عبر python3 (اللي يحوّل مسارات MSYS إلى
             # مسارات ويندوز الأصلية عند الحاجة) بدل source.
             if ! command -v python3 >/dev/null 2>&1; then
-                echo -e "${RED}$(raqib_tr "بايثون 3 مطلوب لهذه الأداة لكنه غير متوفر." "Python 3 is required for this tool but was not found.")${NC}"
+                echo -e "${RED}$(raqib_tr pt_python_missing "بايثون 3 مطلوب لهذه الأداة لكنه غير متوفر." "Python 3 is required for this tool but was not found.")${NC}"
                 return 1
             fi
             ( python3 "$script" "$@" )

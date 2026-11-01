@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: اردو (Urdu) [ur]
-#  Total Keys: 674
+#  Total Keys: 692
 # ============================================================================
 
 declare -g -A STR_UR 2>/dev/null || declare -A STR_UR 2>/dev/null || true
@@ -541,6 +541,24 @@ STR_UR[par_self_warning]="⚠️ آپ نے خود اس کی درخواست کی 
 STR_UR[par_skipped]="چھوڑ دیا (زیر التواء رہتا ہے)"
 STR_UR[par_title]="✅ زیر التواء کارروائیوں کا جائزہ"
 STR_UR[press_enter]="واپس جانے کے لیے Enter دبائیں..."
+STR_UR[pt_adv_forensics]="جدید فرانزک (میموری/پروسیس نسب/بائنری تصدیق)"
+STR_UR[pt_cred_leak]="اسناد اور رازوں کے اخراج کا پتہ لگانے والا (فائلیں/Git ہسٹری)"
+STR_UR[pt_email_analyzer]="ای میل ہیڈر تجزیہ کار (جعل سازی/فشنگ/SPF-DKIM-DMARC)"
+STR_UR[pt_eml_prompt]="ای میل فائل کا راستہ (.eml): "
+STR_UR[pt_file_not_found]="فائل موجود نہیں: {file}"
+STR_UR[pt_install_git]="ونڈوز پر نیٹو RAQIB کے لیے Git for Windows انسٹال کریں، یا مکمل Linux خصوصیات کے لیے WSL2 استعمال کریں۔"
+STR_UR[pt_linux_dep]="یہ ٹول Linux کے مخصوص سب سسٹم پر منحصر ہے (مثلاً /proc یا systemd یا iptables)۔"
+STR_UR[pt_linux_exclusive]="یہ ٹول صرف Linux کے لیے ہے — معاون متبادل استعمال کریں (پرسسٹنس اسکینر، فائر وال چیکر، لاگ ان ہسٹری رپورٹ)۔"
+STR_UR[pt_linux_only]="⚠️  صرف Linux کی خصوصیت"
+STR_UR[pt_macos]="macOS پر:"
+STR_UR[pt_python_missing]="اس ٹول کے لیے Python 3 درکار ہے لیکن نہیں ملا۔"
+STR_UR[pt_rootkit]="روٹ کٹ ڈیٹیکٹر (کرنل/چھپے ہوئے پروسیسز/eBPF/پری لوڈ)"
+STR_UR[pt_win_defense]="🪟 ونڈوز ڈیفنس سوٹ (شیڈول شدہ ٹاسکس، Defender، ایونٹ لاگ، آٹو رنز)"
+STR_UR[pt_win_host_req]="نیٹو ونڈوز ہوسٹ (Git Bash) درکار ہے جس میں powershell.exe اور سسٹم تک رسائی ہو۔"
+STR_UR[pt_win_suite]="سسٹم ہارڈننگ → ونڈوز ڈیفنس سوٹ"
+STR_UR[pt_win_try]="ونڈوز پر: نیٹو ونڈوز ڈیفنس سوٹ آزمائیں:"
+STR_UR[pt_windows_only]="⚠️  صرف Windows کی خصوصیت"
+STR_UR[pt_wsl_hint]="یا تمام Linux خصوصیات کے لیے یہ ٹول مکمل طور پر WSL2 میں چلائیں۔"
 STR_UR[qe_actions_title]="درخواست کردہ اقدام:"
 STR_UR[qe_bytes]="بائٹس"
 STR_UR[qe_cancelled]="منسوخ کر دیا گیا۔"

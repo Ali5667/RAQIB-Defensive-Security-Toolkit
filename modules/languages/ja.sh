@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: 日本語 (Japanese) [ja]
-#  Total Keys: 674
+#  Total Keys: 692
 # ============================================================================
 
 declare -g -A STR_JA 2>/dev/null || declare -A STR_JA 2>/dev/null || true
@@ -541,6 +541,24 @@ STR_JA[par_self_warning]="⚠️ これはあなた自身がリクエストし�
 STR_JA[par_skipped]="スキップされました (保留中のままです)。"
 STR_JA[par_title]="✅ 保留中のアクションのレビュー"
 STR_JA[press_enter]="戻るには Enter を押してください..."
+STR_JA[pt_adv_forensics]="高度フォレンジック（メモリ/プロセス系譜/バイナリ検証）"
+STR_JA[pt_cred_leak]="認証情報・シークレット漏洩チェッカー（ファイル/Git 履歴）"
+STR_JA[pt_email_analyzer]="メールヘッダーアナライザー（なりすまし/フィッシング/SPF-DKIM-DMARC）"
+STR_JA[pt_eml_prompt]="メールファイルのパス (.eml): "
+STR_JA[pt_file_not_found]="ファイルが見つかりません: {file}"
+STR_JA[pt_install_git]="Windows でネイティブに RAQIB を使うには Git for Windows をインストールするか、Linux の全機能には WSL2 を使用してください。"
+STR_JA[pt_linux_dep]="このツールは Linux 固有のサブシステム（/proc、systemd、iptables など）に依存しています。"
+STR_JA[pt_linux_exclusive]="このツールは Linux 専用です — 対応する代替ツール（永続化スキャナー、ファイアウォールチェッカー、ログイン履歴レポート）を使用してください。"
+STR_JA[pt_linux_only]="⚠️  Linux 専用機能"
+STR_JA[pt_macos]="macOS の場合："
+STR_JA[pt_python_missing]="このツールには Python 3 が必要ですが、見つかりません。"
+STR_JA[pt_rootkit]="ルートキット検出器（カーネル/隠しプロセス/eBPF/プリロード）"
+STR_JA[pt_win_defense]="🪟 Windows 防御スイート（スケジュールタスク、Defender、イベントログ、自動起動）"
+STR_JA[pt_win_host_req]="ネイティブな Windows ホスト（Git Bash）と powershell.exe、システムへのアクセスが必要です。"
+STR_JA[pt_win_suite]="システム強化 → Windows 防御スイート"
+STR_JA[pt_win_try]="Windows の場合：ネイティブの Windows 防御スイートをお試しください："
+STR_JA[pt_windows_only]="⚠️  Windows 専用機能"
+STR_JA[pt_wsl_hint]="または、Linux の全機能を使うには WSL2 内でこのツールを完全に実行してください。"
 STR_JA[qe_actions_title]="要求された操作："
 STR_JA[qe_bytes]="バイト"
 STR_JA[qe_cancelled]="キャンセルされました。"

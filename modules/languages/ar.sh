@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: العربية (Arabic) [ar]
-#  Total Keys: 674
+#  Total Keys: 692
 # ============================================================================
 
 declare -g -A STR_AR 2>/dev/null || declare -A STR_AR 2>/dev/null || true
@@ -541,6 +541,24 @@ STR_AR[par_self_warning]="⚠️ أنت نفسك طلبته — بمنظومة �
 STR_AR[par_skipped]="تم التخطي (يضل معلّق)."
 STR_AR[par_title]="✅ مراجعة الطلبات المعلّقة"
 STR_AR[press_enter]="اضغط Enter للرجوع..."
+STR_AR[pt_adv_forensics]="الطب الشرعي المتقدم (ذاكرة/سلالة العمليات/التحقق من الثنائيات)"
+STR_AR[pt_cred_leak]="كاشف تسريب بيانات الاعتماد والأسرار (ملفات/تاريخ Git)"
+STR_AR[pt_email_analyzer]="محلل ترويسات البريد (تزييف/تصيد/SPF-DKIM-DMARC)"
+STR_AR[pt_eml_prompt]="مسار ملف البريد (.eml): "
+STR_AR[pt_file_not_found]="الملف غير موجود: {file}"
+STR_AR[pt_install_git]="ثبّت Git for Windows ليصبح RAQIB يعمل كأصلية على ويندوز، أو WSL2 لميزات لينكس كاملة."
+STR_AR[pt_linux_dep]="هذه الأداة تعتمد على مكوّن مخصّص لـ Linux (مثل /proc أو systemd أو iptables)."
+STR_AR[pt_linux_exclusive]="هذه الأداة لينكس حصراً — استخدم الأدوات المكافئة المدعومة (ماسح الاستمرارية، فاحص الجدار، سجل الدخول)."
+STR_AR[pt_linux_only]="⚠️  ميزة مخصّصة لأنظمة Linux"
+STR_AR[pt_macos]="على macOS:"
+STR_AR[pt_python_missing]="بايثون 3 مطلوب لهذه الأداة لكنه غير متوفر."
+STR_AR[pt_rootkit]="كشف الروتكيت (نواة/عمليات مخفية/eBPF/بريلود)"
+STR_AR[pt_win_defense]="🪟 حزمة دفاع ويندوز الأصلية (المجدول، Defender، Event Log، الإنذارات)"
+STR_AR[pt_win_host_req]="تشتغل من ويندوز أصلي (Git Bash) — تحتاج powershell.exe ووصولاً إلى واجهات النظام."
+STR_AR[pt_win_suite]="تقوية الأنظمة → حزمة دفاع ويندوز"
+STR_AR[pt_win_try]="على ويندوز: جرّب حزمة الدفاع الأصلية:"
+STR_AR[pt_windows_only]="⚠️  ميزة مخصّصة لأنظمة Windows"
+STR_AR[pt_wsl_hint]="أو شغّل الأداة كاملة داخل WSL2 (كل ميزات لينكس)."
 STR_AR[qe_actions_title]="الإجراء المطلوب:"
 STR_AR[qe_bytes]="بايت"
 STR_AR[qe_cancelled]="تم الإلغاء."

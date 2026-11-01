@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: Français (French) [fr]
-#  Total Keys: 674
+#  Total Keys: 692
 # ============================================================================
 
 declare -g -A STR_FR 2>/dev/null || declare -A STR_FR 2>/dev/null || true
@@ -541,6 +541,24 @@ STR_FR[par_self_warning]="⚠️ Vous l'avez demandé vous-même : dans une vé
 STR_FR[par_skipped]="Ignoré (reste en attente)."
 STR_FR[par_title]="✅ Examen des actions en attente"
 STR_FR[press_enter]="Appuyez sur Entrée pour revenir..."
+STR_FR[pt_adv_forensics]="Analyse médico-légale avancée (mémoire/lignée des processus/vérification des binaires)"
+STR_FR[pt_cred_leak]="Détecteur de fuites d'identifiants et de secrets (fichiers/historique Git)"
+STR_FR[pt_email_analyzer]="Analyseur d'en-têtes d'e-mail (usurpation/hameçonnage/SPF-DKIM-DMARC)"
+STR_FR[pt_eml_prompt]="Chemin du fichier e-mail (.eml) : "
+STR_FR[pt_file_not_found]="Fichier introuvable : {file}"
+STR_FR[pt_install_git]="Installez Git for Windows pour un RAQIB natif sous Windows, ou utilisez WSL2 pour toutes les fonctionnalités Linux."
+STR_FR[pt_linux_dep]="Cet outil dépend d'un sous-système spécifique à Linux (par ex. /proc, systemd ou iptables)."
+STR_FR[pt_linux_exclusive]="Cet outil est exclusif à Linux — utilisez les équivalents pris en charge (analyseur de persistance, vérificateur de pare-feu, rapport d'historique de connexion)."
+STR_FR[pt_linux_only]="⚠️  Fonctionnalité réservée à Linux"
+STR_FR[pt_macos]="Sous macOS :"
+STR_FR[pt_python_missing]="Python 3 est requis pour cet outil mais est introuvable."
+STR_FR[pt_rootkit]="Détecteur de rootkits (noyau/processus cachés/eBPF/préchargement)"
+STR_FR[pt_win_defense]="🪟 Suite de défense Windows (tâches planifiées, Defender, journal des événements, démarrages automatiques)"
+STR_FR[pt_win_host_req]="Nécessite un hôte Windows natif (Git Bash) avec powershell.exe et l'accès au système."
+STR_FR[pt_win_suite]="Durcissement du système → Suite de défense Windows"
+STR_FR[pt_win_try]="Sous Windows : essayez la suite de défense Windows native :"
+STR_FR[pt_windows_only]="⚠️  Fonctionnalité réservée à Windows"
+STR_FR[pt_wsl_hint]="ou exécutez cet outil entièrement dans WSL2 pour disposer de toutes les fonctionnalités Linux."
 STR_FR[qe_actions_title]="Action demandée :"
 STR_FR[qe_bytes]="octets"
 STR_FR[qe_cancelled]="Annulé."

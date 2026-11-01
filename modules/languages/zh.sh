@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: 中文 (Chinese) [zh]
-#  Total Keys: 674
+#  Total Keys: 692
 # ============================================================================
 
 declare -g -A STR_ZH 2>/dev/null || declare -A STR_ZH 2>/dev/null || true
@@ -541,6 +541,24 @@ STR_ZH[par_self_warning]="⚠️ 您自己请求了这一点 - 在真正的团�
 STR_ZH[par_skipped]="已跳过（仍待处理）。"
 STR_ZH[par_title]="✅ 待处理行动审核"
 STR_ZH[press_enter]="按回车键返回..."
+STR_ZH[pt_adv_forensics]="高级取证（内存/进程谱系/二进制验证）"
+STR_ZH[pt_cred_leak]="凭据与密钥泄露检查器（文件/Git 历史）"
+STR_ZH[pt_email_analyzer]="邮件头分析器（伪造/钓鱼/SPF-DKIM-DMARC）"
+STR_ZH[pt_eml_prompt]="邮件文件路径（.eml）："
+STR_ZH[pt_file_not_found]="文件不存在：{file}"
+STR_ZH[pt_install_git]="安装 Git for Windows 即可在 Windows 上原生运行 RAQIB，或使用 WSL2 获得完整的 Linux 功能。"
+STR_ZH[pt_linux_dep]="此工具依赖 Linux 专有子系统（例如 /proc、systemd 或 iptables）。"
+STR_ZH[pt_linux_exclusive]="此工具仅限 Linux——请使用受支持的等效工具（持久化扫描器、防火墙检查器、登录历史报告）。"
+STR_ZH[pt_linux_only]="⚠️  仅限 Linux 的功能"
+STR_ZH[pt_macos]="在 macOS 上："
+STR_ZH[pt_python_missing]="此工具需要 Python 3，但未找到。"
+STR_ZH[pt_rootkit]="Rootkit 检测器（内核/隐藏进程/eBPF/预加载）"
+STR_ZH[pt_win_defense]="🪟 Windows 防御套件（计划任务、Defender、事件日志、自启动项）"
+STR_ZH[pt_win_host_req]="需要原生 Windows 主机（Git Bash），并具备 powershell.exe 与系统访问权限。"
+STR_ZH[pt_win_suite]="系统加固 → Windows 防御套件"
+STR_ZH[pt_win_try]="在 Windows 上：请试用原生 Windows 防御套件："
+STR_ZH[pt_windows_only]="⚠️  仅限 Windows 的功能"
+STR_ZH[pt_wsl_hint]="或在 WSL2 中完整运行此工具，以获得全部 Linux 功能。"
 STR_ZH[qe_actions_title]="请求的操作："
 STR_ZH[qe_bytes]="字节"
 STR_ZH[qe_cancelled]="已取消。"

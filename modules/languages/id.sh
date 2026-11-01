@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: Bahasa Indonesia (Indonesian) [id]
-#  Total Keys: 674
+#  Total Keys: 692
 # ============================================================================
 
 declare -g -A STR_ID 2>/dev/null || declare -A STR_ID 2>/dev/null || true
@@ -541,6 +541,24 @@ STR_ID[par_self_warning]="⚠️ Anda sendiri yang memintanya — dalam pengatur
 STR_ID[par_skipped]="Dilewati (tetap tertunda)."
 STR_ID[par_title]="✅ Tinjauan Tindakan yang Tertunda"
 STR_ID[press_enter]="Tekan Enter untuk kembali..."
+STR_ID[pt_adv_forensics]="Forensik Lanjutan (memori/keturunan proses/verifikasi biner)"
+STR_ID[pt_cred_leak]="Pemeriksa Kebocoran Kredensial & Rahasia (file/riwayat Git)"
+STR_ID[pt_email_analyzer]="Penganalisis Header Email (spoofing/phishing/SPF-DKIM-DMARC)"
+STR_ID[pt_eml_prompt]="Jalur file email (.eml): "
+STR_ID[pt_file_not_found]="File tidak ditemukan: {file}"
+STR_ID[pt_install_git]="Pasang Git for Windows agar RAQIB berjalan native di Windows, atau gunakan WSL2 untuk fitur Linux lengkap."
+STR_ID[pt_linux_dep]="Alat ini bergantung pada subsistem khusus Linux (mis. /proc, systemd, atau iptables)."
+STR_ID[pt_linux_exclusive]="Alat ini khusus Linux — gunakan padanan yang didukung (pemindai persistensi, pemeriksa firewall, laporan riwayat login)."
+STR_ID[pt_linux_only]="⚠️  Fitur khusus Linux"
+STR_ID[pt_macos]="Di macOS:"
+STR_ID[pt_python_missing]="Python 3 diperlukan untuk alat ini tetapi tidak ditemukan."
+STR_ID[pt_rootkit]="Detektor Rootkit (kernel/proses tersembunyi/eBPF/preload)"
+STR_ID[pt_win_defense]="🪟 Paket Pertahanan Windows (tugas terjadwal, Defender, Log Peristiwa, autorun)"
+STR_ID[pt_win_host_req]="Memerlukan host Windows native (Git Bash) dengan powershell.exe dan akses sistem."
+STR_ID[pt_win_suite]="Pengerasan Sistem → Paket Pertahanan Windows"
+STR_ID[pt_win_try]="Di Windows: coba Paket Pertahanan Windows bawaan:"
+STR_ID[pt_windows_only]="⚠️  Fitur khusus Windows"
+STR_ID[pt_wsl_hint]="atau jalankan alat ini sepenuhnya di dalam WSL2 untuk seluruh fitur Linux."
 STR_ID[qe_actions_title]="Tindakan yang diminta:"
 STR_ID[qe_bytes]="byte"
 STR_ID[qe_cancelled]="Dibatalkan."

@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: Українська (Ukrainian) [uk]
-#  Total Keys: 674
+#  Total Keys: 692
 # ============================================================================
 
 declare -g -A STR_UK 2>/dev/null || declare -A STR_UK 2>/dev/null || true
@@ -541,6 +541,24 @@ STR_UK[par_self_warning]="⚠️ Ви самі подали запит — у с
 STR_UK[par_skipped]="Пропущено (залишається в очікуванні)."
 STR_UK[par_title]="✅ Розгляд дій, що очікують"
 STR_UK[press_enter]="Натисніть Enter, щоб повернутися..."
+STR_UK[pt_adv_forensics]="Розширена криміналістика (пам'ять/рідословна процесів/перевірка двійкових файлів)"
+STR_UK[pt_cred_leak]="Перевірка витоку облікових даних і секретів (файли/історія Git)"
+STR_UK[pt_email_analyzer]="Аналізатор заголовків електронної пошти (підробка/фішинг/SPF-DKIM-DMARC)"
+STR_UK[pt_eml_prompt]="Шлях до файлу електронної пошти (.eml): "
+STR_UK[pt_file_not_found]="Файл не знайдено: {file}"
+STR_UK[pt_install_git]="Встановіть Git for Windows для власного RAQIB у Windows або використовуйте WSL2 для повного набору функцій Linux."
+STR_UK[pt_linux_dep]="Цей інструмент залежить від специфічної для Linux підсистеми (наприклад, /proc, systemd або iptables)."
+STR_UK[pt_linux_exclusive]="Цей інструмент призначено лише для Linux — скористайтеся підтримуваними відповідниками (сканер стійкості, перевірка брандмауера, звіт про історію входів)."
+STR_UK[pt_linux_only]="⚠️  Функція лише для Linux"
+STR_UK[pt_macos]="У macOS:"
+STR_UK[pt_python_missing]="Для цього інструмента потрібен Python 3, але його не знайдено."
+STR_UK[pt_rootkit]="Детектор руткітів (ядро/приховані процеси/eBPF/попереднє завантаження)"
+STR_UK[pt_win_defense]="🪟 Пакет захисту Windows (заплановані завдання, Defender, журнал подій, автозапуск)"
+STR_UK[pt_win_host_req]="Потрібен власний хост Windows (Git Bash) із powershell.exe та доступом до системи."
+STR_UK[pt_win_suite]="Зміцнення системи → Пакет захисту Windows"
+STR_UK[pt_win_try]="У Windows: спробуйте власний пакет захисту Windows:"
+STR_UK[pt_windows_only]="⚠️  Функція лише для Windows"
+STR_UK[pt_wsl_hint]="або запустіть цей інструмент повністю в WSL2, щоб отримати всі функції Linux."
 STR_UK[qe_actions_title]="Запитувана дія:"
 STR_UK[qe_bytes]="байт"
 STR_UK[qe_cancelled]="Скасовано."

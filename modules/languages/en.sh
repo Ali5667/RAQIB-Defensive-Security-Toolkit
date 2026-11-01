@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: English (English) [en]
-#  Total Keys: 674
+#  Total Keys: 692
 # ============================================================================
 
 declare -g -A STR_EN 2>/dev/null || declare -A STR_EN 2>/dev/null || true
@@ -541,6 +541,24 @@ STR_EN[par_self_warning]="⚠️ You requested this yourself — in a real team 
 STR_EN[par_skipped]="Skipped (stays pending)."
 STR_EN[par_title]="✅ Pending Actions Review"
 STR_EN[press_enter]="Press Enter to return..."
+STR_EN[pt_adv_forensics]="Advanced Forensics (memory/process lineage/binary verification)"
+STR_EN[pt_cred_leak]="Credential & Secret Leak Checker (files/Git history)"
+STR_EN[pt_email_analyzer]="Email Header Analyzer (spoofing/phishing/SPF-DKIM-DMARC)"
+STR_EN[pt_eml_prompt]="Email file path (.eml): "
+STR_EN[pt_file_not_found]="File not found: {file}"
+STR_EN[pt_install_git]="Install Git for Windows for a native Windowsized RAQIB, or use WSL2 for full Linux features."
+STR_EN[pt_linux_dep]="This tool depends on a Linux-specific subsystem (e.g. /proc, systemd or iptables)."
+STR_EN[pt_linux_exclusive]="This tool is Linux-exclusive - use the supported equivalents (persistence scanner, firewall checker, login history report)."
+STR_EN[pt_linux_only]="⚠️  Linux-only feature"
+STR_EN[pt_macos]="On macOS:"
+STR_EN[pt_python_missing]="Python 3 is required for this tool but was not found."
+STR_EN[pt_rootkit]="Rootkit Detector (kernel/hidden procs/eBPF/preload)"
+STR_EN[pt_win_defense]="🪟 Windows Defense Suite (Scheduled Tasks, Defender, Event Log, autoruns)"
+STR_EN[pt_win_host_req]="Requires a native Windows host (Git Bash) with powershell.exe and system access."
+STR_EN[pt_win_suite]="System Hardening → Windows Defense Suite"
+STR_EN[pt_win_try]="On Windows: try the native Windows Defense Suite:"
+STR_EN[pt_windows_only]="⚠️  Windows-only feature"
+STR_EN[pt_wsl_hint]="or run this tool fully inside WSL2 for the full Linux feature set."
 STR_EN[qe_actions_title]="Requested action:"
 STR_EN[qe_bytes]="bytes"
 STR_EN[qe_cancelled]="Cancelled."

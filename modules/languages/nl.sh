@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: Nederlands (Dutch) [nl]
-#  Total Keys: 674
+#  Total Keys: 692
 # ============================================================================
 
 declare -g -A STR_NL 2>/dev/null || declare -A STR_NL 2>/dev/null || true
@@ -541,6 +541,24 @@ STR_NL[par_self_warning]="⚠️Je hebt dit zelf aangevraagd — bij een echte t
 STR_NL[par_skipped]="Overgeslagen (blijft in behandeling)."
 STR_NL[par_title]="✅ Beoordeling van lopende acties"
 STR_NL[press_enter]="Druk op Enter om terug te gaan..."
+STR_NL[pt_adv_forensics]="Geavanceerde forensische analyse (geheugen/procesafstamming/binaire verificatie)"
+STR_NL[pt_cred_leak]="Controle op gelekte inloggegevens en geheimen (bestanden/Git-geschiedenis)"
+STR_NL[pt_email_analyzer]="E-mailheader-analyzer (spoofing/phishing/SPF-DKIM-DMARC)"
+STR_NL[pt_eml_prompt]="Pad naar e-mailbestand (.eml): "
+STR_NL[pt_file_not_found]="Bestand niet gevonden: {file}"
+STR_NL[pt_install_git]="Installeer Git for Windows voor een native RAQIB op Windows, of gebruik WSL2 voor alle Linux-functies."
+STR_NL[pt_linux_dep]="Deze tool is afhankelijk van een Linux-specifiek subsysteem (bijv. /proc, systemd of iptables)."
+STR_NL[pt_linux_exclusive]="Deze tool is uitsluitend voor Linux — gebruik de ondersteunde equivalenten (persistentie-scanner, firewallcontrole, inloggeschiedenisrapport)."
+STR_NL[pt_linux_only]="⚠️  Alleen voor Linux"
+STR_NL[pt_macos]="Op macOS:"
+STR_NL[pt_python_missing]="Python 3 is vereist voor deze tool, maar niet gevonden."
+STR_NL[pt_rootkit]="Rootkit-detector (kernel/verborgen processen/eBPF/preload)"
+STR_NL[pt_win_defense]="🪟 Windows-verdedigingssuite (geplande taken, Defender, gebeurtenislogboek, opstartprogramma's)"
+STR_NL[pt_win_host_req]="Vereist een native Windows-host (Git Bash) met powershell.exe en systeemtoegang."
+STR_NL[pt_win_suite]="Systeemverharding → Windows-verdedigingssuite"
+STR_NL[pt_win_try]="Op Windows: probeer de native Windows-verdedigingssuite:"
+STR_NL[pt_windows_only]="⚠️  Alleen voor Windows"
+STR_NL[pt_wsl_hint]="of voer deze tool volledig uit binnen WSL2 voor alle Linux-functies."
 STR_NL[qe_actions_title]="Gevraagde actie:"
 STR_NL[qe_bytes]="bytes"
 STR_NL[qe_cancelled]="Geannuleerd."

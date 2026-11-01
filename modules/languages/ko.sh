@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: 한국어 (Korean) [ko]
-#  Total Keys: 674
+#  Total Keys: 692
 # ============================================================================
 
 declare -g -A STR_KO 2>/dev/null || declare -A STR_KO 2>/dev/null || true
@@ -541,6 +541,24 @@ STR_KO[par_self_warning]="⚠️ 귀하가 직접 요청한 것입니다. 실제
 STR_KO[par_skipped]="건너뛰었습니다(보류 중)."
 STR_KO[par_title]="✅ 보류 중인 작업 검토"
 STR_KO[press_enter]="돌아가려면 Enter를 누르세요..."
+STR_KO[pt_adv_forensics]="고급 포렌식(메모리/프로세스 계보/바이너리 검증)"
+STR_KO[pt_cred_leak]="자격 증명·비밀 정보 유출 검사기(파일/Git 기록)"
+STR_KO[pt_email_analyzer]="이메일 헤더 분석기(스푸핑/피싱/SPF-DKIM-DMARC)"
+STR_KO[pt_eml_prompt]="이메일 파일 경로(.eml): "
+STR_KO[pt_file_not_found]="파일을 찾을 수 없습니다: {file}"
+STR_KO[pt_install_git]="Windows에서 기본 RAQIB를 사용하려면 Git for Windows를 설치하고, 모든 Linux 기능을 사용하려면 WSL2를 사용하세요."
+STR_KO[pt_linux_dep]="이 도구는 Linux 전용 하위 시스템(/proc, systemd, iptables 등)에 의존합니다."
+STR_KO[pt_linux_exclusive]="이 도구는 Linux 전용입니다 — 지원되는 대체 도구(지속성 스캐너, 방화벽 검사기, 로그인 기록 보고서)를 사용하세요."
+STR_KO[pt_linux_only]="⚠️  Linux 전용 기능"
+STR_KO[pt_macos]="macOS에서:"
+STR_KO[pt_python_missing]="이 도구에는 Python 3이 필요하지만 찾을 수 없습니다."
+STR_KO[pt_rootkit]="루트킷 탐지기(커널/숨겨진 프로세스/eBPF/프리로드)"
+STR_KO[pt_win_defense]="🪟 Windows 방어 제품군(예약 작업, Defender, 이벤트 로그, 자동 실행)"
+STR_KO[pt_win_host_req]="네이티브 Windows 호스트(Git Bash)와 powershell.exe, 시스템 접근 권한이 필요합니다."
+STR_KO[pt_win_suite]="시스템 강화 → Windows 방어 제품군"
+STR_KO[pt_win_try]="Windows에서는 기본 제공 Windows 방어 제품군을 사용해 보세요:"
+STR_KO[pt_windows_only]="⚠️  Windows 전용 기능"
+STR_KO[pt_wsl_hint]="또는 모든 Linux 기능을 사용하려면 이 도구를 WSL2 안에서 완전히 실행하세요."
 STR_KO[qe_actions_title]="요청된 작업:"
 STR_KO[qe_bytes]="바이트"
 STR_KO[qe_cancelled]="취소되었습니다."

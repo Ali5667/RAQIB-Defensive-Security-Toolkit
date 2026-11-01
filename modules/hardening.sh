@@ -13,7 +13,7 @@ menu_hardening() {
             "$(t h6)" \
             "$(t h7)" \
             "$(t h8)" \
-            "$(raqib_tr "🪟 حزمة دفاع ويندوز الأصلية (المجدول، Defender، Event Log، الإنذارات)" "🪟 Windows Defense Suite (Scheduled Tasks, Defender, Event Log, autoruns)")"
+            "$(raqib_tr pt_win_defense "🪟 حزمة دفاع ويندوز الأصلية (المجدول، Defender، Event Log، الإنذارات)" "🪟 Windows Defense Suite (Scheduled Tasks, Defender, Event Log, autoruns)")"
         read -rp "  $(t choice_label)" c
         case $c in
             1) run_tool "$TOOLS_DIR/hardening/permission_auditor.sh" ;;

@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: کوردی (Kurdish) [ku]
-#  Total Keys: 674
+#  Total Keys: 692
 # ============================================================================
 
 declare -g -A STR_KU 2>/dev/null || declare -A STR_KU 2>/dev/null || true
@@ -541,6 +541,24 @@ STR_KU[par_self_warning]="⚠️ تۆ خۆت داوای ئەمەت کردووە 
 STR_KU[par_skipped]="پەڕینەوە (بە چاوەڕوانی دەمێنێتەوە)."
 STR_KU[par_title]="✅ پێداچوونەوە بە کردارەکانی چاوەڕوانکراو"
 STR_KU[press_enter]="Enter لێبدە بۆ گەڕانەوە..."
+STR_KU[pt_adv_forensics]="لێکۆڵینەوەی پێشکەوتوو (بیرگە/ڕەچەڵەکی پرۆسەکان/پشکنینی باینەری)"
+STR_KU[pt_cred_leak]="دۆزەرەوەی دزەپێکردنی ناسنامە و نهێنییەکان (فایلەکان/مێژووی Git)"
+STR_KU[pt_email_analyzer]="شیکەری سەرپەڕەی ئیمەیڵ (خۆنواندن/فیشینگ/SPF-DKIM-DMARC)"
+STR_KU[pt_eml_prompt]="ڕێڕەوی فایلی ئیمەیڵ (.eml): "
+STR_KU[pt_file_not_found]="فایل نەدۆزرایەوە: {file}"
+STR_KU[pt_install_git]="Git for Windows دابمەزرێنە بۆ RAQIB ی ڕەسەن لە ویندۆز، یان WSL2 بەکاربهێنە بۆ هەموو تایبەتمەندییەکانی لینوکس."
+STR_KU[pt_linux_dep]="ئەم ئامرازە پشت بە سیستەمێکی تایبەت بە لینوکس دەبەستێت (وەک /proc یان systemd یان iptables)."
+STR_KU[pt_linux_exclusive]="ئەم ئامرازە تەنها بۆ لینوکسە — هاوتاکانی پشتگیریکراو بەکاربهێنە (پشکنەری مانەوە، پشکنەری دیواری ئاگر، ڕاپۆرتی مێژووی چوونەژوورەوە)."
+STR_KU[pt_linux_only]="⚠️  تایبەتمەندی تایبەت بە لینوکس"
+STR_KU[pt_macos]="لە macOS:"
+STR_KU[pt_python_missing]="بۆ ئەم ئامرازە Python 3 پێویستە بەڵام نەدۆزرایەوە."
+STR_KU[pt_rootkit]="دۆزەرەوەی ڕووتکیت (کرنڵ/پرۆسەی نەهێنی/eBPF/پێشبارکردن)"
+STR_KU[pt_win_defense]="🪟 پاکێجی بەرگری ویندۆز (ئەرکە خشتەبەندکراوەکان، Defender، تۆماری ڕووداوەکان، دەستپێکردنی خۆکار)"
+STR_KU[pt_win_host_req]="پێویستی بە میوانداری ڕەسەنی ویندۆز (Git Bash) هەیە لەگەڵ powershell.exe و دەستگەیشتن بە سیستەم."
+STR_KU[pt_win_suite]="سەختکردنی سیستەم → پاکێجی بەرگری ویندۆز"
+STR_KU[pt_win_try]="لە ویندۆز: پاکێجی بەرگری ڕەسەنی ویندۆز تاقی بکەرەوە:"
+STR_KU[pt_windows_only]="⚠️  تایبەتمەندی تایبەت بە ویندۆز"
+STR_KU[pt_wsl_hint]="یان ئەم ئامرازە بە تەواوی لە ناو WSL2 بکە بۆ هەموو تایبەتمەندییەکانی لینوکس."
 STR_KU[qe_actions_title]="کردارە داواکراوەکە:"
 STR_KU[qe_bytes]="بایت"
 STR_KU[qe_cancelled]="هەڵوەشێنرایەوە."

@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: Türkçe (Turkish) [tr]
-#  Total Keys: 674
+#  Total Keys: 692
 # ============================================================================
 
 declare -g -A STR_TR 2>/dev/null || declare -A STR_TR 2>/dev/null || true
@@ -541,6 +541,24 @@ STR_TR[par_self_warning]="⚠️Bunu kendiniz talep ettiniz; gerçek bir ekip ku
 STR_TR[par_skipped]="Atlandı (beklemede kalır)."
 STR_TR[par_title]="✅ Bekleyen Eylemlerin İncelenmesi"
 STR_TR[press_enter]="Geri dönmek için Enter'a basın..."
+STR_TR[pt_adv_forensics]="Gelişmiş Adli İnceleme (bellek/süreç soy ağacı/ikili doğrulama)"
+STR_TR[pt_cred_leak]="Kimlik Bilgisi ve Sır Sızıntısı Denetleyicisi (dosyalar/Git geçmişi)"
+STR_TR[pt_email_analyzer]="E-posta Başlığı Çözümleyici (sahtecilik/oltalama/SPF-DKIM-DMARC)"
+STR_TR[pt_eml_prompt]="E-posta dosyası yolu (.eml): "
+STR_TR[pt_file_not_found]="Dosya bulunamadı: {file}"
+STR_TR[pt_install_git]="Windows üzerinde yerel RAQIB için Git for Windows kurun veya Linux özelliklerinin tamamı için WSL2 kullanın."
+STR_TR[pt_linux_dep]="Bu araç Linux'a özgü bir alt sisteme dayanır (ör. /proc, systemd veya iptables)."
+STR_TR[pt_linux_exclusive]="Bu araç yalnızca Linux içindir — desteklenen eşdeğerlerini kullanın (kalıcılık tarayıcısı, güvenlik duvarı denetleyicisi, oturum açma geçmişi raporu)."
+STR_TR[pt_linux_only]="⚠️  Yalnızca Linux özelliği"
+STR_TR[pt_macos]="macOS'ta:"
+STR_TR[pt_python_missing]="Bu araç için Python 3 gerekli ancak bulunamadı."
+STR_TR[pt_rootkit]="Rootkit Algılayıcı (çekirdek/gizli süreçler/eBPF/ön yükleme)"
+STR_TR[pt_win_defense]="🪟 Windows Savunma Paketi (zamanlanmış görevler, Defender, olay günlüğü, otomatik başlatmalar)"
+STR_TR[pt_win_host_req]="Yerel bir Windows ana bilgisayarı (Git Bash), powershell.exe ve sistem erişimi gerektirir."
+STR_TR[pt_win_suite]="Sistem Sağlamlaştırma → Windows Savunma Paketi"
+STR_TR[pt_win_try]="Windows'ta: yerel Windows Savunma Paketini deneyin:"
+STR_TR[pt_windows_only]="⚠️  Yalnızca Windows özelliği"
+STR_TR[pt_wsl_hint]="veya Linux özelliklerinin tamamı için bu aracı WSL2 içinde çalıştırın."
 STR_TR[qe_actions_title]="İstenen işlem:"
 STR_TR[qe_bytes]="bayt"
 STR_TR[qe_cancelled]="İptal edildi."

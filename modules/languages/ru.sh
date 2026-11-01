@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: Русский (Russian) [ru]
-#  Total Keys: 674
+#  Total Keys: 692
 # ============================================================================
 
 declare -g -A STR_RU 2>/dev/null || declare -A STR_RU 2>/dev/null || true
@@ -541,6 +541,24 @@ STR_RU[par_self_warning]="⚠️ Вы сами запросили это — в 
 STR_RU[par_skipped]="Пропущено (остается в ожидании)."
 STR_RU[par_title]="✅ Обзор ожидающих действий"
 STR_RU[press_enter]="Нажмите Enter, чтобы вернуться..."
+STR_RU[pt_adv_forensics]="Расширенная криминалистика (память/родословная процессов/проверка бинарных файлов)"
+STR_RU[pt_cred_leak]="Проверка утечек учётных данных и секретов (файлы/история Git)"
+STR_RU[pt_email_analyzer]="Анализатор заголовков электронной почты (подделка/фишинг/SPF-DKIM-DMARC)"
+STR_RU[pt_eml_prompt]="Путь к файлу электронной почты (.eml): "
+STR_RU[pt_file_not_found]="Файл не найден: {file}"
+STR_RU[pt_install_git]="Установите Git for Windows для нативного RAQIB в Windows или используйте WSL2 для полного набора функций Linux."
+STR_RU[pt_linux_dep]="Этот инструмент зависит от подсистемы, специфичной для Linux (например, /proc, systemd или iptables)."
+STR_RU[pt_linux_exclusive]="Этот инструмент предназначен только для Linux — используйте поддерживаемые аналоги (сканер устойчивости, проверка брандмауэра, отчёт об истории входов)."
+STR_RU[pt_linux_only]="⚠️  Функция только для Linux"
+STR_RU[pt_macos]="В macOS:"
+STR_RU[pt_python_missing]="Для этого инструмента требуется Python 3, но он не найден."
+STR_RU[pt_rootkit]="Детектор руткитов (ядро/скрытые процессы/eBPF/предзагрузка)"
+STR_RU[pt_win_defense]="🪟 Пакет защиты Windows (запланированные задачи, Defender, журнал событий, автозапуск)"
+STR_RU[pt_win_host_req]="Требуется нативный хост Windows (Git Bash) с powershell.exe и доступом к системе."
+STR_RU[pt_win_suite]="Укрепление системы → Пакет защиты Windows"
+STR_RU[pt_win_try]="В Windows: попробуйте штатный пакет защиты Windows:"
+STR_RU[pt_windows_only]="⚠️  Функция только для Windows"
+STR_RU[pt_wsl_hint]="или запустите этот инструмент полностью в WSL2, чтобы получить все функции Linux."
 STR_RU[qe_actions_title]="Требуемое действие:"
 STR_RU[qe_bytes]="байт"
 STR_RU[qe_cancelled]="Отменено."

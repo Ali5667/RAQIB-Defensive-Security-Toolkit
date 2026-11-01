@@ -10,7 +10,7 @@ menu_vuln_scan() {
             "$(t v3)" \
             "$(t v4)" \
             "$(t v5)" \
-            "$(raqib_tr "كاشف تسريب بيانات الاعتماد والأسرار (ملفات/تاريخ Git)" "Credential & Secret Leak Checker (files/Git history)")"
+            "$(raqib_tr pt_cred_leak "كاشف تسريب بيانات الاعتماد والأسرار (ملفات/تاريخ Git)" "Credential & Secret Leak Checker (files/Git history)")"
         read -rp "  $(t choice_label)" c
         case $c in
             1) run_tool "$TOOLS_DIR/vuln_scan/open_ports_vs_services.sh" ;;
