@@ -6,7 +6,17 @@ echo -e "${CYAN}${TOOL_TITLE}${NC}"
 echo -e "${GREY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
-if ! command -v python3 >/dev/null 2>&1; then
+# مترجم بايثون: نستخدم الكاشف المركزي (_raqib_py) بدل python3 مباشرة،
+# لأن Git Bash يعرّض python3 كـ Windows Store stub فاشل.
+# Resolve Python through the central probe — Git Bash's python3 may be a broken stub.
+PY=""
+if declare -F _raqib_py >/dev/null 2>&1; then
+    PY="$(_raqib_py 2>/dev/null)" || PY=""
+fi
+if [ -z "$PY" ] && command -v python3 >/dev/null 2>&1 && python3 -c "import sys" >/dev/null 2>&1; then
+    PY="python3"
+fi
+if [ -z "$PY" ]; then
     echo -e "${RED}$(t cred_leak_no_python)${NC}"
     exit 1
 fi

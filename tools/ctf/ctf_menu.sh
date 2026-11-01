@@ -2,9 +2,9 @@
 # =============================================================
 #  RAQIB — CTF Mode
 #  وضع المسابقات الأمنية (picoCTF / CTF competitions)
-#  19 أداة موزعة على 5 تصنيفات:
-#    Crypto | Stego | Forensics | Web | Binary
-#  + Flag Hunter وضع البحث التلقائي عن الـ flags
+#  21 أداة موزعة على 5 تصنيفات:
+#    Crypto (6) | Stego (4) | Forensics (4) | Web (4) | Binary (3)
+#  + Flag Hunter + Writeup Logger (المجموع 23 أداة قابلة للتشغيل)
 # =============================================================
 
 CTF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -16,11 +16,11 @@ menu_ctf_main() {
         echo -e "${BOLD}${CYAN}  ║    🏴 RAQIB — CTF MODE  v2.2            ║${NC}"
         echo -e "${BOLD}${CYAN}  ╚══════════════════════════════════════════╝${NC}"
         echo ""
-        echo -e "  ${CYAN}1)${NC} 🔐 Cryptography        — Base64/Hex/ROT/XOR/RSA/Vigenère"
-        echo -e "  ${CYAN}2)${NC} 🖼️  Steganography        — LSB/Metadata/Magic Bytes/Audio"
-        echo -e "  ${CYAN}3)${NC} 🔍 Forensics            — PCAP/File Carving/Timeline"
-        echo -e "  ${CYAN}4)${NC} 🌐 Web Exploitation     — Headers/JWT/Cookies"
-        echo -e "  ${CYAN}5)${NC} ⚙️  Binary / Reverse     — ELF/Packing/BOF Helper"
+        echo -e "  ${CYAN}1)${NC} 🔐 Cryptography (6)   — Base64/Hex/ROT/XOR/RSA/Vigenère/Auto-Solver"
+        echo -e "  ${CYAN}2)${NC} 🖼️  Steganography (4)   — LSB/Metadata/Magic Bytes/Audio"
+        echo -e "  ${CYAN}3)${NC} 🔍 Forensics (4)         — PCAP/File Carving/Timeline"
+        echo -e "  ${CYAN}4)${NC} 🌐 Web Exploitation (4)  — Headers/JWT/Cookies/HTTP Builder"
+        echo -e "  ${CYAN}5)${NC} ⚙️  Binary / Reverse (3) — ELF/Packing/BOF Helper"
         echo -e "  ${YELLOW}6)${NC} 🏴 Flag Hunter          — ابحث عن flags في أي ملف/مجلد"
         echo -e "  ${GREEN}7)${NC} 📝 Writeup Logger       — سجّل خطوات الحل تلقائياً"
         echo -e "  ${RED}0)${NC} ↩  رجوع للقائمة الرئيسية"
@@ -41,16 +41,31 @@ menu_ctf_main() {
 }
 export -f menu_ctf_main
 
+# كاشف/فاك التشفير التلقائي يحتاج نصاً — نسأل عنه ثم نشغّل وضع solve.
+# The auto-solver needs input text — prompt, then run solve mode.
+run_ctf_cipher_solver() {
+    local text
+    echo ""
+    read -rp "  النص أو الترميز المشبوه: " text
+    if [ -z "$text" ]; then
+        echo -e "  ${RED}لا يوجد إدخال.${NC}"
+        return 1
+    fi
+    run_tool "$CTF_DIR/crypto/cipher_solver.py" solve "$text"
+}
+export -f run_ctf_cipher_solver
+
 menu_ctf_crypto() {
     while true; do
         show_banner
-        echo -e "${BOLD}${CYAN}  🔐 Cryptography Tools${NC}"
+        echo -e "${BOLD}${CYAN}  🔐 Cryptography Tools (6)${NC}"
         echo ""
         echo -e "  ${CYAN}1)${NC} Codec Swiss Army      — Base64/Hex/ROT13/ROT47/XOR/Caesar auto-detect"
         echo -e "  ${CYAN}2)${NC} Frequency Analysis    — تحليل تردد أحرف + خمّن الـ cipher"
         echo -e "  ${CYAN}3)${NC} RSA Helper            — Factoring / e=3 / Wiener attack"
         echo -e "  ${CYAN}4)${NC} Hash Identifier       — MD5/SHA1/SHA256/bcrypt/NTLM..."
         echo -e "  ${CYAN}5)${NC} Vigenère Cracker      — Kasiski + IC attack"
+        echo -e "  ${CYAN}6)${NC} Cipher Auto-Solver    — 15+ encodings + double-encoding + XOR brute"
         echo -e "  ${RED}0)${NC} ↩  رجوع"
         echo ""
         read -rp "  اختر: " choice
@@ -60,6 +75,7 @@ menu_ctf_crypto() {
             3) run_tool "$CTF_DIR/crypto/03_rsa_helper.sh" ;;
             4) run_tool "$CTF_DIR/crypto/04_hash_identifier.sh" ;;
             5) run_tool "$CTF_DIR/crypto/05_vigenere_cracker.sh" ;;
+            6) run_ctf_cipher_solver ;;
             0) return ;;
             *) echo -e "${RED}اختيار غير صحيح${NC}"; sleep 1 ;;
         esac
@@ -118,11 +134,12 @@ export -f menu_ctf_forensics
 menu_ctf_web() {
     while true; do
         show_banner
-        echo -e "${BOLD}${CYAN}  🌐 Web Exploitation Tools${NC}"
+        echo -e "${BOLD}${CYAN}  🌐 Web Exploitation Tools (4)${NC}"
         echo ""
         echo -e "  ${CYAN}1)${NC} Header Inspector      — HTTP headers + security misconfigs"
         echo -e "  ${CYAN}2)${NC} Cookie/JWT Decoder    — JWT + Flask session + cookie analysis"
         echo -e "  ${CYAN}3)${NC} Robots & Secrets      — robots.txt + hidden paths"
+        echo -e "  ${CYAN}4)${NC} HTTP Request Builder  — REPL + SQLi/XSS/LFI/SSTI probes + CORS/JWT"
         echo -e "  ${RED}0)${NC} ↩  رجوع"
         echo ""
         read -rp "  اختر: " choice
@@ -130,6 +147,7 @@ menu_ctf_web() {
             1) run_tool "$CTF_DIR/web/14_header_inspector.sh" ;;
             2) run_tool "$CTF_DIR/web/15_cookie_decoder.sh" ;;
             3) run_tool "$CTF_DIR/web/16_robots_secrets.sh" ;;
+            4) run_tool "$CTF_DIR/web/http_request_builder.py" interactive ;;
             0) return ;;
             *) echo -e "${RED}اختيار غير صحيح${NC}"; sleep 1 ;;
         esac

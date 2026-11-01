@@ -143,21 +143,87 @@ _raqib_py() {
         printf '%s' "$_RAQIB_PY_BIN"
         return 0
     fi
-    local py=""
-    if command -v python3 >/dev/null 2>&1; then
-        py="python3"
-    elif command -v python >/dev/null 2>&1; then
-        py="python"
-    elif command -v py >/dev/null 2>&1 && py -3 -c "import sys" >/dev/null 2>&1; then
-        py="py -3"
-    else
+    # فحص سالب مُخزَّن حتى ما نعيد تجربة المرشحين بكل نداء
+    if [ "${_RAQIB_PY_CHECKED:-0}" = "1" ]; then
         return 1
     fi
-    _RAQIB_PY_BIN="$py"
-    export _RAQIB_PY_BIN
-    printf '%s' "$py"
+
+    local cand
+    for cand in python3 python "py -3"; do
+        # تجنّب الاستدعاء الذاتي لو shim python3 معرّف بنفس الجلسة
+        if [ "$cand" = "python3" ] && declare -F python3 >/dev/null 2>&1; then
+            continue
+        fi
+        # ملاحظة: $cand بدون اقتباس مقصود — "py -3" لازم تنقسم لكلمتين.
+        # command -v وحدها ما تكفي: Git Bash يعرّض python3 كـ Windows Store
+        # stub موجود بالمسار لكنه يفشل عند التشغيل، فنجرّب تنفيذاً حقيقياً.
+        # Unquoted $cand is intentional ("py -3" splits into two words).
+        # command -v alone is not enough: Git Bash exposes a Windows Store
+        # python3 stub that exists but fails to execute — probe for real.
+        command -v ${cand%% *} >/dev/null 2>&1 || continue
+        if $cand -c "import sys" >/dev/null 2>&1; then
+            _RAQIB_PY_BIN="$cand"
+            _RAQIB_PY_CHECKED=1
+            export _RAQIB_PY_BIN _RAQIB_PY_CHECKED
+            printf '%s' "$cand"
+            return 0
+        fi
+    done
+
+    _RAQIB_PY_CHECKED=1
+    export _RAQIB_PY_CHECKED
+    return 1
 }
 export -f _raqib_py
+
+# -----------------------------------------------------
+#  UTF-8 لبايثون على ويندوز — Native Windows Python
+#  يطبع افتراضياً بـ cp1252 فينهار على رموز الطرفية
+#  (box-drawing/عربي). على لينكس/ماك لا نلمس شيئاً.
+# -----------------------------------------------------
+case "${RAQIB_OS:-}" in
+    msys|cygwin)
+        export PYTHONIOENCODING="${PYTHONIOENCODING:-utf-8}"
+        export PYTHONUTF8="${PYTHONUTF8:-1}"
+        ;;
+esac
+
+# -----------------------------------------------------
+#  python3 shim — Git Bash يوفّر python3 كـ Windows Store
+#  stub موجود بالمسار لكنه يفشل عند التشغيل. لو فشل
+#  التنفيذ الفعلي، نوجّه python3 للمترجم الشغّال (python / py -3).
+#  على لينكس/ماك (python3 شغّال) لا يُعرَّف أي shim — صفر تغيير.
+# -----------------------------------------------------
+if ! python3 -c "import sys" >/dev/null 2>&1; then
+    if _raqib_py >/dev/null 2>&1; then
+        # python3 shim: Git Bash exposes a Windows Store python3 stub, and a
+        # native Windows Python does not understand MSYS paths (/c/Users/...).
+        # Convert drive-letter and temp paths to native form before exec.
+        # Only defined when plain `python3` is broken — Linux/macOS unaffected.
+        python3() {
+            local py arg
+            local -a conv=()
+            py="$(_raqib_py 2>/dev/null)" || return 127
+            for arg in "$@"; do
+                case "$arg" in
+                    /[A-Za-z]/*|/tmp/*|/home/*|/usr/*|/var/*|/etc/*|/opt/*)
+                        if [ -e "$arg" ] || [[ "$arg" == /[A-Za-z]/* ]]; then
+                            if command -v cygpath >/dev/null 2>&1; then
+                                arg="$(cygpath -w -- "$arg" 2>/dev/null || printf '%s' "$arg")"
+                            fi
+                        fi
+                        conv+=("$arg")
+                        ;;
+                    *)
+                        conv+=("$arg")
+                        ;;
+                esac
+            done
+            $py "${conv[@]}"
+        }
+        export -f python3
+    fi
+fi
 
 # =====================================================================
 #  SHIMS — تعويض الأوامر الناقصة/المختلفة على macOS و Git Bash

@@ -268,4 +268,187 @@ no resource files at all.
   - **Post-Update Integrity Verification**: Validates syntax of Bash scripts (`bash -n`) and Python files (`py_compile`) before finalizing.
   - **Seamless Integration with `raqib.sh`**: Option 12 in the main menu now directly leverages `raqib_updater.py` when Python is available.
 
+## 10) دعم ويندوز الأصلي + macOS — طبقة المنصات (Cross-Platform Layer)
+
+> أحدث تغيير: RAQIB صار يعمل أصلياً على ويندوز (Git Bash / MSYS2) وعلى macOS،
+> مع بقاء سلوك لينكس كما هو 100% (كل التغييرات مشروطة بغياب أمر أو اختلافه).
+> عدد الأدوات: 96 → 97 (حزمة دفاع ويندوز).
+
+### ملف جديد: `modules/platform.sh` — طبقة المنصات المركزية
+- **كشف النظام**: `RAQIB_OS` = `linux | wsl | darwin | msys | cygwin | unknown`
+  عبر `uname -s -r` + فحص `WSL_DISTRO_NAME` لتمييز WSL2.
+- **اختبارات رخيصة**: `raqib_is_windows/_macos/_linux/_wsl` + `raqib_has_windows_bridge`
+  — بدون أوامر خارجية.
+- **جسر PowerShell**: `raqib_win_ps` ينفّذ سطر PowerShell بأمان مع
+  `-NoProfile -NonInteractive -ExecutionPolicy Bypass` وترميز UTF-8، ويشتغل
+  من Git Bash مباشرة ومن WSL2 عبر `powershell.exe`.
+- **ترجمة فورية ثنائية اللغة**: `raqib_tr "عربي" "English"` تعيد النص حسب
+  `LANG_CODE` — بدون إضافة مفاتيح لملفات الـ 20 لغة (نفس عرف المشروع).
+- **حرس المنصة**: `raqib_linux_only` / `raqib_windows_only` يخرجان برسالة
+  واضحة ثنائية اللغة بأماكن البدائل (حزمة دفاع ويندوز / WSL2 / أدوات macOS).
+- **Shims شرطية** (تُعرَّف كدوال Bash فقط عندما الأمر الأصلي غائب، فلا يتغير
+  أي سلوك على لينكس): `sha256sum`, `md5sum`, `tac`, `readlink -f`, `shred`,
+  `timeout` (بنية perl بـ alarm)، `sed -i`، `stat -c`، و`ss` بمخرجات مطابقة
+  لـ ss الحقيقي (من PowerShell على ويندوز، ومن `lsof` على macOS).
+
+### أداة جديدة: `tools/hardening/windows_defense.sh` — حزمة دفاع ويندوز (97)
+7 فحوص بالأدوات الأصلية لويندوز حصراً (PowerShell / Event Log / مجدول المهام / Defender):
+1. **جدار الحماية**: `Get-NetFirewallProfile` بحالة الملفات الثلاثة + اكتشاف
+   `inbound = ALLOW` (اكتشاف حرج).
+2. **الاتصالات ↔ العملية**: `Get-NetTCPConnection` مربوطة بـ `Get-Process`
+   مع رصد الاتصالات القائمة بعناوين خارج LAN لمراجعتها بذكاء التهديدات.
+3. **فرز 4625**: تسجيلات الدخول الفاشلة لآخر 48 ساعة — ترتيب عناوين
+   المهاجمين والحسابات المستهدفة، والحدود 20/100/500 → متوسط/عالي/حرج.
+4. **استمرارية المهام المجدولة**: إجراءات تنفّذ من TEMP/مسارات مستخدم-قابلة
+   للكتابة أو LOLBins (`-enc`, `mshta`, `regsvr32`, `.vbs`, `wscript`...).
+5. **Defender**: حالة مضاد الفيروسات + الحماية اللحظية + عمر التوقيعات +
+   آخر 10 تهديدات من `Get-MpThreatDetection`.
+6. **Autoruns**: مفاتيح Run/RunOnce (5 خلايا) + مجلدات Startup + مسارات
+   خدمات تلقائية (temp/AppData = مشبوه) مع سطر إجماليات دائماً بالتقرير.
+7. **ملف hosts**: إدخالات DNS الثابتة (مشبوهة عند > 3 أسطر غير تعليقية).
+
+كل الاكتشافات عبر `finding_add` الموحد (أحداث SIEM/تيليجرام) + تقرير
+`windows_defense_scan.txt`. على لينكس/macOS تخرج الحزمة برسالة توضيحية
+ثنائية اللغة بدل الانهيار.
+
+### تحديث الأدوات الموجودة (السلوك على لينكس كما هو حرفياً)
+- `persistence_scanner.sh`: فحص ويندوز أصلي (Run/RunOnce + Startup + مهام
+  مجدولة + خدمات Auto) يُستدعى تلقائياً على ويندوز.
+- `login_history_report.sh`: فرع ويندوز يقرأ معلومات Security.evtx (الحجم/
+  آخر كتابة) ويعرض إرشاداً لسطر PowerShell الكامل للتحليل بـ `Get-WinEvent`.
+- `firewall_status_checker.sh`: يعرض ملفات جدار ويندوز الثلاثة على ويندوز،
+  وحالة PF على macOS، إضافة لمسارات لينكس الحالية.
+- `outdated_packages_checker.sh`: فرع `winget upgrade` (فلتر عمود Available
+  مصحح) على ويندوز؛ فرع `apk` أعيد после خطأ تعويض سابق حذفه.
+- `ssh_config_auditor.sh`: يستهلاف `/c/ProgramData/ssh/sshd_config`
+  الافتراضي على ويندوز مع ملاحظة أن فحوص المجموعات أقل تطبيقاً هناك.
+- أدوات لينكس-حصراً تخرج بلوثيقة واضحة بدل الانهيار على ويندوز/macOS:
+  `rootkit_detector` (LKM/eBPF/ld.so.preload)، `advanced_forensics`
+  (/proc + auditd)، `service_lister` (systemd/SysV)،
+  `password_policy_checker` (login.defs/PAM/shadow)، `cron_auditor`
+  (النظام الأصلي على ويندوز هو Scheduled Tasks)، `permission_auditor` +
+  `weak_permission_scanner` (دلالات يونكس؛ الصلاحيات على ويندوز عبر ACL).
+- `tls_fingerprint_detector`: python3 → `_raqib_py` + رسالة tcpdump خاصة
+  بكل نظام + إصلاح `finding_add` بالمنافذ المشبوهة.
+
+### إصلاحات
+- **shim `ss` (حرج)**: وسائط `awk -v` كانت توضع *بعد* نص البرنامج — الـ
+  gawk يعتبرها أسماء ملفات، يفشل بصمت (stderr مقنّع بـ `2>/dev/null`) ويطبع
+  الترويسة فقط. الحالة كانت تكسر الـ shim على ويندوز وماك. الصواب:
+  `awk -F'|' -v FILTER=.. -v PFLAG=.. -v WANTU=.. 'PROG'` (قبل البرنامج).
+- **`rootkit_detector.sh` bootstrap (حرج — يكسر الأداة حتى على لينكس)**:
+  `declare -p finding_add` يرجع rc=1 للدوال؛ الصحيح `declare -F finding_add`.
+- **shim `timeout` (بناء perl)**: `goto &main_exec` خارج sub خطأ فادح
+  يؤخذ بـ `eval` فينفذ الأمر *بدون* timeout أصلاً. أُعيدت كتابته بـ
+  `$SIG{ALRM} = sub { exit 124 }; alarm($secs) if $secs > 0; exec @ARGV`.
+- **`raqib.bat`**: أُعيد كتابته نظيفاً (النسخة السابقة تحتوي مخلفات ترجمة
+  آلية بينها كلمات صينية وجمل مكسّرة) مع خطوات WSL2 صحيحة ومنطق خروج مبسّط.
+
+### التحقق (على آلة ويندوز حقيقية بمحتوى Git Bash)
+- 23 ملفاً معدّلاً كلها مرت بـ `bash -n` بلا أخطاء.
+- تشغيل حقيقي: جسر PowerShell (`1+2` → 3)، `Get-NetFirewallProfile`
+  (3 ملفات شخصية [OK])، `Get-NetTCPConnection` (121 صفاً)، `ss -tulnp` /
+  `-tn state established` / `-tunap state established` بمخرجات مطابقة
+  للـ ss الحقيقي `users:(("name",pid=N,fd=1))`، `timeout 1 sleep 3` → rc=124.
+- تحقق الأدوات فعلياً: `windows_defense` (قائمة 1→6→0 + حفظ تقرير)،
+  `login_history_report` (قراءة Security.evtx بحجم 20.9MB)،
+  `persistence_scanner` (رصد LM Studio/Edge/CleanupTemporaryState)،
+  `firewall_status_checker`، `outdated_packages_checker` (winget)، وكل
+  الأدوات المحروسة خرجت بلوثيقتها.
+
+---
+
+## 11) جولة الدقة والقوائم — 2026-10-31
+
+### إصلاح جوهري: طبقة PCRE محمولة
+- GNU grep 3.0 على Git Bash يرفض `grep -P` بدون لوكيل UTF-8 صالح، فكان محرك
+  YARA-lite يُتخطّى بصمت وتهبط دقة Web Shell المدمجة إلى 76.5%.
+- `modules/common.sh`: `raqib_pcre_probe` يجرّب `grep -P` كما هو، ثم
+  `LC_ALL=C.UTF-8 / C.utf8 / en_US.UTF-8 / en_US.utf8`، ثم Perl (`-0777`)،
+  ويخزّن النتيجة بـ `_RAQIB_PCRE_MODE` (grep / grep:<locale> / perl / none).
+- `raqib_pcre_match` و`raqib_pcre_valid`: واجهة موحّدة — 0 تطابق/صالح،
+  1 لا تطابق/غير صالح، 2 خطأ. كلاهما يستخدم الملف ككتلة واحدة (multiline).
+- `malware_heuristics.sh` و`rules_updater.sh` يستخدمان الطبقة بدل
+  `grep -Pzo` المباشر. على لينكس ينجح `grep -P` أول مرة → صفر تغيير سلوكي.
+
+### إصلاح بايثون على Git Bash
+- `_raqib_py` يفحص التشغيل الفعلي لا وجود الاسم فقط (python3 في Git Bash هو
+  Windows Store stub فاشل)، ويكشف `py -3`، ويخزّن النتيجة السالبة.
+- shim `python3` يُعرَّف فقط إذا فشل التنفيذ الحقيقي؛ على لينكس/ماك لا يُعرَّف.
+- `run_tool` يدعم أدوات `.py` (وتمرير الوسائط) بدل `source` الذي يفشل مع
+  بايثون، و`credential_leak_checker.sh` صار يستخدم `_raqib_py`.
+
+### توازن القوائم (أعداد فعلية)
+- الملفات المشبوهة: + `rootkit_detector` → 13.
+- التحقيقات: + `advanced_forensics` + `email_header_analyzer` → 7 (مع سؤال
+  عن مسار ملف البريد قبل التشغيل).
+- الثغرات: + `credential_leak_checker` → 6.
+- التحصين: العدد الصحيح 9 (كان معنوناً 8).
+- CTF: إضافة `cipher_solver.py` و`http_request_builder.py` → 23 أداة.
+- القائمة الرئيسية و`README.md` / `README.ar.md` حُدّثت بالأعداد نفسها.
+
+### قاعدة كشف جديدة
+- `NESTED_DECODE_INTO_EXEC|3` تلتقط `eval(gzinflate(base64_decode(...)))`
+  والتفكيك المتداخل المشابه (gzinflate/gzuncompress/str_rot13/convert_uudecode).
+
+### نتائج القياس الفعلية (Git Bash على ويندوز)
+| الكاشف | Precision | Recall | F1 | Accuracy |
+|---|---|---|---|---|
+| Web Shell — كلاسيكي فقط | 100.0% | 52.9% | 69.2 | 76.5% |
+| Web Shell — YARA-lite فقط | 100.0% | 100.0% | 100.0 | 100.0% |
+| Web Shell — المدمج | 100.0% | 100.0% | 100.0 | 100.0% |
+| Cron الخبيث | 100.0% | 100.0% | 100.0 | 100.0% |
+| /tmp (ويندوز) | 100.0% | 60.0% | 75.0 | 81.8% |
+| **الإجمالي** | **100.0%** | **93.5%** | **96.6** | **97.1%** |
+
+- قبل الإصلاح: الإجمالي 85.5% دقة / 80.7 F1 (YARA-lite معطّل).
+- `setuid_shell` لا يمكن اختباره على NTFS (بت setuid غير مدعوم)، و
+  `static_dropper` ملف ELF ساكن بلا إشارات — الربط الساكن وحده لا يُحتسب عمداً.
+- `bash -n`: 124 ملفاً، 0 أخطاء. اختبار اللغات: 20/20 سليمة.
+
+---
+
+## 12) شعار جديد ومؤثرات بصرية متعددة المستويات — 2026-11-01
+
+### الشعار الجديد (`raqib.sh`)
+- كلمة `RAQIB` مبنية حرفاً حرفاً، وكل حرف بلون مستقل:
+  R سماوي، A أزرق فاتح، Q أزرق، I بنفسجي، B بنفسجي غامق.
+- أشرطة بيانات جانبية `░▒▓█ … █▓▒░` تحيط بالاسم، وعرض ثابت 50 عموداً
+  (كل الأسطر متساوية، بدون انكسار في الطرفيات الضيقة نسبياً).
+- خط مسح رأسي: صف إضاءة أبيض يتحرك فوق الحروف (strong/cinematic).
+- بديل ASCII كامل عند غياب UTF-8، وسطر توقيع:
+  `◢◤ رقيب · RAQIB · أداة أمن دفاعي ◥◣ v2.2`.
+
+### محرك المؤثرات (`modules/common.sh`)
+- `raqib_fx_ok` + `raqib_fx_level_cache` + `raqib_fx_level`:
+  المستويات `light` / `strong` (افتراضي) / `cinematic`، مع تخزين النتيجة
+  بدون subshell (مهم على Git Bash).
+- `fx_status_line`: رادار متحرك `▰▰▰▱▱` في strong/cinematic، ونبضة بسيطة في light.
+- `fx_tool_launch`: وميض تحميل بعدد لقطات يتبع المستوى.
+- `fx_matrix_rain`: مطر Matrix خفيف (cinematic فقط).
+- `fx_glitch_line`: سطر Glitch قصير لتسلسل الإقلاع (cinematic).
+- `raqib_clear`: تنظيف الشاشة بتسلسل ANSI مدمج بدل spawn لأمر `clear`.
+- بديل ASCII تلقائي إذا كانت الطرفية لا تدعم UTF-8، وتوافق كامل مع Bash 3.2.
+
+### نقاط الربط
+- `raqib.sh`: `raqib_logo_animated` للشعار، `raqib_boot_sequence` بعد شعار
+  النسر، سطر الحالة أسفل البنر، خط مسح عند كل `show_banner`، وقوائم
+  القائمة الرئيسية تظهر على دفعات.
+- `modules/common.sh`: `show_tool_list` متحرك، و`run_tool` يعرض وميض التحميل.
+- `show_eagle_intro` يتجاوز الأنترو بالكامل عند إطفاء المؤثرات/التشغيل غير التفاعلي.
+
+### تحسين الاستجابة على Git Bash
+- كل spawn لأمر خارجي يكلّف ~80–140ms، فتم تقليل النبضات وتجميعها.
+- البانر: كاش تواريخ اليوم/اللغة، `printf %(...)T` بدل `date`، و`${path##*/}`
+  بدل `basename`، وتنظيف شاشة مدمج — الرجوع المتكرر للقائمة صار أسرع بوضوح.
+- قياس فعلي: `off` ~0.29s، `light` ~0.52s، `strong` ~0.74s، `cinematic` ~1.25s
+  لرسم البانر على Git Bash (strong يضيف ~0.45s فقط عن off).
+
+### الأمان والاختبارات
+- لا تأثير على المخرجات الموجّهة: الاختبارات والأنابيب تبقى فورية ونظيفة.
+- `bash -n` واختبارات الدقة/اللغات أُعيد تشغيلها بعد الإضافة — كلها سليمة.
+
+### لقطات الشاشة
+- `assets/raqib_strong.png` و`assets/raqib_cinematic.png`: لقطتان للشكل النهائي
+  للبانر في الوضعين، مضمّنتان في `README.md` و`README.ar.md`.
 

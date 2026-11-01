@@ -20,6 +20,252 @@ BOLD="${BOLD:-$'\033[1m'}"
 NC="${NC:-$'\033[0m'}"
 export GREEN CYAN YELLOW RED ORANGE CRIMSON WHITE GREY BOLD NC
 
+# =====================================================
+#  مؤثرات بصرية (Visual FX engine)
+#  - تشتغل تلقائياً على طرفية تفاعلية حقيقية فقط
+#  - تتعطّل وحدها عند الأنابيب/إعادة التوجيه أو TERM=dumb أو NO_COLOR
+#  - المستويات: light | strong (افتراضي) | cinematic
+#  - RAQIB_FX=off يطفئها، RAQIB_FX=on يفرض strong،
+#    RAQIB_FX=cinematic يفرض أقوى وضع.
+#  لا تعتمد على أي أداة خارجية، وتتوافق مع Bash 3.2 (macOS).
+# =====================================================
+raqib_fx_ok() {
+    if [ -n "${_RAQIB_FX_OK:-}" ]; then
+        [ "$_RAQIB_FX_OK" = "1" ]
+        return
+    fi
+    local mode="${RAQIB_FX:-auto}"
+    case "$mode" in
+        off|0|no|false|none) _RAQIB_FX_OK=0 ;;
+        on|1|yes|true|full|light|strong|cinematic|max) _RAQIB_FX_OK=1 ;;
+        *)
+            if [ -n "${NO_COLOR:-}" ] || [ "${TERM:-}" = "dumb" ] || [ ! -t 1 ]; then
+                _RAQIB_FX_OK=0
+            else
+                _RAQIB_FX_OK=1
+            fi
+            ;;
+    esac
+    export _RAQIB_FX_OK
+    [ "$_RAQIB_FX_OK" = "1" ]
+}
+export -f raqib_fx_ok
+
+# raqib_fx_level_cache -> يخزّن المستوى في $_RAQIB_FX_LEVEL بدون subshell.
+# الوضع الافتراضي على طرفية تفاعلية هو strong (مؤثرات واضحة لكن سريعة).
+raqib_fx_level_cache() {
+    local mode="${RAQIB_FX:-auto}"
+    if [ "${_RAQIB_FX_LEVEL_MODE:-}" = "$mode" ] && [ -n "${_RAQIB_FX_LEVEL:-}" ]; then
+        return 0
+    fi
+    case "$mode" in
+        off|0|no|false|none) _RAQIB_FX_LEVEL="none" ;;
+        light) _RAQIB_FX_LEVEL="light" ;;
+        cinematic|max) _RAQIB_FX_LEVEL="cinematic" ;;
+        on|1|yes|true|full|strong) _RAQIB_FX_LEVEL="strong" ;;
+        *)
+            if raqib_fx_ok; then
+                _RAQIB_FX_LEVEL="strong"
+            else
+                _RAQIB_FX_LEVEL="none"
+            fi
+            ;;
+    esac
+    _RAQIB_FX_LEVEL_MODE="$mode"
+    export _RAQIB_FX_LEVEL _RAQIB_FX_LEVEL_MODE
+}
+export -f raqib_fx_level_cache
+
+# raqib_fx_level -> none | light | strong | cinematic (للاستخدام الخارجي)
+raqib_fx_level() {
+    raqib_fx_level_cache
+    printf '%s\n' "$_RAQIB_FX_LEVEL"
+}
+export -f raqib_fx_level
+
+# raqib_fx_utf8 -> صفر لو الطرفية تدعم UTF-8 (لاختيار رموز المؤثرات)
+raqib_fx_utf8() {
+    case "${LC_ALL:-${LANG:-}}" in
+        *UTF-8*|*utf-8*|*utf8*|*UTF8*) return 0 ;;
+    esac
+    return 1
+}
+export -f raqib_fx_utf8
+
+raqib_fx_sleep() {
+    raqib_fx_ok || return 0
+    sleep "${1:-0.01}" 2>/dev/null || true
+}
+export -f raqib_fx_sleep
+
+# مسح الشاشة بدون spawn لأمر clear الخارجي (أسرع بكثير على Git Bash)
+raqib_clear() {
+    printf '\033[H\033[2J\033[3J'
+}
+export -f raqib_clear
+
+# يطبع كل سطر، ويأخذ نبضة تأخير واحدة كل مجموعة أسطر (group).
+# التجمع مقصود: sleep الصغير على Git Bash مكلف (~80ms للاستدعاء)،
+# فبدل 14 نبضة للقائمة نستخدم نبضتين فقط مع نفس الإحساس البصري.
+# عند تعطيل المؤثرات يمرّر النص كما هو (cat) بسرعة الاختبارات.
+fx_reveal_lines() {
+    local delay="${1:-0.04}" group="${2:-8}" line n=0
+    if ! raqib_fx_ok; then
+        cat
+        return 0
+    fi
+    while IFS= read -r line || [ -n "$line" ]; do
+        printf '%s\n' "$line"
+        n=$((n + 1))
+        if [ $((n % group)) -eq 0 ]; then
+            raqib_fx_sleep "$delay"
+        fi
+    done
+}
+export -f fx_reveal_lines
+
+# سطر حالة أسفل البنر — مستوى light: نبضة بسيطة، strong/cinematic: رادار
+fx_status_line() {
+    local label="${1:-DEFENSE GRID ONLINE}"
+    local level
+    raqib_fx_level_cache 2>/dev/null || true
+    level="${_RAQIB_FX_LEVEL:-none}"
+    local dot="●" ring="○"
+    local utf8=0
+    raqib_fx_utf8 && utf8=1
+    [ "$utf8" -eq 1 ] || { dot="*"; ring="o"; }
+    if [ "$level" = "none" ]; then
+        printf "  %s%s%s %s%s%s\n" "$GREEN" "$dot" "$NC" "$GREY" "$label" "$NC"
+        return 0
+    fi
+    # إطارات الرادار: كل إطار يوسّع الشريط المضيء تدريجياً
+    local -a frames
+    if [ "$level" = "light" ]; then
+        frames=( "$ring" )
+    elif [ "$level" = "cinematic" ]; then
+        if [ "$utf8" -eq 1 ]; then
+            frames=( "◌ ▱▱▱▱▱▱▱" "◉ ▰▰▰▱▱▱▱" "◉ ▰▰▰▰▰▱▱" )
+        else
+            frames=( "o [----]" "O [###-]" "O [####]" )
+        fi
+    else
+        if [ "$utf8" -eq 1 ]; then
+            frames=( "◉ ▰▰▰▱▱" )
+        else
+            frames=( "O [###-]" )
+        fi
+    fi
+    local f
+    for f in "${frames[@]}"; do
+        printf "\r\033[K  %s%s%s %s%s%s" "$CYAN" "$f" "$NC" "$GREY" "$label" "$NC"
+        raqib_fx_sleep 0.05
+    done
+    printf "\r\033[K  %s%s%s %s%s%s\n" "$GREEN" "$dot" "$NC" "$GREY" "$label" "$NC"
+}
+export -f fx_status_line
+
+# وميض تحميل الأداة — عدد اللقطات يتبع مستوى المؤثرات
+fx_tool_launch() {
+    local name="$1"
+    local level
+    raqib_fx_level_cache 2>/dev/null || true
+    level="${_RAQIB_FX_LEVEL:-none}"
+    [ "$level" = "none" ] && return 0
+    local marker="▸"
+    raqib_fx_utf8 || marker=">"
+    local -a codes
+    if [ "$level" = "cinematic" ]; then
+        codes=( "0x1A" "0x7F" "0x2C" )
+    elif [ "$level" = "light" ]; then
+        codes=( "0x1A" )
+    else
+        codes=( "0x1A" "0x7F" )
+    fi
+    local c
+    for c in "${codes[@]}"; do
+        printf "\r\033[K  %s[%s]%s %s%s %s%s" "$GREY" "$c" "$NC" "$CYAN" "$marker" "$name" "$NC"
+        raqib_fx_sleep 0.05
+    done
+    printf "\r\033[K  %s%s%s %s%s%s\n" "$CYAN" "$marker" "$NC" "$BOLD" "$name" "$NC"
+}
+export -f fx_tool_launch
+
+# خط مسح أفقي سريع — يظهر خافتاً ثم يضيء
+fx_scanline() {
+    local level
+    raqib_fx_level_cache 2>/dev/null || true
+    level="${_RAQIB_FX_LEVEL:-none}"
+    [ "$level" = "none" ] && return 0
+    local width="${1:-44}" i ch="━" line=""
+    raqib_fx_utf8 || ch="-"
+    for ((i = 0; i < width; i++)); do
+        line+="$ch"
+    done
+    printf "  %s%s%s\n" "$GREY" "$line" "$NC"
+    raqib_fx_sleep 0.05
+    printf "\033[1A\r\033[K  %s%s%s\n" "$CYAN" "$line" "$NC"
+}
+export -f fx_scanline
+
+# مطر Matrix — cinematic فقط: وميض بيانات خفيف قبل البانر/الأنترو
+fx_matrix_rain() {
+    local level
+    raqib_fx_level_cache 2>/dev/null || true
+    level="${_RAQIB_FX_LEVEL:-none}"
+    [ "$level" = "cinematic" ] || return 0
+    local width="${1:-54}" rows="${2:-4}" frames=3
+    local f i j line
+    for ((f = 1; f <= frames; f++)); do
+        for ((i = 0; i < rows; i++)); do
+            line=""
+            for ((j = 0; j < width; j++)); do
+                if [ $((RANDOM % 11)) -lt 2 ]; then
+                    if [ $((RANDOM % 2)) -eq 0 ]; then
+                        line+="█"
+                    else
+                        line+="▓"
+                    fi
+                else
+                    line+=" "
+                fi
+            done
+            printf "  %s%s%s\n" "$GREEN" "$line" "$NC"
+        done
+        if [ "$f" -lt "$frames" ]; then
+            raqib_fx_sleep 0.05
+            printf "\033[%dA\r" "$rows"
+        fi
+    done
+}
+export -f fx_matrix_rain
+
+# سطر Glitch قصير (نص ASCII) — يُستخدم في cinematic فقط غالباً
+fx_glitch_line() {
+    local text="$1"
+    local level
+    raqib_fx_level_cache 2>/dev/null || true
+    level="${_RAQIB_FX_LEVEL:-none}"
+    if [ "$level" = "none" ]; then
+        printf "  %s\n" "$text"
+        return 0
+    fi
+    local frames=1
+    [ "$level" = "cinematic" ] && frames=2
+    local len=${#text} glyphs="01#\$%&@?=+*/" i pos line ch f
+    for ((f = 0; f < frames; f++)); do
+        line="$text"
+        for ((i = 0; i < 3; i++)); do
+            pos=$((RANDOM % len))
+            ch="${glyphs:$((RANDOM % ${#glyphs})):1}"
+            line="${line:0:pos}${ch}${line:pos+1}"
+        done
+        printf "\r\033[K  %s%s%s" "$CYAN" "$line" "$NC"
+        raqib_fx_sleep 0.05
+    done
+    printf "\r\033[K  %s%s%s\n" "$BOLD$WHITE" "$text" "$NC"
+}
+export -f fx_glitch_line
+
 # ضمان توفر دوال التاريخ والترجمة متزامنة في كل أداة أو تقرير
 _COMMON_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if [ -z "$(declare -F raqib_format_date 2>/dev/null)" ] && [ -f "$_COMMON_DIR/lang.sh" ]; then
@@ -311,20 +557,121 @@ raqib_owns_file() {
 }
 export -f raqib_owns_file
 
-# raqib_pcre_ok -> صفر لو grep -P (PCRE) مدعوم فعلياً بهذا النظام (BusyBox/BSD grep لا يدعمونه عادة)
-raqib_pcre_ok() {
-    if [ -z "${_RAQIB_PCRE_CHECKED:-}" ]; then
-        if printf 'x' | grep -P 'x' >/dev/null 2>&1; then
-            _RAQIB_PCRE_OK=1
-        else
-            _RAQIB_PCRE_OK=0
-        fi
-        _RAQIB_PCRE_CHECKED=1
-        export _RAQIB_PCRE_OK _RAQIB_PCRE_CHECKED
+# ─── طبقة PCRE المحمولة ───────────────────────────────────────────────
+# بعض أنظمة GNU grep (مثل Git Bash على ويندوز) ترفض -P إذا ما كان فيه لوكيل
+# UTF-8 صالح افتراضي، وبعض الأنظمة (BSD/macOS/BusyBox) ما تدعم -P أصلاً.
+# نجرّب بالترتيب: grep -P كما هو → grep -P مع لوكيل UTF-8 → perl → لا شيء.
+# النتيجة تُخزَّن بـ _RAQIB_PCRE_MODE حتى ما نعيد الفحص لكل ملف/قاعدة.
+#
+# The PCRE layer probes once and caches the working engine:
+#   grep        → plain `grep -P`
+#   grep:<loc>  → `LC_ALL=<loc> grep -P` (needed by GNU grep 3.0 on Git Bash)
+#   perl        → `perl -0777` fallback (POSIX classes supported)
+#   none        → no PCRE engine available
+raqib_pcre_probe() {
+    if [ -n "${_RAQIB_PCRE_MODE:-}" ]; then
+        return 0
     fi
-    [ "$_RAQIB_PCRE_OK" = "1" ]
+
+    local mode="" loc
+    if printf 'x' | grep -P 'x' >/dev/null 2>&1; then
+        mode="grep"
+    else
+        for loc in C.UTF-8 C.utf8 en_US.UTF-8 en_US.utf8; do
+            if printf 'x' | LC_ALL="$loc" grep -P 'x' >/dev/null 2>&1; then
+                mode="grep:$loc"
+                break
+            fi
+        done
+    fi
+
+    if [ -z "$mode" ] && command -v perl >/dev/null 2>&1; then
+        # اختبار فعلي على مدخل حقيقي (مش مجرد وجود perl بالمسار)
+        if printf 'x' | perl -0777 -ne 'BEGIN { $pat = shift @ARGV } exit(/$pat/ ? 0 : 1)' -- 'x' >/dev/null 2>&1; then
+            mode="perl"
+        fi
+    fi
+
+    _RAQIB_PCRE_MODE="${mode:-none}"
+    export _RAQIB_PCRE_MODE
+}
+export -f raqib_pcre_probe
+
+# raqib_pcre_ok -> صفر لو فيه محرك PCRE شغّال (grep -P أو perl)
+raqib_pcre_ok() {
+    raqib_pcre_probe
+    [ "${_RAQIB_PCRE_MODE:-none}" != "none" ]
 }
 export -f raqib_pcre_ok
+
+# raqib_pcre_match <pattern> <file> -> 0 تطابق، 1 لا تطابق، 2 خطأ/محرك غير متوفر
+# يطابق الملف ككتلة واحدة (multiline) — نفس سلوك grep -Pzo.
+raqib_pcre_match() {
+    local pattern="$1" file="$2" mode loc rc
+    [ -f "$file" ] || return 1
+    [ -n "$pattern" ] || return 1
+
+    raqib_pcre_probe
+    mode="${_RAQIB_PCRE_MODE:-none}"
+
+    case "$mode" in
+        grep)
+            grep -Pzoq "$pattern" -- "$file" 2>/dev/null
+            rc=$?
+            ;;
+        grep:*)
+            loc="${mode#grep:}"
+            LC_ALL="$loc" grep -Pzoq "$pattern" -- "$file" 2>/dev/null
+            rc=$?
+            ;;
+        perl)
+            perl -0777 -ne 'BEGIN { $pat = shift @ARGV } exit(/$pat/ ? 0 : 1)' -- "$pattern" "$file" 2>/dev/null
+            rc=$?
+            ;;
+        *)
+            return 2
+            ;;
+    esac
+
+    case "$rc" in
+        0) return 0 ;;
+        1) return 1 ;;
+        *) return 2 ;;
+    esac
+}
+export -f raqib_pcre_match
+
+# raqib_pcre_valid <pattern> -> صفر لو الـ regex يترجم بنجاح
+raqib_pcre_valid() {
+    local pattern="$1" mode loc rc
+    [ -n "$pattern" ] || return 1
+
+    raqib_pcre_probe
+    mode="${_RAQIB_PCRE_MODE:-none}"
+
+    case "$mode" in
+        grep)
+            printf '' | grep -Pzoq "$pattern" >/dev/null 2>&1
+            rc=$?
+            ;;
+        grep:*)
+            loc="${mode#grep:}"
+            printf '' | LC_ALL="$loc" grep -Pzoq "$pattern" >/dev/null 2>&1
+            rc=$?
+            ;;
+        perl)
+            printf '' | perl -0777 -ne 'BEGIN { $pat = shift @ARGV } exit(/$pat/ ? 0 : 1)' -- "$pattern" >/dev/null 2>&1
+            rc=$?
+            ;;
+        *)
+            return 2
+            ;;
+    esac
+
+    # 0 = تطابق، 1 = لا تطابق — كلاهما يعني أن التعبير صالح. أكبر من 1 = خطأ صياغة.
+    [ "$rc" -le 1 ]
+}
+export -f raqib_pcre_valid
 
 # raqib_default_iface -> يحاول إيجاد واجهة الشبكة الافتراضية عبر ip، وإلا route، وإلا ifconfig
 raqib_default_iface() {
@@ -360,25 +707,42 @@ export -f raqib_realpath
 
 show_tool_list() {
     local title="$1"; shift
-    echo ""
-    echo -e "${BOLD}${title}${NC}"
-    local i=1
-    for entry in "$@"; do
-        echo -e "  ${CYAN}${i})${NC} ${entry}"
-        ((i++))
-    done
-    echo -e "  ${RED}0)${NC} $(t back)"
+    {
+        echo ""
+        echo -e "${BOLD}${title}${NC}"
+        local i=1
+        for entry in "$@"; do
+            echo -e "  ${CYAN}${i})${NC} ${entry}"
+            ((i++))
+        done
+        echo -e "  ${RED}0)${NC} $(t back)"
+    } | fx_reveal_lines 0.05 8
 }
 
 run_tool() {
     local script="$1"
+    shift || true
     echo ""
+    fx_tool_launch "$(basename "$script")" 2>/dev/null || true
     if [ ! -x "$script" ]; then chmod +x "$script"; fi
-    # Run in a subshell (not a fresh `bash` process) so that the t()/tf()
-    # translation functions and their associative-array data (which cannot
-    # be exported to a brand-new bash process) remain available to the tool.
-    # `exit` inside a ( ... ) subshell only ends the subshell, not the menu.
-    ( source "$script" )
+    case "$script" in
+        *.py)
+            # أدوات بايثون تُشغَّل عبر python3 (اللي يحوّل مسارات MSYS إلى
+            # مسارات ويندوز الأصلية عند الحاجة) بدل source.
+            if ! command -v python3 >/dev/null 2>&1; then
+                echo -e "${RED}$(raqib_tr "بايثون 3 مطلوب لهذه الأداة لكنه غير متوفر." "Python 3 is required for this tool but was not found.")${NC}"
+                return 1
+            fi
+            ( python3 "$script" "$@" )
+            ;;
+        *)
+            # Run in a subshell (not a fresh `bash` process) so that the t()/tf()
+            # translation functions and their associative-array data (which cannot
+            # be exported to a brand-new bash process) remain available to the tool.
+            # `exit` inside a ( ... ) subshell only ends the subshell, not the menu.
+            ( source "$script" )
+            ;;
+    esac
 }
 
 # يبحث عن ملف auth log القياسي، وإذا ما لقاه يطلبه من المستخدم.

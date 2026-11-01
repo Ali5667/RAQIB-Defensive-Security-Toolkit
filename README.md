@@ -35,7 +35,7 @@
 
 Every single tool is written from scratch against core POSIX utilities (`ss`, `find`, `awk`, `grep`, `openssl`, `/dev/tcp`, `python3` stdlib). No Nmap. No Wireshark. No third-party security binaries. Just clean, auditable code that runs on a minimal Alpine container or a fully-locked-down box.
 
-97 tools across 8 operational domains (including 24 specialized CTF & Wargames tools), **wired together as one integrated incident-response workflow** — not a pile of disconnected scripts. Native Windows support: run from Git Bash (MSYS) or WSL — the Windows Defense Suite audits firewall profiles, TCP connections, event-log logons, scheduled tasks and Defender using PowerShell only.
+97 tools across 8 operational domains (including 23 specialized CTF & Wargames tools), **wired together as one integrated incident-response workflow** — not a pile of disconnected scripts. Native Windows support: run from Git Bash (MSYS) or WSL — the Windows Defense Suite audits firewall profiles, TCP connections, event-log logons, scheduled tasks and Defender using PowerShell only.
 
 > ⚠️ **Authorized use only.** Scanning tools are for *your own infrastructure* or systems you have explicit written authorization to assess.
 
@@ -59,18 +59,35 @@ The toolkit runs directly inside your terminal with an ASCII radar animation, au
   <sub><i>Figure: RAQIB interactive terminal main menu showcasing 8 operational domains, CTF mode, and operator session.</i></sub>
 </div>
 
+### 🎨 Visual FX Modes
+
+<table>
+<tr>
+<td width="50%" valign="top">
+  <img src="assets/raqib_strong.png" alt="RAQIB strong FX mode" width="100%"/>
+  <br/>
+  <sub><i><b>strong</b> — default on a real terminal: per-letter gradient wordmark, vertical sweep, radar status line, boot sequence. ~0.69 s per banner.</i></sub>
+</td>
+<td width="50%" valign="top">
+  <img src="assets/raqib_cinematic.png" alt="RAQIB cinematic FX mode" width="100%"/>
+  <br/>
+  <sub><i><b>cinematic</b> — optional: Matrix rain, full six-row sweep, glitch boot, longer radar. ~1.27 s per banner.</i></sub>
+</td>
+</tr>
+</table>
+
 ---
 
 ## ✨ Why RAQIB
 
 <table>
 <tr><td width="32">🚫</td><td><b>Zero external tool dependency</b><br>Runs on a fresh minimal Linux install. No apt install, no pip install, no external security binaries. Every check is written from scratch on POSIX primitives.</td></tr>
-<tr><td>🧬</td><td><b>Composite malware detection — the YARA-lite engine</b><br>Scores multiple weak signals together: string concatenation, <code>chr()</code> obfuscation, hex escapes, PHP-in-image polyglots, Base64-encoded ELF blobs — instead of one brittle signature. Layers a real <code>yara</code> binary automatically if installed. F1 score: <b>98.5%</b>.</td></tr>
+<tr><td>🧬</td><td><b>Composite malware detection — the YARA-lite engine</b><br>Scores multiple weak signals together: string concatenation, <code>chr()</code> obfuscation, hex escapes, PHP-in-image polyglots, Base64-encoded ELF blobs — instead of one brittle signature. Layers a real <code>yara</code> binary automatically if installed. Engine-only F1: <b>100%</b> on the labeled corpus (96.6% overall — see Accuracy).</td></tr>
 <tr><td>🧠</td><td><b>Local Threat Intelligence Engine</b><br>Builds and queries a local IOC database (IPs, domains, URLs, hashes) from Feodo Tracker, URLhaus, and CISA KEV — completely offline at query time. Auto-consulted by 6 other tools transparently.</td></tr>
 <tr><td>📡</td><td><b>Real-time watchdog + multi-host aggregation</b><br>Background daemon monitors all 7 detection categories. Alerts via Telegram. Forwards structured JSON events to a central collector server on another machine for fleet-wide monitoring.</td></tr>
 <tr><td>📊</td><td><b>Built-in SIEM correlation engine</b><br>Correlates events from all tools into composite incidents using 4 rules: multi-tool clustering, repeat-critical, off-hours activity, and escalating severity patterns. Exports CEF format for Wazuh/Splunk/ELK.</td></tr>
 <tr><td>🔐</td><td><b>AES-256-GCM encrypted reports</b><br>Every saved report can be encrypted with AES-256-GCM + Argon2id KDF (memory-hard, GPU-resistant) in one keystroke. Self-describing format: old reports (Scrypt) remain decryptable forever.</td></tr>
-<tr><td>🏴</td><td><b>Complete CTF / Wargames mode</b><br>22 purpose-built tools across Crypto, Stego, Forensics, Web, and Binary — from Vigenère cracking to ELF analysis to PCAP parsing. Flag Hunter + Writeup Logger included.</td></tr>
+<tr><td>🏴</td><td><b>Complete CTF / Wargames mode</b><br>23 purpose-built tools across Crypto, Stego, Forensics, Web, and Binary — from Vigenère cracking to ELF analysis to PCAP parsing. Flag Hunter + Writeup Logger included.</td></tr>
 <tr><td>👤</td><td><b>Operator identity + approval workflow</b><br>PBKDF2 hashed operator accounts. Two roles (analyst/senior). Every destructive action goes through a pending-approval queue reviewable by senior operators only.</td></tr>
 <tr><td>🌍</td><td><b>20 languages, 674 strings each (100% complete)</b><br>Modular per-language files (<code>modules/languages/</code>). Only the active language is loaded into memory on-demand, with automatic RAM cleanup upon switching — keeping RAQIB ultra-lightweight on Kali Linux and low-RAM environments.</td></tr>
 <tr><td>📈</td><td><b>Honest accuracy benchmark</b><br><code>tests/run_accuracy_eval.sh</code> imports the actual detection code and reports Precision/Recall/F1 against a manually-labeled adversarial corpus.</td></tr>
@@ -115,7 +132,10 @@ raqib/
 ├── assets/
 │   ├── eagle_logo.txt / eagle_logo_2.txt  ← ASCII art (radar-scan terminal banner)
 │   ├── eagle_cry_real.wav               ← Startup sound (afplay / pw-play / paplay / aplay / powershell)
-│   └── raqib_demo.gif                   ← Animated terminal demo for documentation
+│   ├── raqib_demo.gif                   ← Animated terminal demo for documentation
+│   ├── raqib_menu.png                   ← Main menu screenshot
+│   ├── raqib_strong.png                 ← Default FX mode (`RAQIB_FX=strong`)
+│   └── raqib_cinematic.png              ← Cinematic FX mode (`RAQIB_FX=cinematic`)
 │
 ├── samples/                             ← Synthetic test logs and binaries
 │   ├── README_samples.md                ← [MD File] Samples usage guide & test scenarios
@@ -124,7 +144,7 @@ raqib/
 │   └── sample_suspicious_binary.bin     ← Synthetic high-entropy test binary
 │
 ├── tests/
-│   ├── run_accuracy_eval.sh             ← Precision/Recall/F1 benchmark (F1=98.5%)
+│   ├── run_accuracy_eval.sh             ← Precision/Recall/F1 benchmark (overall F1=96.6%)
 │   └── corpus/                          ← Adversarial test corpus
 │
 └── tools/
@@ -147,7 +167,7 @@ raqib/
     │
     ├── hardening/  (9)                  ← System hardening, CIS Benchmark auditing & audit trail
     ├── vuln_scan/  (9)                  ← Vulnerability, secrets & Git history scanning
-    └── ctf/        (24)                 ← CTF / Wargames mode (Crypto/Stego/Forensics/Web/Binary)
+    └── ctf/        (24 files / 23 tools) ← CTF / Wargames mode (Crypto/Stego/Forensics/Web/Binary)
 ```
 
 ---
@@ -179,6 +199,21 @@ raqib.bat
 
 The launcher auto-locates Git Bash (Git for Windows recommended), and scans natively using PowerShell: firewall profiles, listening sockets, TCP↔process mapping, failed-logon events (4625), scheduled-task persistence, Windows Defender status and startup keys. Tools that need Linux (/proc, systemd, iptables) degrade gracefully with a clear pointer — or run everything inside WSL2.
 
+### Visual FX (optional)
+
+RAQIB ships a lightweight, dependency-free FX layer built around a custom **per-letter gradient wordmark** (cyan → blue → violet) flanked by data rails: a vertical scan sweep over the name, a radar status bar, a fast scanline on menu transitions, chunked tool lists, and a module-load flicker before each tool.
+
+- **Levels**
+  - `RAQIB_FX=light` — subtle pulse only (lowest overhead)
+  - `RAQIB_FX=strong` — **default on a real terminal**: logo sweep + radar status + boot sequence
+  - `RAQIB_FX=cinematic` — full sweep, Matrix rain, glitch boot, longer radar
+- **Auto (default):** `strong` on a real interactive terminal; automatically off for pipes, redirects, `TERM=dumb`, and `NO_COLOR`.
+- **Disable:** `RAQIB_FX=off ./raqib.sh`
+- **Force strong (e.g. inside a wrapper):** `RAQIB_FX=on ./raqib.sh`
+- **Cinematic:** `RAQIB_FX=cinematic ./raqib.sh`
+
+No animation slows down tests or captured output. Effects are batched into single beats (important on Git Bash, where each tiny `sleep` costs ~80 ms), and the banner caches its daily dates and clears the screen with a built-in escape sequence instead of spawning `clear`/`date`/`basename` on every redraw. On Git Bash, `strong` adds roughly 0.45 s per banner; `off` and `light` stay faster.
+
 ### Requirements
 
 | Requirement | Notes |
@@ -197,7 +232,9 @@ The launcher auto-locates Git Bash (Git for Windows recommended), and scans nati
 
 ## 📋 Tools & Security Engines (97)
 
-> **Architecture Overview**: RAQIB provides **97 total security tools, analytical engines, and daemons** — 73 core defensive incident-response & audit tools distributed across 7 primary categories, plus 24 dedicated CTF & competition tools.
+> **Architecture Overview**: RAQIB provides **97 total security tools, analytical engines, and daemons** — 73 core defensive incident-response & audit tools distributed across 7 primary categories, plus 23 dedicated CTF & competition tools (24 scripts including the CTF menu).
+>
+> **Interactive menu counts** (exact runnable entries): Monitoring 12 · Logs 5 · IDS/IPS 6 · Malware 13 · Forensics 7 · Hardening 9 · Vulnerability 6 · CTF 23. The tables below also list standalone engines that are invoked directly from the CLI rather than from the menu.
 
 ### 🛰️ Network Monitoring (13)
 
@@ -253,7 +290,7 @@ The launcher auto-locates Git Bash (Git for Windows recommended), and scans nati
 | 6 | **Quarantine & Eradicate** | Hash-identical copy tracking + persistence cleanup + secure shred |
 | 7 | **Auto Malware Cleaner** | Webshells + malicious cron + LD_PRELOAD + /tmp executables in one pass |
 | 8 | **Hash Reputation Check** | VirusTotal API v3 + MalwareBazaar (abuse.ch) |
-| 9 | **YARA-lite Scanner** | Updatable `name|weight|regex` engine — F1=98.5% on adversarial corpus |
+| 9 | **YARA-lite Scanner** | Updatable `name|weight|regex` engine — F1=100% engine-only on the adversarial corpus |
 | 10 | **Live Rules Updater** | Safe pull from your chosen source: format-validated, backed-up, local rules preserved |
 | 11 | **Threat Intel Lookup** | Query and update local IOC database (Feodo/URLhaus/CISA KEV) — offline queries |
 | 12 | **Unknown File Triage** | Weighted explainable heuristic scoring (6 signal types) — no ML, every point justified |
@@ -321,7 +358,7 @@ All findings flow into the unified `finding_add` pipeline → `.raqib_events.jso
 
 ---
 
-## 🏴 CTF / Wargames Mode (24 tools)
+## 🏴 CTF / Wargames Mode (23 tools)
 
 Launched from the main menu — a complete, self-contained toolkit for security competitions:
 
@@ -382,13 +419,12 @@ Launched from the main menu — a complete, self-contained toolkit for security 
 </details>
 
 <details>
-<summary><b>🏴 Core CTF Tools (3)</b></summary>
+<summary><b>🏴 Core CTF Tools (2)</b></summary>
 
 | # | Tool | Capability |
 |---|---|---|
 | — | Flag Hunter | Multi-pattern automated flag search in files/directories/binary/Base64 |
 | — | Writeup Logger | Markdown writeup generator with step-by-step logging |
-| — | (planned) | Network trace flag recovery |
 </details>
 
 ---
@@ -822,16 +858,32 @@ bash tests/run_accuracy_eval.sh
 ```
 
 ```
-Detector           Precision   Recall   F1      Accuracy
-─────────────────────────────────────────────────────────
-Webshell (YARA-lite)  98.1%    97.8%   97.9%    98.2%
-Malicious Cron        100%     96.3%   98.1%    97.8%
-/tmp Executables      100%     97.4%   98.7%    98.5%
-─────────────────────────────────────────────────────────
-Overall (weighted)    99.2%    97.2%   98.2%    98.2%
+Run: 2026-10-31 · Git Bash on Windows 10/11 (GNU grep 3.0 + portable PCRE layer)
+
+Detector                        Precision  Recall    F1     Accuracy
+─────────────────────────────────────────────────────────────────────
+Web Shell — classic only          100.0%   52.9%   69.2    76.5%
+Web Shell — YARA-lite only        100.0%  100.0%  100.0   100.0%
+Web Shell — combined              100.0%  100.0%  100.0   100.0%
+Malicious Cron                    100.0%  100.0%  100.0   100.0%
+/tmp Executables (Windows)*       100.0%   60.0%   75.0    81.8%
+─────────────────────────────────────────────────────────────────────
+Overall (all detectors)           100.0%   93.5%   96.6    97.1%
 ```
 
-> Measured against a manually-labeled, deliberately adversarial corpus including obfuscated webshells, clean-but-suspicious files, and static droppers.
+\* **Platform caveat, stated honestly:** on NTFS/Git Bash the `setuid_shell`
+fixture cannot hold the setuid bit, so that signal never fires; the
+`static_dropper` fixture is a statically-linked ELF with no suspicious strings,
+and static linkage alone is deliberately *not* scored (it is common in
+legitimate Go/Rust tooling). On Linux/WSL/macOS the setuid sample is detected;
+the static dropper remains a known static-analysis limitation. The YARA-lite
+engine reaches 100% precision/recall on the labeled corpus because the portable
+PCRE layer now forces a valid UTF-8 locale (needed by GNU grep 3.0 on Git Bash)
+and falls back to Perl when `grep -P` is unavailable.
+
+> This benchmark is a regression harness against this repo's own labeled corpus
+> (`tests/corpus/`), not universal ground truth. An attacker can still evade
+> static pattern detection; dynamic behavior monitoring remains necessary.
 
 ---
 
