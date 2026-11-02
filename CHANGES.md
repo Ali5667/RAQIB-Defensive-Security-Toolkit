@@ -530,10 +530,15 @@ no resource files at all.
 ### التوثيق
 - لقطات جديدة: `assets/raqib_menu.png` (قائمة إنجليزية) و`assets/raqib_menu_ar.png`
   (قائمة عربية) بالبانر الجديد، مع تحديث `raqib_strong.png` و`raqib_cinematic.png`.
+- عرضان متحركان جديدان: `assets/raqib_demo.gif` (إنجليزي) و`assets/raqib_demo_ar.gif`
+  (عربي) — أمر التشغيل، البانر، القائمة، وتليمتري عملية Matrix/رادار.
 
 ### الاختبارات
+- اختبار انحدار دائم جديد: `tests/test_ui_i18n.sh` — 101 فحصاً ناجحاً يغطي
+  تطابق 712 مفتاحاً بين 20 لغة، اكتمال مفاتيح الواجهة المترجمة، بوابة العرض
+  النظيف، مستويات `RAQIB_FX`، وأكواد خروج `run_tool` (0/3).
 - `run_tool`: نجاح 0، فشل 3، بايثون 0 — في light/strong/cinematic.
 - الأنابيب/`NO_COLOR`/`TERM=dumb`/`RAQIB_FX=off`: خرج نظيف فوري.
 - ASCII fallback بعرض 50 عموداً، وإطار UTF-8 بعرض 50.
-- الدقة 97.1% (TP=29/FP=0/TN=38/FN=2)، 20/20 لغة، 124 ملف `bash -n` بلا أخطاء.
+- الدقة 97.1% (TP=29/FP=0/TN=38/FN=2)، 20/20 لغة، `bash -n` بلا أخطاء.
 

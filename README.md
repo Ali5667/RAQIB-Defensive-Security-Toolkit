@@ -43,12 +43,12 @@ Every single tool is written from scratch against core POSIX utilities (`ss`, `f
 
 ## 🎥 Interactive Demo
 
-The toolkit runs directly inside your terminal with an ASCII radar animation, audible eagle prompt (optional), operator authentication, and live security telemetry:
+The toolkit runs directly inside your terminal with a framed banner, a fully localized menu, and Matrix/radar telemetry around every operation, plus the optional eagle prompt, operator authentication, and live security telemetry:
 
 <div align="center">
   <img src="assets/raqib_demo.gif" alt="RAQIB Live Terminal Demonstration" width="780"/>
   <br/>
-  <sub><i>Figure: RAQIB terminal initialization, subsystem loading, and active defense monitoring.</i></sub>
+  <sub><i>Figure: command launch, the new framed banner, the localized menu, and Matrix/radar operation telemetry.</i></sub>
 </div>
 
 ### 🖥️ Main Menu Interface
@@ -132,7 +132,8 @@ raqib/
 ├── assets/
 │   ├── eagle_logo.txt / eagle_logo_2.txt  ← ASCII art (radar-scan terminal banner)
 │   ├── eagle_cry_real.wav               ← Startup sound (afplay / pw-play / paplay / aplay / powershell)
-│   ├── raqib_demo.gif                   ← Animated terminal demo for documentation
+│   ├── raqib_demo.gif                   ← Animated terminal demo (English)
+│   ├── raqib_demo_ar.gif                ← Animated terminal demo (Arabic)
 │   ├── raqib_menu.png                   ← Main menu screenshot (English)
 │   ├── raqib_menu_ar.png                ← Main menu screenshot (Arabic)
 │   ├── raqib_strong.png                 ← Default FX mode (`RAQIB_FX=strong`)
@@ -146,6 +147,7 @@ raqib/
 │
 ├── tests/
 │   ├── run_accuracy_eval.sh             ← Precision/Recall/F1 benchmark (overall F1=96.6%)
+│   ├── test_ui_i18n.sh                  ← 20-language UI parity, FX gates & run_tool exit codes
 │   └── corpus/                          ← Adversarial test corpus
 │
 └── tools/
@@ -850,7 +852,7 @@ Tool findings ──► finding_add() ──► .raqib_events.jsonl ──► SI
 
 </div>
 
-All 20 languages cover all 505 strings: menus, prompts, report text, error messages, and severity labels. Switch from the in-app language menu at any time — no restart needed.
+All 20 languages cover all 712 keys (14,240 strings): menus, prompts, report text, error messages, and severity labels. Switch from the in-app language menu at any time — no restart needed. Run `bash tests/test_ui_i18n.sh` to verify key parity, localized UI labels, clean-output gates, and `run_tool` exit codes across all 20 languages.
 
 ---
 
