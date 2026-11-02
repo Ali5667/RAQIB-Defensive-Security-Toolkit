@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: Italiano (Italian) [it]
-#  Total Keys: 692
+#  Total Keys: 712
 # ============================================================================
 
 declare -g -A STR_IT 2>/dev/null || declare -A STR_IT 2>/dev/null || true
@@ -60,6 +60,26 @@ STR_IT[c_summary_title]="   Sintesi Esecutiva"
 STR_IT[c_updated]="Aggiornato."
 STR_IT[c_value_must_be_number]="Il valore deve essere un numero."
 STR_IT[cat1]="🛰️  Monitoraggio di Rete"
+STR_IT[cat10]="🌐  Cambia lingua"
+STR_IT[cat11]="⚠️  Limitazioni note"
+STR_IT[cat12]="🔄  Verifica aggiornamenti"
+STR_IT[cat13]="⏰  Orologio di difesa e telemetria in tempo reale"
+STR_IT[cat8]="🏴  Modalità CTF / Wargames"
+STR_IT[cat9]="📜  Visualizza cronologia scansioni"
+STR_IT[fx_op_complete]="OPERAZIONE COMPLETATA"
+STR_IT[fx_op_radar]="RADAR PERIMETRALE"
+STR_IT[fx_op_scan]="OPERAZIONE"
+STR_IT[lbl_author]="Autore"
+STR_IT[lbl_date]="Data"
+STR_IT[lbl_hijri]="Egira"
+STR_IT[lbl_operator]="Operatore"
+STR_IT[lbl_platform]="Piattaforma"
+STR_IT[lbl_siem]="SIEM"
+STR_IT[lbl_status]="GRIGLIA DI DIFESA ONLINE"
+STR_IT[lbl_tagline]="Toolkit Bash per audit rapido e risposta agli incidenti"
+STR_IT[lbl_updated]="Aggiornato"
+STR_IT[menu_choice_range]="Scelta [0-13]: "
+STR_IT[menu_exit]="🚪  Esci da RAQIB"
 STR_IT[cat2]="📋  Analisi dei Log"
 STR_IT[cat3]="🚨  Rilevamento Intrusioni e Minacce"
 STR_IT[cat4]="🦠  Analisi File Sospetti"

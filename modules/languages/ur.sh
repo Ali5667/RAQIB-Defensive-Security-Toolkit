@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: اردو (Urdu) [ur]
-#  Total Keys: 692
+#  Total Keys: 712
 # ============================================================================
 
 declare -g -A STR_UR 2>/dev/null || declare -A STR_UR 2>/dev/null || true
@@ -60,6 +60,26 @@ STR_UR[c_summary_title]="ایگزیکٹو خلاصہ"
 STR_UR[c_updated]="اپ ڈیٹ ہو گیا۔"
 STR_UR[c_value_must_be_number]="قدر ایک نمبر ہونی چاہیے۔"
 STR_UR[cat1]="🛰️  نیٹ ورک مانیٹرنگ"
+STR_UR[cat10]="🌐  زبان تبدیل کریں"
+STR_UR[cat11]="⚠️  معلوم حدود"
+STR_UR[cat12]="🔄  اپ ڈیٹس چیک کریں"
+STR_UR[cat13]="⏰  لائیو ڈیفنس کلاک اور ٹیلی میٹری"
+STR_UR[cat8]="🏴  CTF / وارگیمز موڈ"
+STR_UR[cat9]="📜  اسکین ہسٹری دیکھیں"
+STR_UR[fx_op_complete]="آپریشن مکمل"
+STR_UR[fx_op_radar]="پیری میٹر ریڈار"
+STR_UR[fx_op_scan]="آپریشن"
+STR_UR[lbl_author]="مصنف"
+STR_UR[lbl_date]="تاریخ"
+STR_UR[lbl_hijri]="ہجری"
+STR_UR[lbl_operator]="آپریٹر"
+STR_UR[lbl_platform]="پلیٹ فارم"
+STR_UR[lbl_siem]="SIEM"
+STR_UR[lbl_status]="ڈیفنس گرڈ آن لائن"
+STR_UR[lbl_tagline]="تیز آڈٹ اور واقعہ جوابی کارروائی کے لیے Bash ٹول کٹ"
+STR_UR[lbl_updated]="اپ ڈیٹ شدہ"
+STR_UR[menu_choice_range]="انتخاب [0-13]: "
+STR_UR[menu_exit]="🚪  RAQIB سے باہر نکلیں"
 STR_UR[cat2]="📋  لاگ تجزیہ"
 STR_UR[cat3]="🚨  دخل اندازی اور خطرات کی نشاندہی"
 STR_UR[cat4]="🦠  مشتبہ فائل تجزیہ"

@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: English (English) [en]
-#  Total Keys: 692
+#  Total Keys: 712
 # ============================================================================
 
 declare -g -A STR_EN 2>/dev/null || declare -A STR_EN 2>/dev/null || true
@@ -60,6 +60,26 @@ STR_EN[c_summary_title]="Executive Summary"
 STR_EN[c_updated]="Updated."
 STR_EN[c_value_must_be_number]="The value must be a number."
 STR_EN[cat1]="🛰️  Network Monitoring"
+STR_EN[cat10]="🌐  Change Language"
+STR_EN[cat11]="⚠️  Known Limitations"
+STR_EN[cat12]="🔄  Check for Updates"
+STR_EN[cat13]="⏰  Live Defense Clock & Telemetry"
+STR_EN[cat8]="🏴  CTF / Wargames Mode"
+STR_EN[cat9]="📜  View Scan History"
+STR_EN[fx_op_complete]="OPERATION COMPLETE"
+STR_EN[fx_op_radar]="PERIMETER RADAR"
+STR_EN[fx_op_scan]="OPERATION"
+STR_EN[lbl_author]="Author"
+STR_EN[lbl_date]="Date"
+STR_EN[lbl_hijri]="Hijri"
+STR_EN[lbl_operator]="Operator"
+STR_EN[lbl_platform]="Platform"
+STR_EN[lbl_siem]="SIEM"
+STR_EN[lbl_status]="DEFENSE GRID ONLINE"
+STR_EN[lbl_tagline]="Rapid Audit & Quick Incident-response Bash-toolkit"
+STR_EN[lbl_updated]="Updated"
+STR_EN[menu_choice_range]="Choice [0-13]: "
+STR_EN[menu_exit]="🚪  Exit RAQIB"
 STR_EN[cat2]="📋  Log Analysis"
 STR_EN[cat3]="🚨  Intrusion & Threat Detection"
 STR_EN[cat4]="🦠  Suspicious File Analysis"

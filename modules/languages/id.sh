@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: Bahasa Indonesia (Indonesian) [id]
-#  Total Keys: 692
+#  Total Keys: 712
 # ============================================================================
 
 declare -g -A STR_ID 2>/dev/null || declare -A STR_ID 2>/dev/null || true
@@ -60,6 +60,26 @@ STR_ID[c_summary_title]="Ringkasan Eksekutif"
 STR_ID[c_updated]="Diperbarui."
 STR_ID[c_value_must_be_number]="Nilai harus berupa angka."
 STR_ID[cat1]="🛰️  Pemantauan Jaringan"
+STR_ID[cat10]="🌐  Ubah Bahasa"
+STR_ID[cat11]="⚠️  Batasan yang Diketahui"
+STR_ID[cat12]="🔄  Periksa Pembaruan"
+STR_ID[cat13]="⏰  Jam Pertahanan & Telemetri Langsung"
+STR_ID[cat8]="🏴  Mode CTF / Wargames"
+STR_ID[cat9]="📜  Lihat Riwayat Pemindaian"
+STR_ID[fx_op_complete]="OPERASI SELESAI"
+STR_ID[fx_op_radar]="RADAR PERIMETER"
+STR_ID[fx_op_scan]="OPERASI"
+STR_ID[lbl_author]="Penulis"
+STR_ID[lbl_date]="Tanggal"
+STR_ID[lbl_hijri]="Hijriah"
+STR_ID[lbl_operator]="Operator"
+STR_ID[lbl_platform]="Platform"
+STR_ID[lbl_siem]="SIEM"
+STR_ID[lbl_status]="GRID PERTAHANAN ONLINE"
+STR_ID[lbl_tagline]="Toolkit Bash untuk audit cepat dan respons insiden"
+STR_ID[lbl_updated]="Diperbarui"
+STR_ID[menu_choice_range]="Pilihan [0-13]: "
+STR_ID[menu_exit]="🚪  Keluar dari RAQIB"
 STR_ID[cat2]="📋  Analisis Log"
 STR_ID[cat3]="🚨  Deteksi Intrusi & Ancaman"
 STR_ID[cat4]="🦠  Analisis File Mencurigakan"

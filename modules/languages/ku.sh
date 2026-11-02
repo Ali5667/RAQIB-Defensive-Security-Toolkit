@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: کوردی (Kurdish) [ku]
-#  Total Keys: 692
+#  Total Keys: 712
 # ============================================================================
 
 declare -g -A STR_KU 2>/dev/null || declare -A STR_KU 2>/dev/null || true
@@ -60,6 +60,26 @@ STR_KU[c_summary_title]="کورتەی سەرەکی"
 STR_KU[c_updated]="نوێکرایەوە."
 STR_KU[c_value_must_be_number]="بەها دەبێت ژمارە بێت."
 STR_KU[cat1]="🛰️  چاودێریکردنی تۆڕ"
+STR_KU[cat10]="🌐  گۆڕینی زمان"
+STR_KU[cat11]="⚠️  سنوورە ناسراوەکان"
+STR_KU[cat12]="🔄  پشکنینی نوێکردنەوەکان"
+STR_KU[cat13]="⏰  کاتژمێری بەرگری و تێلەمەتری زیندوو"
+STR_KU[cat8]="🏴  دۆخی CTF / Wargames"
+STR_KU[cat9]="📜  مێژووی پشکنینەکان"
+STR_KU[fx_op_complete]="کردار تەواو بوو"
+STR_KU[fx_op_radar]="ڕاداری دەورووبەر"
+STR_KU[fx_op_scan]="کردار"
+STR_KU[lbl_author]="نووسەر"
+STR_KU[lbl_date]="بەروار"
+STR_KU[lbl_hijri]="کۆچی"
+STR_KU[lbl_operator]="کارپێکەر"
+STR_KU[lbl_platform]="پلاتفۆرم"
+STR_KU[lbl_siem]="SIEM"
+STR_KU[lbl_status]="تۆڕی بەرگری سەرهێڵە"
+STR_KU[lbl_tagline]="کیتێکی Bash بۆ پشکنینی خێرا و وەڵامدانەوەی ڕووداو"
+STR_KU[lbl_updated]="نوێکراوەتەوە"
+STR_KU[menu_choice_range]="هەڵبژاردە [0-13]: "
+STR_KU[menu_exit]="🚪  چوونەدەرەوە لە RAQIB"
 STR_KU[cat2]="📋  شیکاریکردنی تۆمار"
 STR_KU[cat3]="🚨  دۆزینەوەی هێرش و هەڕەشە"
 STR_KU[cat4]="🦠  شیکاریکردنی فایلی گومانلێکراو"

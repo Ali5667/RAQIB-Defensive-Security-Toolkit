@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: 한국어 (Korean) [ko]
-#  Total Keys: 692
+#  Total Keys: 712
 # ============================================================================
 
 declare -g -A STR_KO 2>/dev/null || declare -A STR_KO 2>/dev/null || true
@@ -60,6 +60,26 @@ STR_KO[c_summary_title]="요약"
 STR_KO[c_updated]="업데이트되었습니다."
 STR_KO[c_value_must_be_number]="값은 숫자여야 합니다."
 STR_KO[cat1]="🛰️  네트워크 모니터링"
+STR_KO[cat10]="🌐  언어 변경"
+STR_KO[cat11]="⚠️  알려진 제한"
+STR_KO[cat12]="🔄  업데이트 확인"
+STR_KO[cat13]="⏰  실시간 방어 시계 및 텔레메트리"
+STR_KO[cat8]="🏴  CTF / 워게임 모드"
+STR_KO[cat9]="📜  스캔 기록 보기"
+STR_KO[fx_op_complete]="작전 완료"
+STR_KO[fx_op_radar]="주변 레이더"
+STR_KO[fx_op_scan]="작전"
+STR_KO[lbl_author]="작성자"
+STR_KO[lbl_date]="날짜"
+STR_KO[lbl_hijri]="히즈리"
+STR_KO[lbl_operator]="운영자"
+STR_KO[lbl_platform]="플랫폼"
+STR_KO[lbl_siem]="SIEM"
+STR_KO[lbl_status]="방어 그리드 온라인"
+STR_KO[lbl_tagline]="신속한 감사와 사고 대응을 위한 Bash 툴킷"
+STR_KO[lbl_updated]="업데이트"
+STR_KO[menu_choice_range]="선택 [0-13]: "
+STR_KO[menu_exit]="🚪  RAQIB 종료"
 STR_KO[cat2]="📋  로그 분석"
 STR_KO[cat3]="🚨  침입 및 위협 탐지"
 STR_KO[cat4]="🦠  의심스러운 파일 분석"

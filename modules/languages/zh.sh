@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: 中文 (Chinese) [zh]
-#  Total Keys: 692
+#  Total Keys: 712
 # ============================================================================
 
 declare -g -A STR_ZH 2>/dev/null || declare -A STR_ZH 2>/dev/null || true
@@ -60,6 +60,26 @@ STR_ZH[c_summary_title]="执行摘要"
 STR_ZH[c_updated]="已更新。"
 STR_ZH[c_value_must_be_number]="值必须是数字。"
 STR_ZH[cat1]="🛰️  网络监控"
+STR_ZH[cat10]="🌐  切换语言"
+STR_ZH[cat11]="⚠️  已知限制"
+STR_ZH[cat12]="🔄  检查更新"
+STR_ZH[cat13]="⏰  实时防御时钟与遥测"
+STR_ZH[cat8]="🏴  CTF / 靶场模式"
+STR_ZH[cat9]="📜  查看扫描历史"
+STR_ZH[fx_op_complete]="操作完成"
+STR_ZH[fx_op_radar]="边界雷达"
+STR_ZH[fx_op_scan]="操作"
+STR_ZH[lbl_author]="作者"
+STR_ZH[lbl_date]="日期"
+STR_ZH[lbl_hijri]="回历"
+STR_ZH[lbl_operator]="操作员"
+STR_ZH[lbl_platform]="平台"
+STR_ZH[lbl_siem]="SIEM"
+STR_ZH[lbl_status]="防御网格在线"
+STR_ZH[lbl_tagline]="快速审计与事件响应 Bash 工具包"
+STR_ZH[lbl_updated]="更新时间"
+STR_ZH[menu_choice_range]="选择 [0-13]："
+STR_ZH[menu_exit]="🚪  退出 RAQIB"
 STR_ZH[cat2]="📋  日志分析"
 STR_ZH[cat3]="🚨  入侵与威胁检测"
 STR_ZH[cat4]="🦠  可疑文件分析"

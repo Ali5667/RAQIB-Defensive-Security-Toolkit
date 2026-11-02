@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: Nederlands (Dutch) [nl]
-#  Total Keys: 692
+#  Total Keys: 712
 # ============================================================================
 
 declare -g -A STR_NL 2>/dev/null || declare -A STR_NL 2>/dev/null || true
@@ -60,6 +60,26 @@ STR_NL[c_summary_title]="Managementsamenvatting"
 STR_NL[c_updated]="Bijgewerkt."
 STR_NL[c_value_must_be_number]="De waarde moet een getal zijn."
 STR_NL[cat1]="🛰️  Netwerkmonitoring"
+STR_NL[cat10]="🌐  Taal wijzigen"
+STR_NL[cat11]="⚠️  Bekende beperkingen"
+STR_NL[cat12]="🔄  Controleren op updates"
+STR_NL[cat13]="⏰  Live verdedigingsklok en telemetrie"
+STR_NL[cat8]="🏴  CTF-/Wargames-modus"
+STR_NL[cat9]="📜  Scangeschiedenis bekijken"
+STR_NL[fx_op_complete]="OPERATIE VOLTOOID"
+STR_NL[fx_op_radar]="PERIMETER-RADAR"
+STR_NL[fx_op_scan]="OPERATIE"
+STR_NL[lbl_author]="Auteur"
+STR_NL[lbl_date]="Datum"
+STR_NL[lbl_hijri]="Hidjra"
+STR_NL[lbl_operator]="Operator"
+STR_NL[lbl_platform]="Platform"
+STR_NL[lbl_siem]="SIEM"
+STR_NL[lbl_status]="VERDEDIGINGSNETWERK ONLINE"
+STR_NL[lbl_tagline]="Bash-toolkit voor snelle audits en incidentrespons"
+STR_NL[lbl_updated]="Bijgewerkt"
+STR_NL[menu_choice_range]="Keuze [0-13]: "
+STR_NL[menu_exit]="🚪  RAQIB afsluiten"
 STR_NL[cat2]="📋  Logboekanalyse"
 STR_NL[cat3]="🚨  Indringing & Dreigingsdetectie"
 STR_NL[cat4]="🦠  Analyse van Verdachte Bestanden"

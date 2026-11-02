@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: 日本語 (Japanese) [ja]
-#  Total Keys: 692
+#  Total Keys: 712
 # ============================================================================
 
 declare -g -A STR_JA 2>/dev/null || declare -A STR_JA 2>/dev/null || true
@@ -60,6 +60,26 @@ STR_JA[c_summary_title]="エグゼクティブサマリー"
 STR_JA[c_updated]="更新されました。"
 STR_JA[c_value_must_be_number]="値は数字である必要があります。"
 STR_JA[cat1]="🛰️  ネットワーク監視"
+STR_JA[cat10]="🌐  言語を変更"
+STR_JA[cat11]="⚠️  既知の制限"
+STR_JA[cat12]="🔄  アップデートを確認"
+STR_JA[cat13]="⏰  ライブ防衛クロックとテレメトリ"
+STR_JA[cat8]="🏴  CTF / ウォーゲームモード"
+STR_JA[cat9]="📜  スキャン履歴を表示"
+STR_JA[fx_op_complete]="作戦完了"
+STR_JA[fx_op_radar]="外周レーダー"
+STR_JA[fx_op_scan]="作戦"
+STR_JA[lbl_author]="作者"
+STR_JA[lbl_date]="日付"
+STR_JA[lbl_hijri]="ヒジュラ暦"
+STR_JA[lbl_operator]="オペレーター"
+STR_JA[lbl_platform]="プラットフォーム"
+STR_JA[lbl_siem]="SIEM"
+STR_JA[lbl_status]="防衛グリッド オンライン"
+STR_JA[lbl_tagline]="迅速な監査とインシデント対応のための Bash ツールキット"
+STR_JA[lbl_updated]="更新日"
+STR_JA[menu_choice_range]="選択 [0-13]: "
+STR_JA[menu_exit]="🚪  RAQIB を終了"
 STR_JA[cat2]="📋  ログ分析"
 STR_JA[cat3]="🚨  侵入・脅威検知"
 STR_JA[cat4]="🦠  不審なファイル分析"

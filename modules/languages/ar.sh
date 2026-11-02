@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: العربية (Arabic) [ar]
-#  Total Keys: 692
+#  Total Keys: 712
 # ============================================================================
 
 declare -g -A STR_AR 2>/dev/null || declare -A STR_AR 2>/dev/null || true
@@ -60,6 +60,26 @@ STR_AR[c_summary_title]="الملخص التنفيذي"
 STR_AR[c_updated]="تم التحديث."
 STR_AR[c_value_must_be_number]="القيمة لازم تكون رقم."
 STR_AR[cat1]="🛰️  مراقبة الشبكة"
+STR_AR[cat10]="🌐  تغيير اللغة"
+STR_AR[cat11]="⚠️  حدود معروفة بالأداة"
+STR_AR[cat12]="🔄  التحقق من التحديثات"
+STR_AR[cat13]="⏰  الساعة الحية ورادار الوقت"
+STR_AR[cat8]="🏴  وضع التحديات (CTF / Wargames)"
+STR_AR[cat9]="📜  سجل الفحوصات الأخيرة"
+STR_AR[fx_op_complete]="اكتملت العملية"
+STR_AR[fx_op_radar]="رادار المحيط"
+STR_AR[fx_op_scan]="عملية"
+STR_AR[lbl_author]="المؤلف"
+STR_AR[lbl_date]="التاريخ"
+STR_AR[lbl_hijri]="الهجري"
+STR_AR[lbl_operator]="المشغّل"
+STR_AR[lbl_platform]="المنصة"
+STR_AR[lbl_siem]="SIEM"
+STR_AR[lbl_status]="شبكة الدفاع متصلة"
+STR_AR[lbl_tagline]="أداة سريعة للتدقيق والاستجابة للحوادث عبر Bash"
+STR_AR[lbl_updated]="آخر تحديث"
+STR_AR[menu_choice_range]="اختر [0-13]: "
+STR_AR[menu_exit]="🚪  خروج"
 STR_AR[cat2]="📋  تحليل السجلات"
 STR_AR[cat3]="🚨  كشف التسلل والتهديدات"
 STR_AR[cat4]="🦠  تحليل الملفات المشبوهة"

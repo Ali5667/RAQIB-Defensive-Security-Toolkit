@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: हिन्दी (Hindi) [hi]
-#  Total Keys: 692
+#  Total Keys: 712
 # ============================================================================
 
 declare -g -A STR_HI 2>/dev/null || declare -A STR_HI 2>/dev/null || true
@@ -60,6 +60,26 @@ STR_HI[c_summary_title]="   कार्यकारी सारांश (Exec
 STR_HI[c_updated]="अद्यतन किया गया (Updated)।"
 STR_HI[c_value_must_be_number]="मान एक संख्या होना चाहिए।"
 STR_HI[cat1]="🛰️  नेटवर्क मॉनिटरिंग"
+STR_HI[cat10]="🌐  भाषा बदलें"
+STR_HI[cat11]="⚠️  ज्ञात सीमाएँ"
+STR_HI[cat12]="🔄  अपडेट जाँचें"
+STR_HI[cat13]="⏰  लाइव डिफ़ेंस क्लॉक और टेलीमेट्री"
+STR_HI[cat8]="🏴  CTF / वॉरगेम्स मोड"
+STR_HI[cat9]="📜  स्कैन इतिहास देखें"
+STR_HI[fx_op_complete]="ऑपरेशन पूरा"
+STR_HI[fx_op_radar]="परिधि रडार"
+STR_HI[fx_op_scan]="ऑपरेशन"
+STR_HI[lbl_author]="लेखक"
+STR_HI[lbl_date]="तिथि"
+STR_HI[lbl_hijri]="हिजरी"
+STR_HI[lbl_operator]="ऑपरेटर"
+STR_HI[lbl_platform]="प्लेटफ़ॉर्म"
+STR_HI[lbl_siem]="SIEM"
+STR_HI[lbl_status]="डिफ़ेंस ग्रिड ऑनलाइन"
+STR_HI[lbl_tagline]="तेज़ ऑडिट और घटना प्रतिक्रिया के लिए Bash टूलकिट"
+STR_HI[lbl_updated]="अपडेट किया गया"
+STR_HI[menu_choice_range]="विकल्प [0-13]: "
+STR_HI[menu_exit]="🚪  RAQIB से बाहर निकलें"
 STR_HI[cat2]="📋  लॉग विश्लेषण (Log Analysis)"
 STR_HI[cat3]="🚨  घुसपैठ और खतरे का पता लगाना (Intrusion & Threat Detection)"
 STR_HI[cat4]="🦠  संदिग्ध फ़ाइल विश्लेषण"

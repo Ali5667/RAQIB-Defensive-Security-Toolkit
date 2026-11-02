@@ -56,7 +56,7 @@ The toolkit runs directly inside your terminal with an ASCII radar animation, au
 <div align="center">
   <img src="assets/raqib_menu.png" alt="RAQIB Interactive Main Menu" width="800"/>
   <br/>
-  <sub><i>Figure: RAQIB interactive terminal main menu showcasing 8 operational domains, CTF mode, and operator session.</i></sub>
+  <sub><i>Figure: RAQIB interactive terminal main menu showcasing 13 menu categories + exit, fully localized labels, and the new framed banner.</i></sub>
 </div>
 
 ### 🎨 Visual FX Modes
@@ -66,12 +66,12 @@ The toolkit runs directly inside your terminal with an ASCII radar animation, au
 <td width="50%" valign="top">
   <img src="assets/raqib_strong.png" alt="RAQIB strong FX mode" width="100%"/>
   <br/>
-  <sub><i><b>strong</b> — default on a real terminal: per-letter gradient wordmark, vertical sweep, radar status line, boot sequence. ~0.69 s per banner.</i></sub>
+  <sub><i><b>strong</b> — default on a real terminal: per-letter gradient wordmark, 50-column crown/base, vertical sweep, radar status line, boot sequence, and Matrix + perimeter-radar telemetry around each tool. ~0.71 s per banner.</i></sub>
 </td>
 <td width="50%" valign="top">
   <img src="assets/raqib_cinematic.png" alt="RAQIB cinematic FX mode" width="100%"/>
   <br/>
-  <sub><i><b>cinematic</b> — optional: Matrix rain, full six-row sweep, glitch boot, longer radar. ~1.27 s per banner.</i></sub>
+  <sub><i><b>cinematic</b> — optional: Matrix rain, full six-row sweep, glitch boot, longer radar. ~1.32 s per banner.</i></sub>
 </td>
 </tr>
 </table>
@@ -89,7 +89,7 @@ The toolkit runs directly inside your terminal with an ASCII radar animation, au
 <tr><td>🔐</td><td><b>AES-256-GCM encrypted reports</b><br>Every saved report can be encrypted with AES-256-GCM + Argon2id KDF (memory-hard, GPU-resistant) in one keystroke. Self-describing format: old reports (Scrypt) remain decryptable forever.</td></tr>
 <tr><td>🏴</td><td><b>Complete CTF / Wargames mode</b><br>23 purpose-built tools across Crypto, Stego, Forensics, Web, and Binary — from Vigenère cracking to ELF analysis to PCAP parsing. Flag Hunter + Writeup Logger included.</td></tr>
 <tr><td>👤</td><td><b>Operator identity + approval workflow</b><br>PBKDF2 hashed operator accounts. Two roles (analyst/senior). Every destructive action goes through a pending-approval queue reviewable by senior operators only.</td></tr>
-<tr><td>🌍</td><td><b>20 languages, 692 strings each (100% complete)</b><br>Modular per-language files (<code>modules/languages/</code>). Only the active language is loaded into memory on-demand, with automatic RAM cleanup upon switching — keeping RAQIB ultra-lightweight on Kali Linux and low-RAM environments.</td></tr>
+<tr><td>🌍</td><td><b>20 languages, 712 strings each (100% complete)</b><br>Modular per-language files (<code>modules/languages/</code>). Only the active language is loaded into memory on-demand, with automatic RAM cleanup upon switching — keeping RAQIB ultra-lightweight on Kali Linux and low-RAM environments.</td></tr>
 <tr><td>📈</td><td><b>Honest accuracy benchmark</b><br><code>tests/run_accuracy_eval.sh</code> imports the actual detection code and reports Precision/Recall/F1 against a manually-labeled adversarial corpus.</td></tr>
 </table>
 
@@ -121,7 +121,7 @@ raqib/
 │   │                                       • Universal cross-platform audio player (macOS/Linux/WSL/Windows)
 │   ├── lang.sh                          ← Modular lightweight dynamic i18n loader (loads active lang on-demand)
 │   ├── languages/                       ← 20 modular language files (ar, en, fr, es, de, tr, fa, ru, etc.)
-│   │                                       • 20 × 692 = 13,840 translation strings (100% complete)
+│   │                                       • 20 × 712 = 14,240 translation strings (100% complete)
 │   │                                       • Only active language loaded into RAM (keeps Kali OS & low-spec VMs ultra-light)
 │   │                                       • Dynamic memory cleanup (unsets old language arrays on language switch)
 │   ├── auto_translate.sh                ← Automated on-demand translation bridge
@@ -133,7 +133,8 @@ raqib/
 │   ├── eagle_logo.txt / eagle_logo_2.txt  ← ASCII art (radar-scan terminal banner)
 │   ├── eagle_cry_real.wav               ← Startup sound (afplay / pw-play / paplay / aplay / powershell)
 │   ├── raqib_demo.gif                   ← Animated terminal demo for documentation
-│   ├── raqib_menu.png                   ← Main menu screenshot
+│   ├── raqib_menu.png                   ← Main menu screenshot (English)
+│   ├── raqib_menu_ar.png                ← Main menu screenshot (Arabic)
 │   ├── raqib_strong.png                 ← Default FX mode (`RAQIB_FX=strong`)
 │   └── raqib_cinematic.png              ← Cinematic FX mode (`RAQIB_FX=cinematic`)
 │
@@ -201,18 +202,20 @@ The launcher auto-locates Git Bash (Git for Windows recommended), and scans nati
 
 ### Visual FX (optional)
 
-RAQIB ships a lightweight, dependency-free FX layer built around a custom **per-letter gradient wordmark** (cyan → blue → violet) flanked by data rails: a vertical scan sweep over the name, a radar status bar, a fast scanline on menu transitions, chunked tool lists, and a module-load flicker before each tool.
+RAQIB ships a lightweight, dependency-free FX layer built around a custom **per-letter gradient wordmark** (cyan → blue → violet) framed by a 50-column crown/base and data rails: a vertical scan sweep over the name, a radar status bar, a fast scanline on menu transitions, chunked tool lists, and a module-load flicker before each tool.
+
+Operations have their own telemetry: before a tool runs, RAQIB paints a Matrix data burst and a perimeter-radar sweep, then a localized `OPERATION · <tool>` launch line; when it finishes, a short radar lock reports the localized completion label, tool name, exit state and elapsed time.
 
 - **Levels**
-  - `RAQIB_FX=light` — subtle pulse only (lowest overhead)
-  - `RAQIB_FX=strong` — **default on a real terminal**: logo sweep + radar status + boot sequence
-  - `RAQIB_FX=cinematic` — full sweep, Matrix rain, glitch boot, longer radar
+  - `RAQIB_FX=light` — single-row burst + subtle pulse (lowest overhead)
+  - `RAQIB_FX=strong` — **default on a real terminal**: two-row Matrix burst, perimeter radar, logo sweep, radar status, boot sequence
+  - `RAQIB_FX=cinematic` — three-row burst ×3 frames, full six-row sweep, Matrix rain, glitch boot, longer radar
 - **Auto (default):** `strong` on a real interactive terminal; automatically off for pipes, redirects, `TERM=dumb`, and `NO_COLOR`.
 - **Disable:** `RAQIB_FX=off ./raqib.sh`
-- **Force strong (e.g. inside a wrapper):** `RAQIB_FX=on ./raqib.sh`
-- **Cinematic:** `RAQIB_FX=cinematic ./raqib.sh`
+- **Select a level (interactive terminal):** `RAQIB_FX=light|strong|cinematic ./raqib.sh`
+- **Force colors + effects over a pipe (demos, `less -R`):** `RAQIB_COLOR=always RAQIB_FX=strong ./raqib.sh`
 
-No animation slows down tests or captured output. Effects are batched into single beats (important on Git Bash, where each tiny `sleep` costs ~80 ms), and the banner caches its daily dates and clears the screen with a built-in escape sequence instead of spawning `clear`/`date`/`basename` on every redraw. On Git Bash, `strong` adds roughly 0.45 s per banner; `off` and `light` stay faster.
+All menu names, banner labels, taglines and operation labels follow the selected language (20/20). On a non-TTY, `NO_COLOR`, or `TERM=dumb`, RAQIB emits plain text: no ANSI, no cursor moves, no delays. Effects are batched into single beats (important on Git Bash, where each tiny `sleep` costs ~80 ms), and the banner caches its daily dates and uses built-in escapes instead of spawning `clear`/`date`/`basename` on every redraw. Warm Git Bash timings: `off` ~0.17 s, `light` ~0.35 s, `strong` ~0.71 s, `cinematic` ~1.32 s per banner.
 
 ### Requirements
 

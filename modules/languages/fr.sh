@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: Français (French) [fr]
-#  Total Keys: 692
+#  Total Keys: 712
 # ============================================================================
 
 declare -g -A STR_FR 2>/dev/null || declare -A STR_FR 2>/dev/null || true
@@ -60,6 +60,26 @@ STR_FR[c_summary_title]="Résumé exécutif"
 STR_FR[c_updated]="Mis à jour."
 STR_FR[c_value_must_be_number]="La valeur doit être un nombre."
 STR_FR[cat1]="🛰️  Surveillance réseau"
+STR_FR[cat10]="🌐  Changer de langue"
+STR_FR[cat11]="⚠️  Limites connues"
+STR_FR[cat12]="🔄  Vérifier les mises à jour"
+STR_FR[cat13]="⏰  Horloge de défense et télémétrie en direct"
+STR_FR[cat8]="🏴  Mode CTF / Wargames"
+STR_FR[cat9]="📜  Historique des analyses"
+STR_FR[fx_op_complete]="OPÉRATION TERMINÉE"
+STR_FR[fx_op_radar]="RADAR PÉRIMÉTRIQUE"
+STR_FR[fx_op_scan]="OPÉRATION"
+STR_FR[lbl_author]="Auteur"
+STR_FR[lbl_date]="Date"
+STR_FR[lbl_hijri]="Hégire"
+STR_FR[lbl_operator]="Opérateur"
+STR_FR[lbl_platform]="Plateforme"
+STR_FR[lbl_siem]="SIEM"
+STR_FR[lbl_status]="GRILLE DE DÉFENSE EN LIGNE"
+STR_FR[lbl_tagline]="Boîte à outils Bash d'audit rapide et de réponse aux incidents"
+STR_FR[lbl_updated]="Mise à jour"
+STR_FR[menu_choice_range]="Choix [0-13] : "
+STR_FR[menu_exit]="🚪  Quitter RAQIB"
 STR_FR[cat2]="📋  Analyse des journaux"
 STR_FR[cat3]="🚨  Détection d'intrusion et de menaces"
 STR_FR[cat4]="🦠  Analyse de fichiers suspects"

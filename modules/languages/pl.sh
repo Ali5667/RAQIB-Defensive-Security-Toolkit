@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: Polski (Polish) [pl]
-#  Total Keys: 692
+#  Total Keys: 712
 # ============================================================================
 
 declare -g -A STR_PL 2>/dev/null || declare -A STR_PL 2>/dev/null || true
@@ -60,6 +60,26 @@ STR_PL[c_summary_title]="Podsumowanie Wykonawcze"
 STR_PL[c_updated]="Zaktualizowano."
 STR_PL[c_value_must_be_number]="Wartość musi być liczbą."
 STR_PL[cat1]="🛰️  Monitorowanie Sieci"
+STR_PL[cat10]="🌐  Zmień język"
+STR_PL[cat11]="⚠️  Znane ograniczenia"
+STR_PL[cat12]="🔄  Sprawdź aktualizacje"
+STR_PL[cat13]="⏰  Zegar obrony i telemetria na żywo"
+STR_PL[cat8]="🏴  Tryb CTF / Wargames"
+STR_PL[cat9]="📜  Historia skanów"
+STR_PL[fx_op_complete]="OPERACJA ZAKOŃCZONA"
+STR_PL[fx_op_radar]="RADAR OBWODOWY"
+STR_PL[fx_op_scan]="OPERACJA"
+STR_PL[lbl_author]="Autor"
+STR_PL[lbl_date]="Data"
+STR_PL[lbl_hijri]="Hidżra"
+STR_PL[lbl_operator]="Operator"
+STR_PL[lbl_platform]="Platforma"
+STR_PL[lbl_siem]="SIEM"
+STR_PL[lbl_status]="SIATKA OBRONNA ONLINE"
+STR_PL[lbl_tagline]="Zestaw Bash do szybkiego audytu i reagowania na incydenty"
+STR_PL[lbl_updated]="Zaktualizowano"
+STR_PL[menu_choice_range]="Wybór [0-13]: "
+STR_PL[menu_exit]="🚪  Wyjdź z RAQIB"
 STR_PL[cat2]="📋  Analiza Logów"
 STR_PL[cat3]="🚨  Wykrywanie Włamań i Zagrożeń"
 STR_PL[cat4]="🦠  Analiza Podejrzanych Plików"

@@ -64,17 +64,22 @@ raqib_os_label() {
 }
 export -f raqib_os_label
 
-GREEN=$'\033[0;32m'
-CYAN=$'\033[0;36m'
-YELLOW=$'\033[1;33m'
-RED=$'\033[0;31m'
-ORANGE=$'\033[38;5;208m'
-CRIMSON=$'\033[1;31m'
-WHITE=$'\033[1;37m'
-GREY=$'\033[1;30m'
-BOLD=$'\033[1m'
-PURPLE=$'\033[38;5;141m'
-NC=$'\033[0m'
+if declare -F raqib_color_enabled >/dev/null 2>&1 && ! raqib_color_enabled; then
+    GREEN="" CYAN="" YELLOW="" RED="" ORANGE="" CRIMSON=""
+    WHITE="" GREY="" BOLD="" PURPLE="" NC=""
+else
+    GREEN=$'\033[0;32m'
+    CYAN=$'\033[0;36m'
+    YELLOW=$'\033[1;33m'
+    RED=$'\033[0;31m'
+    ORANGE=$'\033[38;5;208m'
+    CRIMSON=$'\033[1;31m'
+    WHITE=$'\033[1;37m'
+    GREY=$'\033[1;30m'
+    BOLD=$'\033[1m'
+    PURPLE=$'\033[38;5;141m'
+    NC=$'\033[0m'
+fi
 export GREEN CYAN YELLOW RED ORANGE CRIMSON WHITE GREY BOLD PURPLE NC
 
 type_line() {
@@ -346,6 +351,14 @@ EOF
     local cR=$'\033[1;36m' cA=$'\033[38;5;51m' cQ=$'\033[38;5;75m'
     local cI=$'\033[38;5;105m' cB=$'\033[38;5;141m'
     local railL=$'\033[38;5;30m' railR=$'\033[38;5;37m' railHot=$'\033[1;36m'
+    if declare -F raqib_color_enabled >/dev/null 2>&1 && ! raqib_color_enabled; then
+        # خرج معاد توجيهه/NO_COLOR: نفس الشعار بدون أي أكواد تحكم
+        local p
+        for p in 0 1 2 3 4 5; do
+            printf '  ░▒▓█  %s%s%s%s%s  █▓▒░\n' "${gR[$p]}" "${gA[$p]}" "${gQ[$p]}" "${gI[$p]}" "${gB[$p]}"
+        done
+        return 0
+    fi
     local i row
     for i in 0 1 2 3 4 5; do
         if [ "$highlight" = "$i" ]; then
@@ -359,6 +372,66 @@ EOF
     done
 }
 export -f raqib_print_logo
+
+# شرائط زخرفية جاهزة (بدون spawn ولا حلقات وقت العرض)
+_RAQIB_RULE11="▬▬▬▬▬▬▬▬▬▬▬"
+_RAQIB_RULE12="▬▬▬▬▬▬▬▬▬▬▬▬"
+_RAQIB_RULE24="────────────────────────"
+_RAQIB_RULE25="─────────────────────────"
+
+# تاج الشعار — إطار علوي بعرض 50 عموداً بالضبط، بتدرّج متماثل
+raqib_logo_crown() {
+    local utf8=0
+    case "${LC_ALL:-${LANG:-}}" in
+        *UTF-8*|*utf-8*|*utf8*|*UTF8*) utf8=1 ;;
+    esac
+    if [ "$utf8" -ne 1 ]; then
+        printf '  +------------------------------------------------+\n'
+        return 0
+    fi
+    local c1=$'\033[1;36m' c2=$'\033[38;5;75m' c3=$'\033[38;5;141m'
+    if declare -F raqib_color_enabled >/dev/null 2>&1 && ! raqib_color_enabled; then
+        c1="" c2="" c3=""
+    fi
+    printf '  %s◤%s%s%s%s%s%s%s%s%s%s◥%s\n' \
+        "$c1" "$_RAQIB_RULE11" "$c2" "$_RAQIB_RULE12" "$WHITE" "◈" \
+        "$c2" "$_RAQIB_RULE12" "$c3" "$_RAQIB_RULE12" "$NC"
+}
+export -f raqib_logo_crown
+
+# قاعدة الشعار — مرآة التاج، بنفس العرض
+raqib_logo_base() {
+    local utf8=0
+    case "${LC_ALL:-${LANG:-}}" in
+        *UTF-8*|*utf-8*|*utf8*|*UTF8*) utf8=1 ;;
+    esac
+    if [ "$utf8" -ne 1 ]; then
+        printf '  +------------------------------------------------+\n'
+        return 0
+    fi
+    local c1=$'\033[1;36m' c2=$'\033[38;5;75m' c3=$'\033[38;5;141m'
+    if declare -F raqib_color_enabled >/dev/null 2>&1 && ! raqib_color_enabled; then
+        c1="" c2="" c3=""
+    fi
+    printf '  %s◣%s%s%s%s%s%s%s%s%s%s◢%s\n' \
+        "$c3" "$_RAQIB_RULE11" "$c2" "$_RAQIB_RULE12" "$WHITE" "◈" \
+        "$c2" "$_RAQIB_RULE12" "$c1" "$_RAQIB_RULE12" "$NC"
+}
+export -f raqib_logo_base
+
+# فاصل رفيع بعرض 50 عموداً مع معيّن في الوسط
+raqib_logo_rule() {
+    local utf8=0
+    case "${LC_ALL:-${LANG:-}}" in
+        *UTF-8*|*utf-8*|*utf8*|*UTF8*) utf8=1 ;;
+    esac
+    if [ "$utf8" -ne 1 ]; then
+        printf '  %s--------------------------------------------------%s\n' "$GREY" "$NC"
+        return 0
+    fi
+    printf '  %s%s%s%s%s%s%s\n' "$GREY" "$_RAQIB_RULE24" "$CYAN" "◈" "$GREY" "$_RAQIB_RULE25" "$NC"
+}
+export -f raqib_logo_rule
 
 # يحرّك صف إضاءة فوق الشعار (مسح رأسي) حسب مستوى المؤثرات:
 # light: بدون حركة | strong: لقطتان | cinematic: مسح كامل.
@@ -394,24 +467,50 @@ export -f raqib_logo_animated
 
 # مستخدمة من show_eagle_intro (مرة وحدة بالبداية) ومن show_banner (كل رجعة للقائمة الرئيسية).
 print_banner_info() {
-    # الشعار يتحرك (خط مسح رأسي) حسب مستوى المؤثرات
+    # كاش عناوين البانر حسب اللغة — 9 استدعاءات مرة واحدة فقط لكل لغة
+    if [ "${_RAQIB_BANNER_LBL_LANG:-}" != "${LANG_CODE:-ar}" ]; then
+        _RAQIB_BANNER_LBL_LANG="${LANG_CODE:-ar}"
+        if declare -F t >/dev/null 2>&1; then
+            _RAQIB_L_PLATFORM="$(t lbl_platform)"
+            _RAQIB_L_DATE="$(t lbl_date)"
+            _RAQIB_L_HIJRI="$(t lbl_hijri)"
+            _RAQIB_L_SIEM="$(t lbl_siem)"
+            _RAQIB_L_OPERATOR="$(t lbl_operator)"
+            _RAQIB_L_AUTHOR="$(t lbl_author)"
+            _RAQIB_L_UPDATED="$(t lbl_updated)"
+            _RAQIB_L_TAGLINE="$(t lbl_tagline)"
+            _RAQIB_L_STATUS="$(t lbl_status)"
+        fi
+    fi
+    local lbl_platform="${_RAQIB_L_PLATFORM:-Platform}" lbl_date="${_RAQIB_L_DATE:-Date}"
+    local lbl_hijri="${_RAQIB_L_HIJRI:-Hijri}" lbl_siem="${_RAQIB_L_SIEM:-SIEM}"
+    local lbl_operator="${_RAQIB_L_OPERATOR:-Operator}" lbl_author="${_RAQIB_L_AUTHOR:-Author}"
+    local lbl_updated="${_RAQIB_L_UPDATED:-Updated}" lbl_tagline="${_RAQIB_L_TAGLINE:-Rapid Audit & Quick Incident-response Bash-toolkit}"
+    local lbl_status="${_RAQIB_L_STATUS:-DEFENSE GRID ONLINE}"
+
+    # التاج + الشعار (مسح رأسي) + القاعدة — إطار واحد متماسك
+    if declare -F raqib_logo_crown >/dev/null 2>&1; then
+        raqib_logo_crown
+    fi
     if declare -F raqib_logo_animated >/dev/null 2>&1; then
         raqib_logo_animated
     else
         raqib_print_logo
     fi
+    if declare -F raqib_logo_base >/dev/null 2>&1; then
+        raqib_logo_base
+    fi
     echo ""
     # زخارف سطر التوقيع: بديل ASCII إذا كانت الطرفية لا تدعم UTF-8
-    local tag_l="◢◤" tag_r="◥◣" tag_sep="·"
+    local tag_l="◢◤" tag_r="◥◣" tag_sep="·" dotsep="·" utf8=0
     case "${LC_ALL:-${LANG:-}}" in
-        *UTF-8*|*utf-8*|*utf8*|*UTF8*) ;;
-        *) tag_l="<<"; tag_r=">>"; tag_sep="|" ;;
+        *UTF-8*|*utf-8*|*utf8*|*UTF8*) utf8=1 ;;
+        *) tag_l="<<"; tag_r=">>"; tag_sep="|"; dotsep="|" ;;
     esac
     echo -e "   ${PURPLE}${tag_l}${NC}  ${ORANGE}رقيب${NC} ${GREY}${tag_sep}${NC} ${BOLD}${WHITE}RAQIB${NC} ${GREY}${tag_sep}${NC} ${CYAN}$(t subtitle)${NC}  ${PURPLE}${tag_r}${NC}  ${GREY}v${VERSION}${NC}"
-    echo -e "      ${GREY}Rapid Audit & Quick Incident-response Bash-toolkit${NC}"
-    echo -e "  ${GREY}────────────────────────────────────────────────────────────────${NC}"
+    echo -e "      ${GREY}${lbl_tagline}${NC}"
 
-    local cur_time greg_dt hijri_dt created_fmt updated_fmt
+    local cur_time greg_dt hijri_dt updated_fmt
     # الوقت/التاريخ عبر printf المدمج في Bash 4.2+ (بدون spawn لأمر date).
     # على macOS (Bash 3.2) نرتد إلى date مرة واحدة فقط.
     local _now _today
@@ -429,17 +528,14 @@ print_banner_info() {
     if [ "${_RAQIB_BANNER_DATE_KEY:-}" = "$_date_key" ]; then
         greg_dt="${_RAQIB_BANNER_GREG:-}"
         hijri_dt="${_RAQIB_BANNER_HIJRI:-}"
-        created_fmt="${_RAQIB_BANNER_CREATED:-}"
         updated_fmt="${_RAQIB_BANNER_UPDATED:-}"
     else
         greg_dt="$(raqib_gregorian_date "${LANG_CODE:-ar}")"
         hijri_dt="$(raqib_hijri_date "${LANG_CODE:-ar}" 2>/dev/null || echo '—')"
-        created_fmt="$(raqib_gregorian_date "${LANG_CODE:-ar}" "${CREATED_DATE:-2026-09-01}")"
         updated_fmt="$(raqib_gregorian_date "${LANG_CODE:-ar}" "${LAST_UPDATED:-2026-10-14}")"
         _RAQIB_BANNER_DATE_KEY="$_date_key"
         _RAQIB_BANNER_GREG="$greg_dt"
         _RAQIB_BANNER_HIJRI="$hijri_dt"
-        _RAQIB_BANNER_CREATED="$created_fmt"
         _RAQIB_BANNER_UPDATED="$updated_fmt"
     fi
 
@@ -448,9 +544,11 @@ print_banner_info() {
     # بدون tr خارجي — أول حرف يبقى كما هو (القيمة الافتراضية Senior أصلاً)
     op_role="${op_role:0:1}${op_role:1}"
     local siem_file="${RAQIB_EVENTS_FILE:-.raqib_events.jsonl}"
-    local siem_state="Standby" siem_events=0
+    local siem_dot="○" siem_color="$GREY" siem_events=0
+    [ "$utf8" -ne 1 ] && siem_dot="o"
     if [ -s "$siem_file" ]; then
-        siem_state="Active"
+        if [ "$utf8" -eq 1 ]; then siem_dot="●"; else siem_dot="*"; fi
+        siem_color="$GREEN"
         siem_events="$(wc -l < "$siem_file" 2>/dev/null)"
         siem_events="${siem_events// /}"
         [ -z "$siem_events" ] && siem_events=0
@@ -458,18 +556,22 @@ print_banner_info() {
     local os_label
     os_label="$(raqib_os_label 2>/dev/null || echo "${RAQIB_OS:-Linux}")"
 
-    printf "  ${YELLOW}%-9s${NC}: %s  ${GREY}|${NC}  ${WHITE}%s${NC}\n" "Platform" "$os_label" "$cur_time"
-    printf "  ${YELLOW}%-9s${NC}: %s\n" "Date" "$greg_dt"
-    printf "  ${YELLOW}%-9s${NC}: %s\n" "Hijri" "$hijri_dt"
-    printf "  ${YELLOW}%-9s${NC}: %s · %s events  (%s)\n" "SIEM" "$siem_state" "$siem_events" "${siem_file##*/}"
-    printf "  ${YELLOW}%-9s${NC}: %s ${GREY}(%s)${NC}\n" "Operator" "$op_name" "$op_role"
-    printf "  ${YELLOW}%-9s${NC}: %s\n" "Author" "Ali Alnuaimi (@Ali5667) · github.com/Ali5667 · x.com/ali_cys45"
-    printf "  ${YELLOW}%-9s${NC}: ${GREEN}v${VERSION}${NC} · %s ${GREY}(created %s)${NC}\n" "Updated" "$updated_fmt" "$created_fmt"
-    echo -e "  ${GREY}────────────────────────────────────────────────────────────────${NC}"
-    if declare -F fx_status_line >/dev/null 2>&1; then
-        fx_status_line "DEFENSE GRID ONLINE · ${os_label} · v${VERSION}"
+    printf "  ${YELLOW}%s${NC}: %s  ${GREY}|${NC}  ${WHITE}%s${NC}\n" "$lbl_platform" "$os_label" "$cur_time"
+    printf "  ${YELLOW}%s${NC}: %s\n" "$lbl_date" "$greg_dt"
+    printf "  ${YELLOW}%s${NC}: %s\n" "$lbl_hijri" "$hijri_dt"
+    printf "  ${YELLOW}%s${NC}: %s%s%s %s ${dotsep} %s\n" "$lbl_siem" "$siem_color" "$siem_dot" "$NC" "$siem_events" "${siem_file##*/}"
+    printf "  ${YELLOW}%s${NC}: %s ${GREY}(%s)${NC}\n" "$lbl_operator" "$op_name" "$op_role"
+    printf "  ${YELLOW}%s${NC}: %s\n" "$lbl_author" "Ali Alnuaimi (@Ali5667) ${dotsep} github.com/Ali5667 ${dotsep} x.com/ali_cys45"
+    printf "  ${YELLOW}%s${NC}: ${GREEN}v${VERSION}${NC} ${dotsep} %s\n" "$lbl_updated" "$updated_fmt"
+    if declare -F raqib_logo_rule >/dev/null 2>&1; then
+        raqib_logo_rule
     else
-        echo -e "  ${GREEN}●${NC} ${GREY}DEFENSE GRID ONLINE${NC}"
+        echo -e "  ${GREY}──────────────────────────────────────────────────${NC}"
+    fi
+    if declare -F fx_status_line >/dev/null 2>&1; then
+        fx_status_line "${lbl_status} ${dotsep} ${os_label} ${dotsep} v${VERSION}"
+    else
+        echo -e "  ${GREEN}●${NC} ${GREY}${lbl_status}${NC}"
     fi
     echo ""
 }
@@ -479,7 +581,7 @@ show_banner() {
     raqib_clear
     # خط مسح سريع فوق البنر — حركة بصرية خفيفة بكل انتقال بين القوائم
     if declare -F fx_scanline >/dev/null 2>&1; then
-        fx_scanline 44
+        fx_scanline 50
     fi
     print_banner_info
 }
@@ -692,49 +794,61 @@ export -f check_for_updates
 main_menu() {
     while true; do
         show_banner
-        printf '%s\n\n' "${BOLD}Choose a defensive category / اختر الفئة الأمنية للدفاع:${NC}" | fx_reveal_lines 0.05
-        if [ "${LANG_CODE:-ar}" = "ar" ]; then
-            {
-            echo -e "  ${CYAN} 1)${NC} 🛰️  مراقبة الشبكة                     ${CYAN}(12 tools - PortScan, ARP, SIEM, Collector)${NC}"
-            echo -e "  ${CYAN} 2)${NC} 📋  تحليل السجلات                     ${CYAN}(5 tools  - SSH Brute, Keyword, Timeline, Web)${NC}"
-            echo -e "  ${CYAN} 3)${NC} 🚨  كشف التسلل والتهديدات             ${CYAN}(6 tools  - FIM, Cron Auditor, IP Blocker)${NC}"
-            echo -e "  ${CYAN} 4)${NC} 🦠  تحليل الملفات المشبوهة            ${CYAN}(13 tools - YARA-Lite, Threat Intel, Rootkit)${NC}"
-            echo -e "  ${CYAN} 5)${NC} 🔍  الطب الشرعي الرقمي                ${CYAN}(7 tools  - Email Header, Advanced, Sudo, History)${NC}"
-            echo -e "  ${CYAN} 6)${NC} 🛡️  تقوية الأنظمة                     ${CYAN}(9 tools  - Permissions, SSH, Windows Defense)${NC}"
-            echo -e "  ${CYAN} 7)${NC} 🎯  فحص الثغرات والصلاحيات            ${CYAN}(6 tools  - Port CVEs, Outdated Pkgs, Secrets)${NC}"
-            echo -e "  ${CYAN} 8)${NC} 🏴  وضع التحديات (CTF / Wargames)     ${PURPLE}(23 tools - Crypto, Stego, Forensics, Web, Binary)${NC}"
-            echo -e "  ${CYAN} 9)${NC} 📜  سجل الفحوصات الأخيرة              ${GREY}(Last 10 generated audit reports)${NC}"
-            echo -e "  ${CYAN}10)${NC} 🌐  تغيير اللغة                       ${GREY}(20 fully supported languages)${NC}"
-            echo -e "  ${CYAN}11)${NC} ⚠️  حدود معروفة بالأداة               ${GREY}(Transparency & technical boundaries)${NC}"
-            echo -e "  ${CYAN}12)${NC} 🔄  التحقق من التحديثات               ${GREY}(Passive GitHub release check)${NC}"
-            echo -e "  ${CYAN}13)${NC} ⏰  الساعة الحية ورادار الوقت            ${GREEN}(Live Digital Clock, Dates & Uptime)${NC}"
-            echo -e "  ${RED} 0)${NC} 🚪  خروج                              ${RED}(Clean session shutdown)${NC}"
-            } | fx_reveal_lines 0.05 7
-        else
-            {
-            echo -e "  ${CYAN} 1)${NC} 🛰️  Network Monitoring               ${CYAN}(12 tools - PortScan, ARP, SIEM, Collector)${NC}"
-            echo -e "  ${CYAN} 2)${NC} 📋  Log Analysis                      ${CYAN}(5 tools  - SSH Brute, Keyword, Timeline, Web)${NC}"
-            echo -e "  ${CYAN} 3)${NC} 🚨  Intrusion & Threat Detection      ${CYAN}(6 tools  - FIM, Cron Auditor, IP Blocker)${NC}"
-            echo -e "  ${CYAN} 4)${NC} 🦠  Suspicious File Analysis          ${CYAN}(13 tools - YARA-Lite, Threat Intel, Rootkit)${NC}"
-            echo -e "  ${CYAN} 5)${NC} 🔍  Digital Forensics                 ${CYAN}(7 tools  - Email Header, Advanced, Sudo, History)${NC}"
-            echo -e "  ${CYAN} 6)${NC} 🛡️  System Hardening                  ${CYAN}(9 tools  - Permissions, SSH, Windows Defense)${NC}"
-            echo -e "  ${CYAN} 7)${NC} 🎯  Vulnerability & Permission Scan   ${CYAN}(6 tools  - Port CVEs, Outdated Pkgs, Secrets)${NC}"
-            echo -e "  ${CYAN} 8)${NC} 🏴  CTF / Wargames Mode               ${PURPLE}(23 tools - Crypto, Stego, Forensics, Web, Binary)${NC}"
-            echo -e "  ${CYAN} 9)${NC} 📜  View Scan History                 ${GREY}(Last 10 generated audit reports)${NC}"
-            echo -e "  ${CYAN}10)${NC} 🌐  Change Language                   ${GREY}(20 fully supported languages)${NC}"
-            echo -e "  ${CYAN}11)${NC} ⚠️  Known Limitations                 ${GREY}(Transparency & technical boundaries)${NC}"
-            echo -e "  ${CYAN}12)${NC} 🔄  Check for Updates                 ${GREY}(Passive GitHub release check)${NC}"
-            echo -e "  ${CYAN}13)${NC} ⏰  Live Defense Clock & Telemetry        ${GREEN}(Live Digital Clock, Dates & Uptime)${NC}"
-            echo -e "  ${RED} 0)${NC} 🚪  Exit RAQIB                        ${RED}(Clean session shutdown)${NC}"
-            } | fx_reveal_lines 0.05 7
+        # أسماء الفئات تتبع اللغة المختارة — تُحمّل مرة واحدة لكل لغة
+        if [ "${_RAQIB_MAINMENU_LANG:-}" != "${LANG_CODE:-ar}" ]; then
+            _RAQIB_MAINMENU_LANG="${LANG_CODE:-ar}"
+            _RAQIB_MM_NAMES=(
+                "$(t cat1)" "$(t cat2)" "$(t cat3)" "$(t cat4)"
+                "$(t cat5)" "$(t cat6)" "$(t cat7)" "$(t cat8)"
+                "$(t cat9)" "$(t cat10)" "$(t cat11)" "$(t cat12)"
+                "$(t cat13)" "$(t menu_exit)"
+            )
+            _RAQIB_MM_PROMPT="$(t menu_prompt)"
+            _RAQIB_MM_CHOICE="$(t menu_choice_range)"
         fi
+        _RAQIB_MM_DESC=(
+            "12 tools · PortScan, ARP, SIEM, Collector"
+            "5 tools · SSH Brute, Keyword, Timeline, Web"
+            "6 tools · FIM, Cron Auditor, IP Blocker"
+            "13 tools · YARA-Lite, Threat Intel, Rootkit"
+            "7 tools · Email Header, Advanced, Sudo, History"
+            "9 tools · Permissions, SSH, Windows Defense"
+            "6 tools · Port CVEs, Outdated Pkgs, Secrets"
+            "23 tools · Crypto, Stego, Forensics, Web, Binary"
+            "Last 10 generated audit reports"
+            "20 fully supported languages"
+            "Transparency & technical boundaries"
+            "Passive GitHub release check"
+            "Live Digital Clock, Dates & Uptime"
+            "Clean session shutdown"
+        )
+        local sep="┃"
+        case "${LC_ALL:-${LANG:-}}" in
+            *UTF-8*|*utf-8*|*utf8*|*UTF8*) ;;
+            *) sep="|" ;;
+        esac
+        printf '%s\n\n' "${BOLD}${_RAQIB_MM_PROMPT}${NC}" | fx_reveal_lines 0.05
+        {
+            local _i num color name_color desc_color
+            for _i in 0 1 2 3 4 5 6 7 8 9 10 11 12 13; do
+                num=$((_i + 1))
+                [ "$_i" -eq 13 ] && num=0
+                color="$CYAN"; name_color="$WHITE"; desc_color="$GREY"
+                [ "$_i" -eq 7 ] && color="$PURPLE"
+                [ "$_i" -eq 12 ] && color="$GREEN"
+                if [ "$_i" -eq 13 ]; then
+                    color="$RED"; name_color="$RED"; desc_color="$RED"
+                fi
+                printf '  %s%2s)%s %s%s%s  %s%s%s %s%s%s\n' \
+                    "$color" "$num" "$NC" \
+                    "$BOLD$name_color" "${_RAQIB_MM_NAMES[$_i]}" "$NC" \
+                    "$GREY" "$sep" "$NC" \
+                    "$desc_color" "${_RAQIB_MM_DESC[$_i]}" "$NC"
+            done
+        } | fx_reveal_lines 0.05 7
         echo ""
         local choice
-        if [ "${LANG_CODE:-ar}" = "ar" ]; then
-            read -rp "  ${BOLD}${YELLOW}اختر [0-13]: ${NC}" choice
-        else
-            read -rp "  ${BOLD}${YELLOW}Choice [0-13]: ${NC}" choice
-        fi
+        read -rp "  ${BOLD}${YELLOW}${_RAQIB_MM_CHOICE}${NC}" choice
         case "$choice" in
             1) menu_monitoring ;;
             2) menu_logs ;;

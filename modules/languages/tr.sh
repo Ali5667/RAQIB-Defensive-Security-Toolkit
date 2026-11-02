@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: Türkçe (Turkish) [tr]
-#  Total Keys: 692
+#  Total Keys: 712
 # ============================================================================
 
 declare -g -A STR_TR 2>/dev/null || declare -A STR_TR 2>/dev/null || true
@@ -60,6 +60,26 @@ STR_TR[c_summary_title]="Yönetici Özeti"
 STR_TR[c_updated]="Güncellendi."
 STR_TR[c_value_must_be_number]="Değer bir sayı olmalıdır."
 STR_TR[cat1]="🛰️  Ağ İzleme"
+STR_TR[cat10]="🌐  Dili Değiştir"
+STR_TR[cat11]="⚠️  Bilinen Sınırlamalar"
+STR_TR[cat12]="🔄  Güncellemeleri Kontrol Et"
+STR_TR[cat13]="⏰  Canlı Savunma Saati ve Telemetri"
+STR_TR[cat8]="🏴  CTF / Wargame Modu"
+STR_TR[cat9]="📜  Tarama Geçmişini Görüntüle"
+STR_TR[fx_op_complete]="İŞLEM TAMAMLANDI"
+STR_TR[fx_op_radar]="ÇEVRE RADARI"
+STR_TR[fx_op_scan]="İŞLEM"
+STR_TR[lbl_author]="Yazar"
+STR_TR[lbl_date]="Tarih"
+STR_TR[lbl_hijri]="Hicri"
+STR_TR[lbl_operator]="Operatör"
+STR_TR[lbl_platform]="Platform"
+STR_TR[lbl_siem]="SIEM"
+STR_TR[lbl_status]="SAVUNMA AĞI ÇEVRİMİÇİ"
+STR_TR[lbl_tagline]="Hızlı denetim ve olay müdahalesi için Bash araç seti"
+STR_TR[lbl_updated]="Güncellendi"
+STR_TR[menu_choice_range]="Seçim [0-13]: "
+STR_TR[menu_exit]="🚪  RAQIB'ten Çık"
 STR_TR[cat2]="📋  Günlük Analizi"
 STR_TR[cat3]="🚨  Saldırı ve Tehdit Tespiti"
 STR_TR[cat4]="🦠  Şüpheli Dosya Analizi"

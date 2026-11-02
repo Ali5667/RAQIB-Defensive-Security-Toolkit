@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: Українська (Ukrainian) [uk]
-#  Total Keys: 692
+#  Total Keys: 712
 # ============================================================================
 
 declare -g -A STR_UK 2>/dev/null || declare -A STR_UK 2>/dev/null || true
@@ -60,6 +60,26 @@ STR_UK[c_summary_title]="Стислий огляд"
 STR_UK[c_updated]="Оновлено."
 STR_UK[c_value_must_be_number]="Значення має бути числом."
 STR_UK[cat1]="🛰️  Моніторинг мережі"
+STR_UK[cat10]="🌐  Змінити мову"
+STR_UK[cat11]="⚠️  Відомі обмеження"
+STR_UK[cat12]="🔄  Перевірити оновлення"
+STR_UK[cat13]="⏰  Живий годинник захисту та телеметрія"
+STR_UK[cat8]="🏴  Режим CTF / Wargames"
+STR_UK[cat9]="📜  Історія сканувань"
+STR_UK[fx_op_complete]="ОПЕРАЦІЮ ЗАВЕРШЕНО"
+STR_UK[fx_op_radar]="ПЕРИМЕТРАЛЬНИЙ РАДАР"
+STR_UK[fx_op_scan]="ОПЕРАЦІЯ"
+STR_UK[lbl_author]="Автор"
+STR_UK[lbl_date]="Дата"
+STR_UK[lbl_hijri]="Хіджра"
+STR_UK[lbl_operator]="Оператор"
+STR_UK[lbl_platform]="Платформа"
+STR_UK[lbl_siem]="SIEM"
+STR_UK[lbl_status]="ЗАХИСНА СІТКА ОНЛАЙН"
+STR_UK[lbl_tagline]="Bash-набір для швидкого аудиту та реагування на інциденти"
+STR_UK[lbl_updated]="Оновлено"
+STR_UK[menu_choice_range]="Вибір [0-13]: "
+STR_UK[menu_exit]="🚪  Вийти з RAQIB"
 STR_UK[cat2]="📋  Аналіз журналів"
 STR_UK[cat3]="🚨  Виявлення вторгнень і загроз"
 STR_UK[cat4]="🦠  Аналіз підозрілих файлів"

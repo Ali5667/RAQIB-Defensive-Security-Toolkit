@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: فارسی (Persian) [fa]
-#  Total Keys: 692
+#  Total Keys: 712
 # ============================================================================
 
 declare -g -A STR_FA 2>/dev/null || declare -A STR_FA 2>/dev/null || true
@@ -60,6 +60,26 @@ STR_FA[c_summary_title]="خلاصه اجرایی"
 STR_FA[c_updated]="به‌روزرسانی شد."
 STR_FA[c_value_must_be_number]="مقدار باید عدد باشد."
 STR_FA[cat1]="🛰️  پایش شبکه"
+STR_FA[cat10]="🌐  تغییر زبان"
+STR_FA[cat11]="⚠️  محدودیت‌های شناخته‌شده"
+STR_FA[cat12]="🔄  بررسی به‌روزرسانی‌ها"
+STR_FA[cat13]="⏰  ساعت دفاعی و تله‌متری زنده"
+STR_FA[cat8]="🏴  حالت CTF / Wargames"
+STR_FA[cat9]="📜  تاریخچه اسکن‌ها"
+STR_FA[fx_op_complete]="عملیات کامل شد"
+STR_FA[fx_op_radar]="رادار پیرامونی"
+STR_FA[fx_op_scan]="عملیات"
+STR_FA[lbl_author]="نویسنده"
+STR_FA[lbl_date]="تاریخ"
+STR_FA[lbl_hijri]="هجری"
+STR_FA[lbl_operator]="اپراتور"
+STR_FA[lbl_platform]="پلتفرم"
+STR_FA[lbl_siem]="SIEM"
+STR_FA[lbl_status]="شبکه دفاعی آنلاین"
+STR_FA[lbl_tagline]="جعبه‌ابزار Bash برای ممیزی سریع و واکنش به حادثه"
+STR_FA[lbl_updated]="به‌روزرسانی"
+STR_FA[menu_choice_range]="انتخاب [0-13]: "
+STR_FA[menu_exit]="🚪  خروج از RAQIB"
 STR_FA[cat2]="📋  تحلیل لاگ"
 STR_FA[cat3]="🚨  تشخیص نفوذ و تهدید"
 STR_FA[cat4]="🦠  تحلیل فایل‌های مشکوک"

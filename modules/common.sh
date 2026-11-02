@@ -8,16 +8,46 @@
 #  يدوياً من قائمة "استخبارات التهديدات"، وهذي الدوال تتيح لأي أداة ثانية
 #  بالمشروع تستشير نفس القاعدة محلياً بدون إنترنت وقت الفحص.
 # =====================================================
-GREEN="${GREEN:-$'\033[0;32m'}"
-CYAN="${CYAN:-$'\033[0;36m'}"
-YELLOW="${YELLOW:-$'\033[1;33m'}"
-RED="${RED:-$'\033[0;31m'}"
-ORANGE="${ORANGE:-$'\033[38;5;208m'}"
-CRIMSON="${CRIMSON:-$'\033[1;31m'}"
-WHITE="${WHITE:-$'\033[1;37m'}"
-GREY="${GREY:-$'\033[1;30m'}"
-BOLD="${BOLD:-$'\033[1m'}"
-NC="${NC:-$'\033[0m'}"
+# بوابة الألوان: لا ANSI على الأنابيب/الملفات، ولا مع NO_COLOR أو TERM=dumb.
+# RAQIB_COLOR=always|never يفرض الحالة عند الحاجة (الافتراضي auto).
+# RAQIB_COLOR=always = فرض الألوان (والمؤثرات مع RAQIB_FX) حتى على الأنابيب.
+# مفيد للعروض أو تمرير الخرج إلى less -R؛ الافتراضي auto.
+raqib_visual_forced() {
+    case "${RAQIB_COLOR:-auto}" in
+        always|1|yes|true|on) return 0 ;;
+    esac
+    return 1
+}
+export -f raqib_visual_forced
+
+raqib_color_enabled() {
+    local mode="${RAQIB_COLOR:-auto}"
+    case "$mode" in
+        always|1|yes|true|on) return 0 ;;
+        never|0|no|false|off) return 1 ;;
+    esac
+    [ -n "${NO_COLOR:-}" ] && return 1
+    [ "${TERM:-}" = "dumb" ] && return 1
+    [ -t 1 ] || return 1
+    return 0
+}
+export -f raqib_color_enabled
+
+if raqib_color_enabled; then
+    GREEN="${GREEN:-$'\033[0;32m'}"
+    CYAN="${CYAN:-$'\033[0;36m'}"
+    YELLOW="${YELLOW:-$'\033[1;33m'}"
+    RED="${RED:-$'\033[0;31m'}"
+    ORANGE="${ORANGE:-$'\033[38;5;208m'}"
+    CRIMSON="${CRIMSON:-$'\033[1;31m'}"
+    WHITE="${WHITE:-$'\033[1;37m'}"
+    GREY="${GREY:-$'\033[1;30m'}"
+    BOLD="${BOLD:-$'\033[1m'}"
+    NC="${NC:-$'\033[0m'}"
+else
+    GREEN="" CYAN="" YELLOW="" RED="" ORANGE="" CRIMSON=""
+    WHITE="" GREY="" BOLD="" NC=""
+fi
 export GREEN CYAN YELLOW RED ORANGE CRIMSON WHITE GREY BOLD NC
 
 # =====================================================
@@ -35,17 +65,22 @@ raqib_fx_ok() {
         return
     fi
     local mode="${RAQIB_FX:-auto}"
-    case "$mode" in
-        off|0|no|false|none) _RAQIB_FX_OK=0 ;;
-        on|1|yes|true|full|light|strong|cinematic|max) _RAQIB_FX_OK=1 ;;
-        *)
-            if [ -n "${NO_COLOR:-}" ] || [ "${TERM:-}" = "dumb" ] || [ ! -t 1 ]; then
-                _RAQIB_FX_OK=0
-            else
-                _RAQIB_FX_OK=1
-            fi
-            ;;
-    esac
+    # البوابة الصلبة أولاً: أنبوب/إعادة توجيه، NO_COLOR، TERM=dumb = بلا مؤثرات
+    # حتى لو طلب المستخدم مستوى صريحاً — يبقى الخرج نظيفاً وسريعاً في السجلات.
+    # RAQIB_COLOR=always يفرض العرض البصري عمداً (عروض/أدوات pager).
+    if raqib_visual_forced; then
+        case "$mode" in
+            off|0|no|false|none) _RAQIB_FX_OK=0 ;;
+            *) _RAQIB_FX_OK=1 ;;
+        esac
+    elif [ -n "${NO_COLOR:-}" ] || [ "${TERM:-}" = "dumb" ] || [ ! -t 1 ]; then
+        _RAQIB_FX_OK=0
+    else
+        case "$mode" in
+            off|0|no|false|none) _RAQIB_FX_OK=0 ;;
+            *) _RAQIB_FX_OK=1 ;;
+        esac
+    fi
     export _RAQIB_FX_OK
     [ "$_RAQIB_FX_OK" = "1" ]
 }
@@ -58,19 +93,25 @@ raqib_fx_level_cache() {
     if [ "${_RAQIB_FX_LEVEL_MODE:-}" = "$mode" ] && [ -n "${_RAQIB_FX_LEVEL:-}" ]; then
         return 0
     fi
-    case "$mode" in
-        off|0|no|false|none) _RAQIB_FX_LEVEL="none" ;;
-        light) _RAQIB_FX_LEVEL="light" ;;
-        cinematic|max) _RAQIB_FX_LEVEL="cinematic" ;;
-        on|1|yes|true|full|strong) _RAQIB_FX_LEVEL="strong" ;;
-        *)
-            if raqib_fx_ok; then
-                _RAQIB_FX_LEVEL="strong"
-            else
-                _RAQIB_FX_LEVEL="none"
-            fi
-            ;;
-    esac
+    # البوابة الصلبة قبل أي مستوى صريح: أنبوب/إعادة توجيه، NO_COLOR، TERM=dumb
+    # (RAQIB_COLOR=always يفرض المستوى المطلوب عمداً)
+    if ! raqib_visual_forced && { [ -n "${NO_COLOR:-}" ] || [ "${TERM:-}" = "dumb" ] || [ ! -t 1 ]; }; then
+        _RAQIB_FX_LEVEL="none"
+    else
+        case "$mode" in
+            off|0|no|false|none) _RAQIB_FX_LEVEL="none" ;;
+            light) _RAQIB_FX_LEVEL="light" ;;
+            cinematic|max) _RAQIB_FX_LEVEL="cinematic" ;;
+            on|1|yes|true|full|strong) _RAQIB_FX_LEVEL="strong" ;;
+            *)
+                if raqib_fx_ok; then
+                    _RAQIB_FX_LEVEL="strong"
+                else
+                    _RAQIB_FX_LEVEL="none"
+                fi
+                ;;
+        esac
+    fi
     _RAQIB_FX_LEVEL_MODE="$mode"
     export _RAQIB_FX_LEVEL _RAQIB_FX_LEVEL_MODE
 }
@@ -99,7 +140,10 @@ raqib_fx_sleep() {
 export -f raqib_fx_sleep
 
 # مسح الشاشة بدون spawn لأمر clear الخارجي (أسرع بكثير على Git Bash)
+# لا يُرسل أي أكواد تحكم إلا على طرفية حقيقية — يبقى الخرج المعاد توجيهه نظيفاً.
 raqib_clear() {
+    [ -t 1 ] || return 0
+    [ "${TERM:-}" = "dumb" ] && return 0
     printf '\033[H\033[2J\033[3J'
 }
 export -f raqib_clear
@@ -140,25 +184,23 @@ fx_status_line() {
     fi
     # إطارات الرادار: كل إطار يوسّع الشريط المضيء تدريجياً
     local -a frames
-    if [ "$level" = "light" ]; then
-        frames=( "$ring" )
-    elif [ "$level" = "cinematic" ]; then
-        if [ "$utf8" -eq 1 ]; then
-            frames=( "◌ ▱▱▱▱▱▱▱" "◉ ▰▰▰▱▱▱▱" "◉ ▰▰▰▰▰▱▱" )
-        else
-            frames=( "o [----]" "O [###-]" "O [####]" )
-        fi
+    if [ "$utf8" -eq 1 ]; then
+        case "$level" in
+            light) frames=( "◌ ▱▱▱▱▱" ) ;;
+            cinematic) frames=( "◜ ▰▱▱▱▱▱" "◝ ▰▰▰▱▱▱" "◞ ▰▰▰▰▰▱" "◟ ▰▰▰▰▰▰" ) ;;
+            *) frames=( "◜ ▰▱▱▱▱" "◉ ▰▰▰▱▱" ) ;;
+        esac
     else
-        if [ "$utf8" -eq 1 ]; then
-            frames=( "◉ ▰▰▰▱▱" )
-        else
-            frames=( "O [###-]" )
-        fi
+        case "$level" in
+            light) frames=( "o [--]" ) ;;
+            cinematic) frames=( "o [-]" "O [##]" "O [###]" "O [####]" ) ;;
+            *) frames=( "o [--]" "O [###]" ) ;;
+        esac
     fi
     local f
     for f in "${frames[@]}"; do
         printf "\r\033[K  %s%s%s %s%s%s" "$CYAN" "$f" "$NC" "$GREY" "$label" "$NC"
-        raqib_fx_sleep 0.05
+        raqib_fx_sleep 0.045
     done
     printf "\r\033[K  %s%s%s %s%s%s\n" "$GREEN" "$dot" "$NC" "$GREY" "$label" "$NC"
 }
@@ -190,22 +232,72 @@ fx_tool_launch() {
 }
 export -f fx_tool_launch
 
-# خط مسح أفقي سريع — يظهر خافتاً ثم يضيء
+# خط مسح أفقي سريع — شعاع رادار يمشي على العرض ثم يستقر
 fx_scanline() {
     local level
     raqib_fx_level_cache 2>/dev/null || true
     level="${_RAQIB_FX_LEVEL:-none}"
     [ "$level" = "none" ] && return 0
-    local width="${1:-44}" i ch="━" line=""
-    raqib_fx_utf8 || ch="-"
-    for ((i = 0; i < width; i++)); do
-        line+="$ch"
+    local width="${1:-44}" ch="━" hot="◈"
+    raqib_fx_utf8 || { ch="-"; hot="+"; }
+    local -a spots
+    case "$level" in
+        light) spots=( $((width / 2)) ) ;;
+        cinematic) spots=( 2 $((width / 2)) $((width - 3)) ) ;;
+        *) spots=( $((width / 3)) $((width - 4)) ) ;;
+    esac
+    local pos left right
+    for pos in "${spots[@]}"; do
+        printf -v left '%*s' "$pos" ''
+        left="${left// /$ch}"
+        printf -v right '%*s' "$((width - pos - 1))" ''
+        right="${right// /$ch}"
+        printf "\r\033[K  %s%s%s%s%s%s%s" "$GREY" "$left" "$WHITE" "$hot" "$GREY" "$right" "$NC"
+        raqib_fx_sleep 0.04
     done
-    printf "  %s%s%s\n" "$GREY" "$line" "$NC"
-    raqib_fx_sleep 0.05
-    printf "\033[1A\r\033[K  %s%s%s\n" "$CYAN" "$line" "$NC"
+    printf -v left '%*s' $((width / 2)) ''
+    left="${left// /$ch}"
+    printf -v right '%*s' "$((width - width / 2 - 1))" ''
+    right="${right// /$ch}"
+    printf "\r\033[K  %s%s%s%s%s%s\n" "$GREY" "$left" "$CYAN" "$hot" "$GREY" "$right" "$NC"
 }
 export -f fx_scanline
+
+# مطر Matrix — light: صف واحد، strong: صفان، cinematic: أربعة صفوف.
+# كل صف يُرسم دفعة واحدة (بدون escape لكل حرف) ليبقى سريعاً على Git Bash.
+fx_matrix_burst() {
+    local rows="${1:-2}" width="${2:-54}"
+    local level
+    raqib_fx_level_cache 2>/dev/null || true
+    level="${_RAQIB_FX_LEVEL:-none}"
+    [ "$level" = "none" ] && return 0
+    local frames=1
+    case "$level" in
+        light) rows=1 ;;
+        strong) [ "$rows" -gt 2 ] && rows=2 ;;
+        cinematic) [ "$rows" -gt 4 ] && rows=4; frames=3 ;;
+    esac
+    local i j body r f
+    for ((f = 1; f <= frames; f++)); do
+        for ((i = 0; i < rows; i++)); do
+            body=""
+            for ((j = 0; j < width; j++)); do
+                r=$((RANDOM % 100))
+                if [ "$r" -lt 7 ]; then body+="█"
+                elif [ "$r" -lt 18 ]; then body+="▓"
+                elif [ "$r" -lt 31 ]; then body+="▒"
+                elif [ "$r" -lt 44 ]; then body+="░"
+                else body+=" "; fi
+            done
+            printf "  %s%s%s\n" "$GREEN" "$body" "$NC"
+        done
+        if [ "$f" -lt "$frames" ]; then
+            raqib_fx_sleep 0.045
+            printf "\033[%dA\r" "$rows"
+        fi
+    done
+}
+export -f fx_matrix_burst
 
 # مطر Matrix — cinematic فقط: وميض بيانات خفيف قبل البانر/الأنترو
 fx_matrix_rain() {
@@ -213,31 +305,49 @@ fx_matrix_rain() {
     raqib_fx_level_cache 2>/dev/null || true
     level="${_RAQIB_FX_LEVEL:-none}"
     [ "$level" = "cinematic" ] || return 0
-    local width="${1:-54}" rows="${2:-4}" frames=3
-    local f i j line
-    for ((f = 1; f <= frames; f++)); do
-        for ((i = 0; i < rows; i++)); do
-            line=""
-            for ((j = 0; j < width; j++)); do
-                if [ $((RANDOM % 11)) -lt 2 ]; then
-                    if [ $((RANDOM % 2)) -eq 0 ]; then
-                        line+="█"
-                    else
-                        line+="▓"
-                    fi
-                else
-                    line+=" "
-                fi
-            done
-            printf "  %s%s%s\n" "$GREEN" "$line" "$NC"
-        done
-        if [ "$f" -lt "$frames" ]; then
-            raqib_fx_sleep 0.05
-            printf "\033[%dA\r" "$rows"
-        fi
-    done
+    fx_matrix_burst "${2:-4}" "${1:-54}"
 }
 export -f fx_matrix_rain
+
+# رادار أفقي أثناء العمليات: مؤشر يدور وشريط يمتلئ ثم يقفل
+fx_radar_ping() {
+    local label="${1:-PERIMETER RADAR}"
+    local level
+    raqib_fx_level_cache 2>/dev/null || true
+    level="${_RAQIB_FX_LEVEL:-none}"
+    [ "$level" = "none" ] && return 0
+    local utf8=0
+    raqib_fx_utf8 && utf8=1
+    local -a spins bars
+    if [ "$utf8" -eq 1 ]; then
+        case "$level" in
+            light) spins=( "◐" ); bars=( "▰▰▰▰▱▱▱▱" ) ;;
+            cinematic) spins=( "◐" "◓" "◑" "◒" ); bars=( "▰▱▱▱▱▱▱▱" "▰▰▰▱▱▱▱▱" "▰▰▰▰▰▰▱▱" "▰▰▰▰▰▰▰▰" ) ;;
+            *) spins=( "◐" "◓" ); bars=( "▰▰▱▱▱▱▱▱" "▰▰▰▰▰▰▱▱" ) ;;
+        esac
+    else
+        case "$level" in
+            light) spins=( "o" ); bars=( "[####----]" ) ;;
+            cinematic) spins=( "o" "O" "o" "O" ); bars=( "[#-------]" "[###-----]" "[######--]" "[########]" ) ;;
+            *) spins=( "o" "O" ); bars=( "[##------]" "[######--]" ) ;;
+        esac
+    fi
+    local i
+    for ((i = 0; i < ${#bars[@]}; i++)); do
+        printf "\r\033[K  %s%s%s %s%s%s  %s%s%s  %s[SWEEP]%s" \
+            "$CYAN" "${spins[$i]}" "$NC" "$BOLD" "$label" "$NC" \
+            "$GREEN" "${bars[$i]}" "$NC" "$GREY" "$NC"
+        raqib_fx_sleep 0.045
+    done
+    if [ "$utf8" -eq 1 ]; then
+        printf "\r\033[K  %s◉%s %s%s%s  %s▰▰▰▰▰▰▰▰%s  %s[LOCK]%s\n" \
+            "$GREEN" "$NC" "$BOLD" "$label" "$NC" "$GREEN" "$NC" "$GREY" "$NC"
+    else
+        printf "\r\033[K  %s*%s %s%s%s  %s[########]%s  %s[LOCK]%s\n" \
+            "$GREEN" "$NC" "$BOLD" "$label" "$NC" "$GREEN" "$NC" "$GREY" "$NC"
+    fi
+}
+export -f fx_radar_ping
 
 # سطر Glitch قصير (نص ASCII) — يُستخدم في cinematic فقط غالباً
 fx_glitch_line() {
@@ -265,6 +375,60 @@ fx_glitch_line() {
     printf "\r\033[K  %s%s%s\n" "$BOLD$WHITE" "$text" "$NC"
 }
 export -f fx_glitch_line
+
+# ترويسة عملية: عنوان + مطر Matrix + رادار + سطر إطلاق الأداة.
+# تظهر قبل تنفيذ أي أداة (حسب المستوى) ولا تعطّل إدخال الأدوات التفاعلية.
+fx_ops_header() {
+    local name="$1"
+    local level
+    raqib_fx_level_cache 2>/dev/null || true
+    level="${_RAQIB_FX_LEVEL:-none}"
+    [ "$level" = "none" ] && return 0
+    local scan="OPERATION" radar="PERIMETER RADAR" v
+    if declare -F t >/dev/null 2>&1; then
+        v="$(t fx_op_scan 2>/dev/null)"; [ -n "$v" ] && scan="$v"
+        v="$(t fx_op_radar 2>/dev/null)"; [ -n "$v" ] && radar="$v"
+    fi
+    if [ "$level" = "cinematic" ] && declare -F fx_glitch_line >/dev/null 2>&1; then
+        # نصّ ASCII خالص: fx_glitch_line يعمل على البايتات، فاللغة المحلية تُفسد الحروف
+        fx_glitch_line "RAQIB // OPERATION :: ${name}"
+    fi
+    fx_matrix_burst 3 54
+    [ "$level" != "light" ] && fx_radar_ping "$radar"
+    fx_tool_launch "${scan} · ${name}"
+}
+export -f fx_ops_header
+
+# خاتمة العملية: نبضة رادار قصيرة + زمن التنفيذ ورمز الخروج
+fx_ops_footer() {
+    local name="$1" rc="${2:-0}" secs="${3:-}"
+    local level
+    raqib_fx_level_cache 2>/dev/null || true
+    level="${_RAQIB_FX_LEVEL:-none}"
+    [ "$level" = "none" ] && return 0
+    local done_label="OPERATION COMPLETE" v
+    if declare -F t >/dev/null 2>&1; then
+        v="$(t fx_op_complete 2>/dev/null)"; [ -n "$v" ] && done_label="$v"
+    fi
+    local color="$GREEN" mark="◉"
+    if [ "$rc" != "0" ]; then color="$ORANGE"; mark="◈"; fi
+    local suffix="" detail
+    [ -n "$secs" ] && suffix=" · ${secs}s"
+    detail="${done_label} · ${name}${suffix}"
+    if [ "$level" = "light" ]; then
+        printf "  %s%s%s %s%s%s\n" "$color" "$mark" "$NC" "$GREY" "$detail" "$NC"
+        return 0
+    fi
+    local -a frames=( "◜" "◝" )
+    [ "$level" = "cinematic" ] && frames=( "◜" "◝" "◞" "◟" )
+    local f
+    for f in "${frames[@]}"; do
+        printf "\r\033[K  %s%s%s %s%s%s%s" "$color" "$f" "$NC" "$GREY" "$done_label" "$suffix" "$NC"
+        raqib_fx_sleep 0.045
+    done
+    printf "\r\033[K  %s%s%s %s%s%s\n" "$color" "$mark" "$NC" "$GREY" "$detail" "$NC"
+}
+export -f fx_ops_footer
 
 # ضمان توفر دوال التاريخ والترجمة متزامنة في كل أداة أو تقرير
 _COMMON_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -722,8 +886,11 @@ show_tool_list() {
 run_tool() {
     local script="$1"
     shift || true
+    local tool_name _t0 _rc=0
+    tool_name="$(basename "$script")"
     echo ""
-    fx_tool_launch "$(basename "$script")" 2>/dev/null || true
+    fx_ops_header "$tool_name" 2>/dev/null || true
+    _t0=$SECONDS
     if [ ! -x "$script" ]; then chmod +x "$script"; fi
     case "$script" in
         *.py)
@@ -731,9 +898,11 @@ run_tool() {
             # مسارات ويندوز الأصلية عند الحاجة) بدل source.
             if ! command -v python3 >/dev/null 2>&1; then
                 echo -e "${RED}$(raqib_tr pt_python_missing "بايثون 3 مطلوب لهذه الأداة لكنه غير متوفر." "Python 3 is required for this tool but was not found.")${NC}"
-                return 1
+                _rc=1
+            else
+                ( python3 "$script" "$@" )
+                _rc=$?
             fi
-            ( python3 "$script" "$@" )
             ;;
         *)
             # Run in a subshell (not a fresh `bash` process) so that the t()/tf()
@@ -741,8 +910,11 @@ run_tool() {
             # be exported to a brand-new bash process) remain available to the tool.
             # `exit` inside a ( ... ) subshell only ends the subshell, not the menu.
             ( source "$script" )
+            _rc=$?
             ;;
     esac
+    fx_ops_footer "$tool_name" "$_rc" "$((SECONDS - _t0))" 2>/dev/null || true
+    return "$_rc"
 }
 
 # يبحث عن ملف auth log القياسي، وإذا ما لقاه يطلبه من المستخدم.

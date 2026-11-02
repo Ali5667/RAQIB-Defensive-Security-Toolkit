@@ -2,7 +2,7 @@
 # ============================================================================
 #  RAQIB Defensive Security Toolkit — Language File
 #  Language: Deutsch (German) [de]
-#  Total Keys: 692
+#  Total Keys: 712
 # ============================================================================
 
 declare -g -A STR_DE 2>/dev/null || declare -A STR_DE 2>/dev/null || true
@@ -60,6 +60,26 @@ STR_DE[c_summary_title]="Zusammenfassung"
 STR_DE[c_updated]="Aktualisiert."
 STR_DE[c_value_must_be_number]="Der Wert muss eine Zahl sein."
 STR_DE[cat1]="🛰️  Netzwerküberwachung"
+STR_DE[cat10]="🌐  Sprache ändern"
+STR_DE[cat11]="⚠️  Bekannte Einschränkungen"
+STR_DE[cat12]="🔄  Auf Updates prüfen"
+STR_DE[cat13]="⏰  Live-Verteidigungsuhr und Telemetrie"
+STR_DE[cat8]="🏴  CTF-/Wargames-Modus"
+STR_DE[cat9]="📜  Scan-Verlauf anzeigen"
+STR_DE[fx_op_complete]="VORGANG ABGESCHLOSSEN"
+STR_DE[fx_op_radar]="UMFELDRADAR"
+STR_DE[fx_op_scan]="VORGANG"
+STR_DE[lbl_author]="Autor"
+STR_DE[lbl_date]="Datum"
+STR_DE[lbl_hijri]="Hidschra"
+STR_DE[lbl_operator]="Bediener"
+STR_DE[lbl_platform]="Plattform"
+STR_DE[lbl_siem]="SIEM"
+STR_DE[lbl_status]="VERTEIDIGUNGSNETZ ONLINE"
+STR_DE[lbl_tagline]="Bash-Toolkit für schnelle Audits und Incident-Response"
+STR_DE[lbl_updated]="Aktualisiert"
+STR_DE[menu_choice_range]="Auswahl [0-13]: "
+STR_DE[menu_exit]="🚪  RAQIB beenden"
 STR_DE[cat2]="📋  Log-Analyse"
 STR_DE[cat3]="🚨  Angriffs- und Bedrohungserkennung"
 STR_DE[cat4]="🦠  Analyse verdächtiger Dateien"
